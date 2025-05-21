@@ -1,0 +1,42 @@
+/* Passes in different Tailwind directives */
+/* 
+ * The order should be: base, components, then utilities.
+ * - The base layer defines Tailwind’s default CSS behavior and resets.
+ * - The components layer builds on base styles with reusable component classes.
+ * - The utilities layer contains low-level classes that can override styles in the other two layers.
+ */
+
+
+/* 
+ * Base Layer of Tailwind
+ *
+ * - Normalizes styling across different browsers (via Preflight).
+ * - Adds sensible defaults to elements like headers, paragraphs, and buttons.
+ * - Sets default font sizes and box-sizing (which affects how element dimensions are calculated).
+ *
+ * => Ensures consistent styling across browsers.
+ */
+ @tailwind base;
+
+
+ /* 
+  * Components Layer of Tailwind
+  *
+  * - Defines reusable component styles.
+  * - Includes Tailwind’s built-in components and your custom ones using "@layer components { ... }".
+  *
+  * => Makes UI patterns reusable and keeps class names meaningful.
+  */
+ @tailwind components;
+ 
+ 
+ /* 
+  * Utilities Layer of Tailwind
+  *
+  * - Includes Tailwind’s utility-first classes like p-4, text-center, bg-blue-500, etc.
+  * - These classes apply single-purpose styles.
+  *
+  * => Enables fast, inline styling without writing custom CSS.
+  */
+ @tailwind utilities;
+ 
