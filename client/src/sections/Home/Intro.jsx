@@ -16,14 +16,14 @@ export default function Intro(){
               * 
               * flex sets the layout and children elements as a flexbox
               * max-w-5xl sets the max width of the context wrapper to extra large x5
-              * w-full allows the element to use up to the full parent width or the max width even if the content requires smallermwidth
+              * w-full allows the element to use up to the full parent width or the max width even if the content requires smaller width
               * gap-10 sets a gap for every children in the both direction of the flex (default to horizontal here). 10 * 0.25rem = 4rem
               * flex-[1] sets flex-grow = 1 (allows item to fill in available space), flex-shrink = 1 (allows item to shrink), flex-basis = 0% (start with a base size of 0%)
               * 
             */}
             <img 
                 src="/path/to/image.jpg"
-                alt="Profile"
+                alt="Intro"
                 className="w-96 h-96 rounded-full object-cover shadow-2xl flex-shrink-0" 
             />
             {/* Img Element: Circular element that holds the profile image

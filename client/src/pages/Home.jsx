@@ -1,7 +1,8 @@
 // Imports
 import React from 'react';                              // Imports React to make React components
-import Header from "../components/Header";              // Imports the Header component from the path ../components/Header
-import Intro from "../sections/Home/Intro";             // Imports the Intro component from the path ../sections/Home/Intro
+import Header from "../components/Header";              // Imports the Header component from the path ../components/Header.jsx
+import Intro from "../sections/Home/Intro";             // Imports the Intro component from the path ../sections/Home/Intro.jsx
+import Projects from '../sections/Home/Projects';       // Imports the Project component from the path ../sections/Home/Projects.jsx
 
 /* Defines the Home component
  *
@@ -26,8 +27,11 @@ export default function Home(){
           * overflow-y-auto shows scrollbar if children overflow. Otherwise, no scrollbar
           *  
           */}
-          <section className='h-screen flex items-center justify-center px-6'>
+          <section className='h-screen flex items-center justify-center px-6 shadow-2xl'>
               <Intro/>
+          </section>
+          <section className='h-screen flex items-center justify-center px-6 shadow-2xl'>
+              <Projects/>
           </section>
             {/* Section: Content Wrapper for each section. Section is used to group similar content together
               * 
