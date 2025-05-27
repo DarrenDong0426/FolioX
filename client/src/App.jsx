@@ -1,9 +1,10 @@
 // Imports
 import React from 'react';                        // Import React to enable creation of React components                          
 import { 
-  BrowserRouter, Routes, Route                   // Import React Router components for client-side routing
+  BrowserRouter, Routes, Route                    // Import React Router components for client-side routing
 } from 'react-router-dom';
 import Home from './pages/Home';                  // Import custom "Home" component from ./pages/Home
+import Projects from './pages/Projects';          // Import custom "Projects" component from ./pages/Projects
 
 /* Defines the App component
  *
@@ -17,9 +18,10 @@ import Home from './pages/Home';                  // Import custom "Home" compon
  */
 export default function App() {
   return (
-    <BrowserRouter>                               {/* Enables browser history API for routing and navigation */}         
-      <Routes>                                    {/* Container for all Route components */} 
-        <Route path="/" element={<Home />} />     {/* Maps the root path "/" to render the Home component */}
+    <BrowserRouter>                                           {/* Enables browser history API for routing and navigation */}         
+      <Routes>                                                {/* Container for all Route components */} 
+        <Route path="/" element={<Home />} />                 {/* Maps the root path "/" to render the Home component */}
+        <Route path="/Projects" element={<Projects />} />     {/* Maps the path "/Projects" to render the Projects component */}
       </Routes>
     </BrowserRouter>
   );

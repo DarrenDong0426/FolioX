@@ -1,6 +1,6 @@
 // Imports 
-import React from "react";                                          // Imports React to create React component
-import wordCloud from "../../assets/images/project_word_cloud.png";    // Imports wordCloud image from path ../assets/images/project_word_cloud.png
+import React from "react";                                              // Imports React to create React component
+import wordCloud from "../../assets/images/project_word_cloud.png";     // Imports wordCloud image from path ../assets/images/project_word_cloud.png
 import { Link } from "react-router-dom";
 
 /* Defines the Project component
