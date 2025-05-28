@@ -1,6 +1,7 @@
 // Imports
 import React from 'react';                              // Imports React to make React components
 import Header from "../components/Header";              // Imports the Header component from the path ../components/Header.jsx
+import ProjectsList from '../sections/Projects/ProjectsList';   // Import Projects component from the path ../sections/Projects/Projects.jsx
 
 /* Defines the Project page component
  *
@@ -28,7 +29,8 @@ export default function Projects(){
           * overflow-y-auto shows scrollbar if children overflow. Otherwise, no scrollbar
           *  
           */}
-        
+        <h1 className='text-4xl font-bold mb-4 mt-4 text-center'>List of Projects</h1>
+        <ProjectsList/>
       </main>
     </div>
   );

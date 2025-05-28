@@ -23,7 +23,7 @@ export default function Projects(){
                     Due to academic integrity policies, some projects are restricted and cannot be accessed directly. Attempting to view the source code or specification for these protected projects will prompt a passcode request. Passcodes are granted on a case-by-case basis and require users to contact the project owner (me) with a valid reason and assurance that no honor code violations will occur. These passcodes are time-sensitive and may expire; if so, a new request will be required.
                 </p>
                 <p className="mb-4">
-                    <Link to="/" className=" font-bold text-blue-600 hover:text-red-600">
+                    <Link to="/Projects" className=" font-bold text-blue-600 hover:text-red-600">
                         View Projects
                     </Link>
                 </p>
