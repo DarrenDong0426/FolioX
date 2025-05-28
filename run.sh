@@ -10,11 +10,12 @@ NPM_PID=$!
 
 # Define a cleanup function to kill background processes
 cleanup() {
-  echo "Caught SIGINT, stopping servers..."
-  kill $FLASK_PID
-  kill $NPM_PID
+  echo "Caught signal, stopping servers..."
+  kill -TERM $FLASK_PID $NPM_PID 2>/dev/null
+  wait $FLASK_PID $NPM_PID
   exit 0
 }
+
 
 # Trap SIGINT (Ctrl+C) and call cleanup
 trap cleanup SIGINT SIGTSTP
