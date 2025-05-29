@@ -30,7 +30,7 @@ def hardcode_projects_database(app):
                                     lock=True, wip=False, month_year=date(2022, 10, 19), language=["C++"], type=["Software"])
         eecs280_p5_ml = Projects(name="Programming and Intro Data Structures (EECS 280): Machine Learning", desc="""Piazza label classifier using bag of word model of a post. 
                                                                                                                 The classification method is using bayesian probability to calculate the log probability of each label given the bag of words model of a post.""",
-                                lock=True, wip=False, month_year=date(2022, 11, 18), language=["C++"], type=["Software"])
+                                lock=True, wip=False, month_year=date(2022, 11, 18), language=["C++"], type=["Software", "AI/ML"])
         eecs281_p1_back_to_the_ship = Projects(name="Data Structures and Algorithms (EECS 281): Back to the Ship!", desc="""Path finding algorithm from a given location to an exit of a 3D maze using Breadth-Fist Search and Depth-First Search. 
                                                                                                                         The scenario is a space station composed of ten levels. An agent can only move horitonally and vertically on a 2d grid and move to another level through the elevator at that level, which brings the agent to the same coordinate at adjacent levels.""",
                                         lock=True, wip=False, month_year=date(2023, 1, 13), language=["C++"], type=["Software"])
@@ -92,7 +92,7 @@ def hardcode_projects_database(app):
                                                                                             To minimize disk movement and memory, swap-backed pages are shared if data is the same among multiple processes and are allocated its own when a write occurs. The eviction algorithm used to move from physical memory is clock page replacement algorithm.
                                                                                             The pager should support functions such as vm_map, vm_yield, vm_switch, vm_destroy and forking from an existing process.""", 
                             lock=True, wip=False, month_year=date(2025, 3, 26), language=["C++"], type=["Software"])
-        eecs482_p4_file_system = Projects(name="Intro to Operating Systems (EECS 482): Network Operating System", desc="""A network file system with processes requesting read, write, create, and deleting operations on a file. Multiple processes are able to send requests to the server process using socket programming. 
+        eecs482_p4_file_system = Projects(name="Intro to Operating Systems (EECS 482): Network File System", desc="""A network file system with processes requesting read, write, create, and deleting operations on a file. Multiple processes are able to send requests to the server process using socket programming. 
                                                                                                                     Files can only be read and write to through slow disk reads and disk writes. Directories and files can only be destroyed or created under another directory. The root directory, set at inode 0, is accessible by everyone while other directories and files can only be accessed by the owner (the creator). 
                                                                                                                     On initialization prior to receiving request, the server process does a walk to check for existing file system which can be passed in as input to initialize existing inodes. 
                                                                                                                     Reader and writer locks are used to maintain concurrency such that every request results in correctness and consistency. Upgradable locks are further used to manage even more concurrency.
@@ -136,10 +136,10 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False                        # Disables SQLAlechemy's event tracking that emits signal for changes in the db
     projects_db.init_app(app)                                                   # Binds the SQLAlechemy to the Flask Object
 
-    # hardcode_projects_database(app)                                           # Code to reset database (TODO: binarize this later)
+    hardcode_projects_database(app)                                           # Code to reset database (TODO: binarize this later)
 
     # Register Blueprints       
-    from .routes import projects_bp                                             # Import blueprint for projects table
-    app.register_blueprint(projects_bp, url_prefix="/api")                      # Access projects table via /api/projects
+    from .routes import projects_bp                                             # Import blueprint for projects route
+    app.register_blueprint(projects_bp)                                         # Access the projects route
 
     return app                                                                  # Return app

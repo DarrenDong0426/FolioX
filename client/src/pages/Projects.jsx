@@ -1,8 +1,7 @@
 // Imports
-import React from 'react';                              // Imports React to make React components
-import Header from "../components/Header";              // Imports the Header component from the path ../components/Header.jsx
+import React from 'react';                                      // Imports React to make React components
+import Header from "../components/Header";                      // Imports the Header component from the path ../components/Header.jsx
 import ProjectsList from '../sections/Projects/ProjectsList';   // Import Projects component from the path ../sections/Projects/Projects.jsx
-
 
 
 /* Defines the Project page component
