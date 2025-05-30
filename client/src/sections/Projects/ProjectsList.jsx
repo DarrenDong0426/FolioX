@@ -2,6 +2,7 @@ import React from 'react';                              // Imports React to make
 import getProjects from '../../hooks/getProjects';      // Import getProjects API hook 
 import Tag from '../../components/Tag';                 // Import Tag component from path ../../components/Tag
 import Pagination from '../../components/Pagination';   // Import Pagination component from path ../../components/Pagination
+import Controls from './Controls';
 
 
 /* Defines the ProjectsList section component
@@ -11,7 +12,7 @@ import Pagination from '../../components/Pagination';   // Import Pagination com
  * 
 */
 export default function ProjectsList(){
-  const { projects, loading, error, pagination, currentPage, setCurrentPage, totalPage } = getProjects();   // Get projects, loading, and error state from getProjects()
+  const { projects, loading, error, currentPage, setCurrentPage, totalPage, query, setQuery, options, dropDown, setDropDown, isOpen, setIsOpen } = getProjects();   // Get projects, loading, and error state from getProjects()
 
   if (loading){                                                           // If loading (no error and fetching daa)
     return (
@@ -43,6 +44,16 @@ export default function ProjectsList(){
 
   return (                                                              // If data successfully retrieved, list out each project with map()
    <>
+    <Controls
+      query={query}
+      setQuery={setQuery}
+      setCurrentPage={setCurrentPage}
+      options={options}
+      dropDown={dropDown}
+      setDropDown={setDropDown}
+      isOpen={isOpen}
+      setIsOpen={setIsOpen}
+    />
     <ul className='px-4 max-w-7xl mx-auto'>
         {/* ul: Unordered list for each project
           *

@@ -13,6 +13,7 @@ cleanup() {
   echo "Caught signal, stopping servers..."
   kill -TERM $FLASK_PID $NPM_PID 2>/dev/null
   wait $FLASK_PID $NPM_PID
+  echo "ALL PROCESSES ENDED"
   exit 0
 }
 

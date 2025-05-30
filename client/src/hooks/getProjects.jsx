@@ -10,20 +10,21 @@ const getProjects = () => {
     const [projects, setProjects] = useState([]);                                 // list of projects with useState hook
     const [loading, setLoading] = useState(true);                                 // loading flag with useState hook initialized to true
     const [error, setError] = useState(null);                                     // error flag with useState hook
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPage, setTotalPage] = useState(null);
-    const [pages, setPages] = useState([])
+    const [currentPage, setCurrentPage] = useState(1);                            // currentPage for pagination with useState hook    
+    const [totalPage, setTotalPage] = useState(null);                             // totalPage for pagination with useState hook
+    const [query, setQuery] = useState("")                                        // query for search bar with useState hook
+    const options = ["Most Recent", "Least Recent", "A-Z", "Z-A"]                 // Option list of dropdown menu
+    const [isOpen, setIsOpen] = useState(false)                                   // dropdown open flag initialized to false
+    const [dropDown, setDropDown] = useState("Most Recent")                       // dropDown value initialized to "Most Recent"
 
     useEffect(() => {                                                             // useEffect to call api projects
-      fetch(`http://localhost:9000/api/projects/?page=${currentPage}`)
+      fetch(`http://localhost:9000/api/projects/?page=${currentPage}&query=${query}&dropDown=${dropDown}`)
         .then(response => {
           if (!response.ok) throw new Error('Network response was not ok');       // Throw error if response unsuccessful             
           return response.json();                                                 // Return json response on success
         })
         .then(data => {
-          if (totalPage == null){
-            setTotalPage(Math.ceil(data.totalItems / 5));
-          }
+          setTotalPage(Math.ceil(data.totalItems / 5));
           setProjects(data.projects);                                             // set the projects as the json response 
           setLoading(false);                                                      // set loading to false
           window.scrollTo({ top: 0, behavior: 'smooth' });                        // Force to top of window on render
@@ -33,9 +34,9 @@ const getProjects = () => {
           setError(err);                                                          // set error flag
           setLoading(false);                                                      // set loading to false
         });
-    }, [currentPage]);                                                            // useEffect renders once per page
+    }, [currentPage, query, dropDown]);                                           // useEffect renders whenevers page, search query, or dropdown setting changes
   
-    return { projects, loading, error, currentPage, setCurrentPage, totalPage };  // Return projects, loading, and error state
+    return { projects, loading, error, currentPage, setCurrentPage, totalPage, query, setQuery, options, dropDown, setDropDown, isOpen, setIsOpen };  // Return projects, loading, and error state
   };
   
   export default getProjects;

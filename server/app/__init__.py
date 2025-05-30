@@ -136,7 +136,7 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False                        # Disables SQLAlechemy's event tracking that emits signal for changes in the db
     projects_db.init_app(app)                                                   # Binds the SQLAlechemy to the Flask Object
 
-    hardcode_projects_database(app)                                           # Code to reset database (TODO: binarize this later)
+    # hardcode_projects_database(app)                                           # Code to reset database (TODO: binarize this later)
 
     # Register Blueprints       
     from .routes import projects_bp                                             # Import blueprint for projects route
