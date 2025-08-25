@@ -1,7 +1,3 @@
-// Imports
-import React from "react";                                              // Import React to create react components
-
-
 /* Defines the Dropdown Component 
  *
  * Options param sets array of options that a user can choose from

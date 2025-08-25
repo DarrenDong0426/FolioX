@@ -1,7 +1,7 @@
 // Imports
-import React from 'react';                                      // Imports React to make React components
-import Header from "../components/Header";                      // Imports the Header component from the path ../components/Header.jsx
-import ProjectsList from '../sections/Projects/ProjectsList';   // Import Projects component from the path ../sections/Projects/Projects.jsx
+import Header from "../components/Header";                          // Imports the Header component from the path ../components/Header.jsx
+import ProjectsList from '../sections/Projects/ProjectsList';       // Import Projects component from the path ../sections/Projects/Projects.jsx
+import { ProjectListProvider } from '../hooks/projectListContext';  // Import ProjectListProvider from the path ../hooks/projectListContext.jsx
 
 
 /* Defines the Project page component
@@ -13,6 +13,7 @@ import ProjectsList from '../sections/Projects/ProjectsList';   // Import Projec
  */
 export default function Projects(){
   return (
+    
     <div className='min-h-screen flex flex-col bg-gray-50'>
       {/* Div: Content Wrapper over the entire home page
         *
@@ -42,7 +43,10 @@ export default function Projects(){
           * text-center puts the text in the center of the flex direction (horizontal here)
           *  
           */}
-        <ProjectsList/>
+        <ProjectListProvider>
+          {/* Wrap the ProjectsList component with ProjectListProvider to provide context */}
+          <ProjectsList/>
+        </ProjectListProvider>
       </main>
     </div>
   );

@@ -1,8 +1,8 @@
-import React from 'react';                              // Imports React to make React components
-import getProjects from '../../hooks/getProjects';      // Import getProjects API hook 
+// Imports
 import Tag from '../../components/Tag';                 // Import Tag component from path ../../components/Tag
 import Pagination from '../../components/Pagination';   // Import Pagination component from path ../../components/Pagination
-import Controls from './Controls';
+import Controls from './Controls';                      // Import Controls component from path ./Controls
+import { useProjects } from '../../hooks/projectListContext';   // Import useProjects hook from path ../../hooks/projectListContext
 
 
 /* Defines the ProjectsList section component
@@ -12,7 +12,11 @@ import Controls from './Controls';
  * 
 */
 export default function ProjectsList(){
-  const { projects, loading, error, currentPage, setCurrentPage, totalPage, query, setQuery, options, dropDown, setDropDown, isOpen, setIsOpen } = getProjects();   // Get projects, loading, and error state from getProjects()
+  const { 
+    projects, loading, error, 
+    currentPage, setCurrentPage, 
+    totalPage
+  } = useProjects();                                                      // Get projects, loading, error state, and pagination data from useProjects() from from projectListContext 
 
   if (loading){                                                           // If loading (no error and fetching daa)
     return (
@@ -44,16 +48,7 @@ export default function ProjectsList(){
 
   return (                                                              // If data successfully retrieved, list out each project with map()
    <>
-    <Controls
-      query={query}
-      setQuery={setQuery}
-      setCurrentPage={setCurrentPage}
-      options={options}
-      dropDown={dropDown}
-      setDropDown={setDropDown}
-      isOpen={isOpen}
-      setIsOpen={setIsOpen}
-    />
+    <Controls/>
     <ul className='px-4 max-w-7xl mx-auto'>
         {/* ul: Unordered list for each project
           *

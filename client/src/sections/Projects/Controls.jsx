@@ -1,6 +1,7 @@
-import React from 'react';
-import Dropdown from '../../components/Dropdown';
-import SearchBar from '../../components/SearchBar';
+// Imports
+import Dropdown from '../../components/Dropdown';               // Import Dropdown component from path ../../components/Dropdown
+import SearchBar from '../../components/SearchBar';             // Import SearchBar component from path ../../components/SearchBar  
+import { useProjects } from '../../hooks/projectListContext';   // Import useProjects hook from path ../../hooks/projectListContext
 
 /* Defines the Controls section component
  *
@@ -9,12 +10,11 @@ import SearchBar from '../../components/SearchBar';
  * Calls the filter option component
  * 
 */
-export default function Controls({
-  query, setQuery,
-  setCurrentPage,
-  options, dropDown, setDropDown,
-  isOpen, setIsOpen
-}) {
+export default function Controls() {
+
+  // Get query, pagination, and dropdown states from useProjects 
+  const { query, setQuery, setCurrentPage, options, dropDown, setDropDown, isOpen, setIsOpen } = useProjects();
+
   return (
     <div className="flex flex-wrap items-center justify-between w-full max-w-4xl mx-auto mb-6 gap-4 px-4">
         {/* Div: Context wrapper for control section of Projects page
@@ -50,6 +50,7 @@ export default function Controls({
           isOpen={isOpen}
           setIsOpen={setIsOpen}
         />
+        
     </div>
   );
 }

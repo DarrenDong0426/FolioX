@@ -1,7 +1,3 @@
-// Imports
-import React from "react";                                          // Import React to make react components
-
-
 /* Defines the SearchBar Component
  *
  * SearchBar with query
