@@ -1,16 +1,4 @@
-// import { useFilters } from "./FilterContext";
-
 // export default function FilterSidebar() {
-//   const { filters, setFilters } = useFilters();
-
-//   const toggleCategory = (cat) => {
-//     setFilters((prev) => ({
-//       ...prev,
-//       category: prev.category.includes(cat)
-//         ? prev.category.filter((c) => c !== cat)
-//         : [...prev.category, cat],
-//     }));
-//   };
 
 //   return (
 //     <aside className="w-64 bg-gray-100 p-4">

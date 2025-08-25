@@ -1,5 +1,5 @@
 // Imports 
-import React from "react";                                  // Imports React to create React component
+import profilePic from '../../assets/images/darren.jpg';  // Import profile picture from path ../../assets/profile.jpg   
 
 /* Defines the Intro component
  *
@@ -22,7 +22,7 @@ export default function Intro(){
               * 
             */}
             <img 
-                src="/path/to/image.jpg"
+                src={profilePic}
                 alt="Intro"
                 className="w-96 h-96 rounded-full object-cover shadow-2xl flex-shrink-0" 
             />
