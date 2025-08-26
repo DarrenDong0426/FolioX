@@ -16,6 +16,8 @@ const getProjects = () => {
     const options = ["Most Recent", "Least Recent", "A-Z", "Z-A"]                 // Option list of dropdown menu
     const [isOpen, setIsOpen] = useState(false)                                   // dropdown open flag initialized to false
     const [dropDown, setDropDown] = useState("Most Recent")                       // dropDown value initialized to "Most Recent"
+    const [filters, setFilters] = useState({category: []});                       // filters state for categories with useState hook initialized to empty array
+    const [filterOpen, setFilterOpen] = useState(false);                          // filter open flag initialized to false
 
     useEffect(() => {                                                             // useEffect to call api projects
       fetch(`http://localhost:9000/api/projects/?page=${currentPage}&query=${query}&dropDown=${dropDown}`)
@@ -36,7 +38,7 @@ const getProjects = () => {
         });
     }, [currentPage, query, dropDown]);                                           // useEffect renders whenevers page, search query, or dropdown setting changes
   
-    return { projects, loading, error, currentPage, setCurrentPage, totalPage, query, setQuery, options, dropDown, setDropDown, isOpen, setIsOpen };  // Return projects, loading, and error state
+    return { projects, loading, error, currentPage, setCurrentPage, totalPage, query, setQuery, options, dropDown, setDropDown, isOpen, setIsOpen, filters, setFilters, filterOpen, setFilterOpen };  // Return projects, loading, and error state
   };
   
   export default getProjects;

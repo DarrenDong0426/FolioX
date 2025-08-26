@@ -1,5 +1,6 @@
 // Imports
 import Dropdown from '../../components/Dropdown';               // Import Dropdown component from path ../../components/Dropdown
+import FilterSidebar from '../../components/FilterSidebar';
 import SearchBar from '../../components/SearchBar';             // Import SearchBar component from path ../../components/SearchBar  
 import { useProjects } from '../../hooks/projectListContext';   // Import useProjects hook from path ../../hooks/projectListContext
 
@@ -13,7 +14,7 @@ import { useProjects } from '../../hooks/projectListContext';   // Import usePro
 export default function Controls() {
 
   // Get query, pagination, and dropdown states from useProjects 
-  const { query, setQuery, setCurrentPage, options, dropDown, setDropDown, isOpen, setIsOpen } = useProjects();
+  const { query, setQuery, setCurrentPage, options, dropDown, setDropDown, isOpen, setIsOpen, filters, setFilters, filterOpen, setFilterOpen } = useProjects();
 
   return (
     <div className="flex flex-wrap items-center justify-between w-full max-w-4xl mx-auto mb-6 gap-4 px-4">
@@ -50,7 +51,12 @@ export default function Controls() {
           isOpen={isOpen}
           setIsOpen={setIsOpen}
         />
-        
+        <FilterSidebar 
+          filters={filters}
+          setFilters={setFilters}
+          filterOpen={filterOpen}
+          setFilterOpen={setFilterOpen}
+        />
     </div>
   );
 }
