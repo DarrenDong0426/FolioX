@@ -3,6 +3,7 @@ import React from 'react';                              // Imports React to make
 import Header from "../components/Header";              // Imports the Header component from the path ../components/Header.jsx
 import Intro from "../sections/Home/Intro";             // Imports the Intro component from the path ../sections/Home/Intro.jsx
 import Projects from '../sections/Home/Projects';       // Imports the Project component from the path ../sections/Home/Projects.jsx
+import Documents from '../sections/Home/Documents';     // Imports the Documents component from the path ../sections/Home/Documents.jsx
 
 /* Defines the Home component
  *
@@ -32,6 +33,18 @@ export default function Home(){
           </section>
           <section className='h-screen flex items-center justify-center px-6 shadow-2xl'>
               <Projects/>
+          </section>
+            {/* Section: Content Wrapper for each section. Section is used to group similar content together
+              * 
+              * h-screen sets the height of the element to be the size of the screen
+              * flex sets the format to be in flexbox
+              * items-center aligns items to the center in the direction perpendicular to the flex direction (flex direction is horizontal here)
+              * justify-center aligns items to the center in the direction parallel to the flex direction (flex direction is horizontal here)
+              * px-6 applies horizontal padding to both sides. 6 * 0.25rem = 1.5rem 
+              *   
+              */}
+          <section className='h-screen flex items-center justify-center px-6 shadow-2xl'>
+              <Documents/>
           </section>
             {/* Section: Content Wrapper for each section. Section is used to group similar content together
               * 

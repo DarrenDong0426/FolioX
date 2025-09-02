@@ -47,7 +47,7 @@ export default function Header() {
 
             <nav className="space-x-4">
                 <Link to="/Projects" className="text-gray-600 hover:text-blue-500">Projects</Link>
-                <Link to="/Resume" className="text-gray-600 hover:text-blue-500">Resume</Link>
+                <Link to="/Documents" className="text-gray-600 hover:text-blue-500">Documents</Link>
                 <Link to="/Highlights" className="text-gray-600 hover:text-blue-500">Highlights</Link>
                 <Link to="/FAQs" className="text-gray-600 hover:text-blue-500">FAQs</Link>
                 <Link to="/Changelog" className="text-gray-600 hover:text-blue-500">Changelog</Link>
