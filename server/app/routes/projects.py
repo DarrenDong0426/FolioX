@@ -12,28 +12,32 @@ def get_projects():
     page = request.args.get("page", 1, type=int)                              # Get page from query if exist or set to 1 if not
     query = request.args.get("query", "", type=str).strip().split()           # Get query from query if exist or set to empty str if not
     dropdown = request.args.get("dropDown", "Most Recent", type=str)          # Get dropdown setting if exist or set to "Most Recent" if not
-
-    filters = request.args.get("filters", "", type=str).strip().split(",") 
+    filters = request.args.get("filters", "", type=str).strip().split(",")    # Get a list of filters if exist or a set of empty string if not
 
     words = []                                                                # Get list of words from description  
     for word in query:  
         words.append(Projects.name.ilike(f"%{word}%"))                        # Add rows of projects where the name contains a word from query
         words.append(Projects.desc.ilike(f"%{word}%"))                        # Add rows of projects where the desc contains a word from query
     
-    if filters != ['']:
-        language_conditions = []
-        type_conditions = []
-        for f in filters:
-            language_conditions.extend([
-                Projects.language == f'["{f}"]',
-                Projects.language.like(f'["{f}",%'),
+    if filters != ['']:                                                       # If filters is not an a set of empty string
+        language_conditions = []                                              # Array to store projects that matches language criteria
+        type_conditions = []                                                  # Array to store project that matches type critieria
+        for f in filters:                                                     # Iterate through each filter value
+            language_conditions.extend([                                      # Add to language array if any of the following match
+                Projects.language == f'["{f}"]',                              # Language is stored as a JSON in database (a string s = '[item1, item2, ...]')
+                Projects.language.like(f'["{f}",%'),                          # Parses language JSON based on singular item ([] on both side), first item ([item, ]), last item ([, item]), or middle item ([, item])
                 Projects.language.like(f'%, "{f}"]'),
                 Projects.language.like(f'%, "{f}",%')
+            ])                                          
+            type_conditions.extend([                                          # Same logic applied here to project type critieria   
+                Projects.type == f'["{f}"]',                              
+                Projects.type.like(f'["{f}",%'),                         
+                Projects.type.like(f'%, "{f}"]'),
+                Projects.type.like(f'%, "{f}",%')
             ])
-            type_conditions.append(Projects.type.like(f'%"{f}"%'))
-        filter_condition = or_(*language_conditions, *type_conditions)
+        filter_condition = or_(*language_conditions, *type_conditions)        # Take the or of both types so projects in either array are accepted
     else:
-        filter_condition = True
+        filter_condition = True                                               # If filter is empty, return true so all projects are accepted
 
 
     if (dropdown == "Least Recent"):
