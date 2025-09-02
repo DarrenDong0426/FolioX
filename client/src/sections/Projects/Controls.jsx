@@ -1,6 +1,6 @@
 // Imports
 import Dropdown from '../../components/Dropdown';               // Import Dropdown component from path ../../components/Dropdown
-import FilterSidebar from '../../components/FilterSidebar';
+import Filter from '../../components/Filter';
 import SearchBar from '../../components/SearchBar';             // Import SearchBar component from path ../../components/SearchBar  
 import { useProjects } from '../../hooks/projectListContext';   // Import useProjects hook from path ../../hooks/projectListContext
 
@@ -35,7 +35,7 @@ export default function Controls() {
       <div className="flex-1">
         {/* Div: Context wrapper over the search bar 
           * 
-          * flex-1 allows childnre components to take all extra space
+          * flex-1 allows children components to take all extra space
           * 
         */}
         <SearchBar
@@ -51,7 +51,7 @@ export default function Controls() {
           isOpen={isOpen}
           setIsOpen={setIsOpen}
         />
-        <FilterSidebar 
+        <Filter 
           filters={filters}
           setFilters={setFilters}
           filterOpen={filterOpen}
