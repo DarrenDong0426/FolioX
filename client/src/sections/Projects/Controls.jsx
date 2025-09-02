@@ -15,6 +15,23 @@ export default function Controls() {
 
   // Get query, pagination, and dropdown states from useProjects 
   const { query, setQuery, setCurrentPage, options, dropDown, setDropDown, isOpen, setIsOpen, filters, setFilters, filterOpen, setFilterOpen } = useProjects();
+  
+  // Define the sections and options for each section for the filter
+  const filterSections = [
+      {
+        title: "Project Category",
+        type: "type",
+        options: ["AI/ML", "Hardware", "Software"],
+      },
+      {
+        title: "Languages",
+        type: "language",
+        options: [
+          "C", "C++", "CSS", "Dart", "HTML", 
+          "Java", "JavaScript", "Python", "Shell"
+        ],
+      },
+    ];
 
   return (
     <div className="flex flex-wrap items-center justify-between w-full max-w-4xl mx-auto mb-6 gap-4 px-4">
@@ -56,6 +73,7 @@ export default function Controls() {
           setFilters={setFilters}
           filterOpen={filterOpen}
           setFilterOpen={setFilterOpen}
+          filterSections={filterSections}
         />
     </div>
   );

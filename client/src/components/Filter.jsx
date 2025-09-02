@@ -10,7 +10,7 @@ import Tag from './Tag';                                                // Impor
  * setFilterOpen param modifies the filterOpen state when on hover
  *  
 */
-export default function Filter( {filters, setFilters, filterOpen, setFilterOpen }) {
+export default function Filter( {filters, setFilters, filterOpen, setFilterOpen, filterSections }) {
 
     {/* Toggle Category function
         *   
@@ -33,8 +33,9 @@ export default function Filter( {filters, setFilters, filterOpen, setFilterOpen 
   return (
     <div 
       onMouseEnter={() => setFilterOpen(true)}
-      onMouseLeave={() => setFilterOpen(false)}>
-        {/* Div: Context wrapper over entire filter component
+      onMouseLeave={() => setFilterOpen(false)}
+    >
+      {/* Div: Context wrapper over entire filter component
           * 
           * onMouseEnter calls the setFilterOpen function to open the filter menu on hover
           * onMouseLeave calls the setFilterOpen function to close the filter menu when not hover
@@ -44,8 +45,8 @@ export default function Filter( {filters, setFilters, filterOpen, setFilterOpen 
         src={filterIcon}
         alt="Filter Icon"
         className="w-6 h-6 cursor-pointer"
-        />
-        {/* Img: filter icon image
+      />
+      {/* Img: filter icon image
           * 
           * w-6 sets the width of the image to 0.25rem * 6 = 1.5rem
           * h-6 sets the height of the image to 0.25rem * 6 = 1.5rem
@@ -54,11 +55,11 @@ export default function Filter( {filters, setFilters, filterOpen, setFilterOpen 
         */}
       {filterOpen && (
         <div
-            className="absolute w-1/6 bg-white border border-gray-200 rounded shadow-lg z-10 flex flex-col p-3"
-            role="menu"
-            aria-orientation="vertical"
-            aria-labelledby="options-menu"
-          >
+          className="absolute w-1/6 bg-white border border-gray-200 rounded shadow-lg z-10 flex flex-col p-3"
+          role="menu"
+          aria-orientation="vertical"
+          aria-labelledby="options-menu"
+        >
           {/* Div: Context wrapper over the filter menu if filterOpen is true
             * 
             * absolute sets the position to be asolute relatied to the nearested positioned ancestor
@@ -77,15 +78,19 @@ export default function Filter( {filters, setFilters, filterOpen, setFilterOpen 
             * aria-labelledby="options-menu" associates the menu with a label for accessibility
             * 
           */}
-          <div className="flex flex-col space-y-2">
+          {filterSections.map((section, idx) => (
+            <div key={idx} className="flex flex-col mt-4 first:mt-0">
               {/* Div: Context wrapper over different sections of the filter menu
                 * 
                 * flex sets the format as flexbox for children components
                 * flex-col sets the flex direction to column so children item stack vertically
-                * space-y-2 adds a vertical space of 0.25rem * 2 = 0.5rem between children components
+                * mt-4 adds a top margin of 4 * 0.25rem = 1rem
+                * first:mt-0 makes the first item in the map to have a top margin of 0rem
                 * 
               */}
-              <span className="font-semibold mb-1 w-full text-center border-b border-gray-300">Project Category</span>
+              <span className="font-semibold mb-1 w-full text-center border-b border-gray-300">
+                {section.title}
+              </span>
               {/* Span: Title for the project category section (same format for language section below)
                 * 
                 * font-semibold sets the font weight to semibold
@@ -96,7 +101,8 @@ export default function Filter( {filters, setFilters, filterOpen, setFilterOpen 
                 * border-gray-300 sets the border color to gray-300
                 * 
               */}
-              <div className='flex flex-wrap gap-2'>
+              {/* Section options */}
+              <div className="flex flex-wrap gap-2">
                 {/* Div: Context wrapper over the different category options
                   * 
                   * flex sets the format as flexbox for children components
@@ -104,138 +110,26 @@ export default function Filter( {filters, setFilters, filterOpen, setFilterOpen 
                   * gap-2 adds a gap of 0.25rem * 2 = 0.5rem in all directions between children components
                   * 
                 */}
-                <label className='flex items-center space-x-2"'>
-                  {/* Label: Context wrapper over each category option (same format for all options)
-                    * 
-                    * flex sets the format as flexbox for children components
-                    * items-center aligns children item perpendicular to the axis (vertical here)
-                    * space-x-2 adds a horizontal space of 0.25rem * 2 = 0.5rem between children components
-                    * 
-                  */}
-                  <input
-                    type="checkbox"
-                    checked={filters.category.includes("AI/ML")}
-                    onChange={() => toggleCategory("AI/ML")}
+                {section.options.map((option) => (
+                  <label key={option} className="flex items-center space-x-2">
+                    {/* Label: Context wrapper over each category option (same format for all options)
+                      * 
+                      * flex sets the format as flexbox for children components
+                      * items-center aligns children item perpendicular to the axis (vertical here)
+                      * space-x-2 adds a horizontal space of 0.25rem * 2 = 0.5rem between children components
+                      * 
+                    */}
+                    <input
+                      type="checkbox"
+                      checked={filters.category.includes(option)}
+                      onChange={() => toggleCategory(option)}
                     />
-                  {/* Input: checkbox for the category option (same format for all options)
-                    * 
-                    * type="checkbox" sets the input type to checkbox
-                    * checked sets the filters array to include the option 
-                    * onChange calls the toggleCategory function to add or remove the option from the filters array
-                    * 
-                  */}
-                  <Tag label="AI/ML" type="type" />
-                </label>
-                <label className='flex items-center space-x-2"'>
-                  <input
-                    type="checkbox"
-                    checked={filters.category.includes("Hardware")}
-                    onChange={() => toggleCategory("Hardware")}
-                    />
-                    <Tag label="Hardware" type="type" />
-                </label>
-                <label className='flex items-center space-x-2"'>
-                  <input
-                    type="checkbox"
-                    checked={filters.category.includes("Software")}
-                    onChange={() => toggleCategory("Software")}
-                    />
-                  <Tag label="Software" type="type" />
-                </label>
+                    <Tag label={option} type={section.type} />
+                  </label>
+                ))}
+              </div>
             </div>
-          </div >
-          <div className="flex flex-col mt-4">
-              {/* Div: Context wrapper over the language section of the filter menu
-                * 
-                * flex sets the format as flexbox for children components
-                * flex-col sets the flex direction to column so children item stack vertically
-                * mt-4 adds a top margin of 0.25rem * 4 = 1rem to separate from the above section
-                * 
-              */}
-              <span className="font-semibold mb-1 w-full text-center border-b border-gray-300">Languages</span>
-              <div className='flex flex-wrap gap-2'>
-                <label className='flex items-center space-x-2"'>
-                  <input
-                    type="checkbox"
-                    checked={filters.category.includes("C")}
-                    onChange={() => toggleCategory("C")}
-                    />
-                  <Tag label="C" type="language" />
-                </label>
-
-                <label className='flex items-center space-x-2"'>
-                  <input
-                    type="checkbox"
-                    checked={filters.category.includes("C++")}
-                    onChange={() => toggleCategory("C++")}
-                    />
-                  <Tag label="C++" type="language" />
-                </label>
-
-                <label className='flex items-center space-x-2"'>
-                  <input
-                    type="checkbox"
-                    checked={filters.category.includes("CSS")}
-                    onChange={() => toggleCategory("CSS")}
-                    />
-                  <Tag label="CSS" type="language" />
-                </label>
-
-                <label className='flex items-center space-x-2"'>
-                  <input
-                    type="checkbox"
-                    checked={filters.category.includes("Dart")}
-                    onChange={() => toggleCategory("Dart")}
-                    />
-                  <Tag label="Dart" type="language" />
-                </label>
-
-                <label className='flex items-center space-x-2"'>
-                  <input
-                    type="checkbox"
-                    checked={filters.category.includes("HTML")}
-                    onChange={() => toggleCategory("HTML")}
-                    />
-                  <Tag label="HTML" type="language" />
-                </label>
-
-                <label className='flex items-center space-x-2"'>
-                  <input
-                    type="checkbox"
-                    checked={filters.category.includes("Java")}
-                    onChange={() => toggleCategory("Java")}
-                    />
-                  <Tag label="Java" type="language" />
-                </label>
-                    
-                <label className='flex items-center space-x-2"'>
-                  <input
-                    type="checkbox"
-                    checked={filters.category.includes("JavaScript")}
-                    onChange={() => toggleCategory("JavaScript")}
-                    />
-                  <Tag label="JavaScript" type="language" />
-                </label>
-
-                <label className='flex items-center space-x-2"'>
-                  <input
-                    type="checkbox"
-                    checked={filters.category.includes("Python")}
-                    onChange={() => toggleCategory("Python")}
-                    />
-                  <Tag label="Python" type="language" />
-                </label>
-
-                <label className='flex items-center space-x-2"'>
-                  <input
-                    type="checkbox"
-                    checked={filters.category.includes("Shell")}
-                    onChange={() => toggleCategory("Shell")}
-                    />
-                  <Tag label="Shell" type="language" />
-                </label>
-            </div>
-          </div>
+          ))}
         </div>
       )}
     </div>
