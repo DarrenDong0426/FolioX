@@ -234,8 +234,6 @@ export default function Filter( {filters, setFilters, filterOpen, setFilterOpen 
                     />
                   <Tag label="Shell" type="language" />
                 </label>
-                
-                
             </div>
           </div>
         </div>

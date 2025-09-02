@@ -1,12 +1,13 @@
 #!/bin/bash
 
-cd server
+cd client
+PORT=8000 npm start &
+NPM_PID=$!
+
+cd ../server
 flask run --port=9000 &
 FLASK_PID=$!
 
-cd ../client
-PORT=8000 npm start &
-NPM_PID=$!
 
 # Define a cleanup function to kill background processes
 cleanup() {

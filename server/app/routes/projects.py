@@ -11,6 +11,8 @@ projects_bp = Blueprint('projects', __name__, url_prefix="/api")              # 
 def get_projects():
     page = request.args.get("page", 1, type=int)                              # Get page from query if exist or set to 1 if not
     query = request.args.get("query", "", type=str).strip().split()           # Get query from query if exist or set to empty str if not
+    filters = request.args.get("filters", "", type=str).strip().split(",") 
+
     words = []                                                                # Get list of words from description  
     for word in query:  
         words.append(Projects.name.ilike(f"%{word}%"))                        # Add rows of projects where the name contains a word from query
