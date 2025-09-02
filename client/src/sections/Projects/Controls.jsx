@@ -1,6 +1,6 @@
 // Imports
 import Dropdown from '../../components/Dropdown';               // Import Dropdown component from path ../../components/Dropdown
-import Filter from '../../components/Filter';
+import Filter from '../../components/Filter';                   // Import Filter component from path ../../components/Filter
 import SearchBar from '../../components/SearchBar';             // Import SearchBar component from path ../../components/SearchBar  
 import { useProjects } from '../../hooks/projectListContext';   // Import useProjects hook from path ../../hooks/projectListContext
 
