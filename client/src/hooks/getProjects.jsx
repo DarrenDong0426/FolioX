@@ -20,7 +20,8 @@ const getProjects = () => {
     const [filterOpen, setFilterOpen] = useState(false);                          // filter open flag initialized to false
 
     useEffect(() => {                                                             // useEffect to call api projects
-      fetch(`http://localhost:9000/api/projects/?page=${currentPage}&query=${query}&dropDown=${dropDown}&filters=${filters.category.join(",")}`)
+      const encodedFilters = filters.category.map(encodeURIComponent).join(",");          
+      fetch(`http://localhost:9000/api/projects/?page=${currentPage}&query=${query}&dropDown=${dropDown}&filters=${encodedFilters}`)
         .then(response => {
           if (!response.ok) throw new Error('Network response was not ok');       // Throw error if response unsuccessful             
           return response.json();                                                 // Return json response on success
