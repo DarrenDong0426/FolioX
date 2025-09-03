@@ -1,14 +1,13 @@
 from flask import Flask
 from flask_cors import CORS
 from config import DATABASE_FILENAME                                        # Imports Flask
-from .models import projects_db, Projects                                   # Imports database and schemas from models
+from .models import db, Projects, Documents                                 # Imports database and schemas from models
 from datetime import date                                                   # Import data format from datetime
 
 # Function to hardcode the project database 
 def hardcode_projects_database(app):   
     with app.app_context():                                                 # Descriptor to access Flask obect (the database here)                            
-        projects_db.drop_all()                                                       # Clears the database of all tables
-        projects_db.create_all()                                                     # Creates the database of all tables based on the scheme defined 
+        Projects.query.delete()                                             # Delete all rows in Projects table
 
         # Hardcode project rows
         tictactoe = Projects(name="TictacToe", desc="""A standard Tic-Tac-Toe game where an user can choose between playing a computer or a second user.
@@ -100,7 +99,7 @@ def hardcode_projects_database(app):
                                 lock=True, wip=False, month_year=date(2025, 4, 26), language=["C++"], type=["Software"])
         
         # Add projects items into project table
-        projects_db.session.add_all([
+        db.session.add_all([
             tictactoe,
             recipEats_app,
             eecs280_p2_cv,
@@ -124,9 +123,15 @@ def hardcode_projects_database(app):
             eecs482_p3_pager,
             eecs482_p4_file_system
         ])
-        projects_db.session.commit()                                            # Commit changes to project table
+        db.session.commit()                                            # Commit changes to project table
         print("Database created and populated.")
 
+def hardcode_documents_database(app):
+    with app.app_context():                                                 # Descriptor to access Flask obect (the database here)                            
+        Documents.query.delete()                                            # Delete all rows in Documents table
+
+        db.session.commit()                                            # Commit changes to project table
+        print("Database created and populated.")
 
 
 def create_app():
@@ -134,12 +139,16 @@ def create_app():
     CORS(app)                                                                   # Allow cross-origin requests (client and server has different ports)
     app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_FILENAME                   # Configure database and its location. Here it indicates sqlite as the database and site.db relative to this path via ///
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False                        # Disables SQLAlechemy's event tracking that emits signal for changes in the db
-    projects_db.init_app(app)                                                   # Binds the SQLAlechemy to the Flask Object
+    db.init_app(app)                                                            # Binds the SQLAlechemy to the Flask Object
 
+    with app.app_context():
+        db.create_all()
     # hardcode_projects_database(app)                                           # Code to reset database (TODO: binarize this later)
+    # hardcode_documents_database(app)
 
     # Register Blueprints       
-    from .routes import projects_bp                                             # Import blueprint for projects route
+    from .routes import projects_bp, documents_bp                               # Import blueprint for projects route
     app.register_blueprint(projects_bp)                                         # Access the projects route
+    app.register_blueprint(documents_bp)                                         # Access the documents route
 
     return app                                                                  # Return app
