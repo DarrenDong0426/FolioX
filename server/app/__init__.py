@@ -1,3 +1,4 @@
+from datetime import date
 from flask import Flask
 from flask_cors import CORS
 from config import DATABASE_FILENAME                                        # Imports Flask
@@ -130,7 +131,18 @@ def hardcode_documents_database(app):
     with app.app_context():                                                 # Descriptor to access Flask obect (the database here)                            
         Documents.query.delete()                                            # Delete all rows in Documents table
 
-        db.session.commit()                                            # Commit changes to project table
+        AI_ML_Resume = Documents(title="AI/ML Resume", desc="A resume tailored to positions related to artificial intelligence and machine learning. Items on this document will reference projects and experiences focusing more on using and developing models and less on system design.", last_updated=date.today())
+        Embedded_Resume = Documents(title="Embedded Systems Resume", desc="A resume tailored to positions related to hardware and embedded systems. Items on this document will reference projects and experiencees that involves hardawre components, circuits, and programming on embedded software.", last_updated=date.today())
+        Software_Resume = Documents(title="Software Engineering Resume", desc="A resume tailored to positions related to software engineering. Items on this document will reference projects and experiences that involves heavier programming skills such as using data structures, developing algorithms, and scalaibility. ", last_updated=date.today())
+        Transcript = Documents(title="Transcript", desc="Transcript from the University of Michigan, outlining classes transferred and taken as an undergraduate students. The documents holds the timeline of classes as well as the grade and semester taken for each class.", last_updated=date.today())
+
+        db.session.add_all([
+            AI_ML_Resume, 
+            Embedded_Resume,
+            Software_Resume, 
+            Transcript
+        ])
+        db.session.commit()                                            # Commit changes to documents table
         print("Database created and populated.")
 
 
