@@ -1,10 +1,79 @@
 
 
-export default function Sidebar(){
-    return(
-        <div className="h-screen w-full border-r border-gray-500 p-4">
-            
-        </div>
-    )
+/* *
+ * Sidebar Component
+ * 
+ * Sidebar component with list of items
+ * Items param is the list of items to be enumerated on the sidebar
+ * currIndex is the index of the selected item
+ * setCurrDoc is a function to change the currIndex on click
+ * 
+ */
+export default function Sidebar({ items, currIndex, setCurrDoc }) {
+  return (
+    <div className="h-screen w-64 border-r border-gray-300 bg-gray-50 p-4 flex flex-col">
+      {/* Div: Context wrapper over sidebar component
+        * 
+        * h-screen sets the height to be the size of the screen
+        * w-64 sets the width of the component to 16rem (64 is the value set by CSS)
+        * border-r adds a border to the right side of the component
+        * border-gray-300 sets the color of the border to gray
+        * bg-gray-50 sets the color of the background to gray
+        * p-4 adds a padding of size 4 * 0.25rem = 1rem in all directions
+        * flex sets the container to be in flex format
+        * flex-col sets the children on the container to be in a column
+        * 
+        */}
+      <h2 className="text-xl font-semibold mb-6 text-gray-800">Documents</h2>
+      {/* h2: header to indicate Documents
+        * 
+        * text-xl sets the size of the text to extra large
+        * font-semibold sets the font of the text to semibold
+        * mb-6 sets the bottom margin to 6 * 0.25 = 1.5rem
+        * text-gray-800 sets the color of the text to gray
+        * 
+      */}
+      <div className="space-y-2 overflow-y-auto">
+        {/* Div: Context wrapper over the items of the sidebar
+          * 
+          * space-y-2 adds a space of 2 * 0.25rem = 0.5rem after each children component not including the first and last
+          * overflow-y-auto shows a scroll bar in the y-direction only when needed
+          * 
+        */}
+        {/* Iterate through each item in the items list */}
+        {items.map((item, index) => (
+          <button
+            key={item.id}                                                 // Sets the key of each item to be the id
+            onClick={() => setCurrDoc(index)}                             // On click, use setCurrDoc to set the new index to index
+            className={`                            
+              w-full text-left px-4 py-2 rounded-xl transition-colors
+              ${
+                index === currIndex
+                  ? "bg-blue-500 text-white shadow-sm"
+                  : "bg-white hover:bg-blue-100 text-gray-700"
+              }
+            `}
+          >
+            {/* Button: Each item on the list of items
+              * 
+              * w-full sets the size of the button to be the width of the container
+              * text-left aligns the text to start on the left
+              * px-4 adds a padding in the x direction by 4 * 0.25rem = 1 rem
+              * py-2 adds a padding in the y direction by 2 * 0.25rem = 0.5rem
+              * rounded-xl sets the container to be rounded on the corners
+              * transition-color adds a transition in the color change
+              * bg-blue-500 sets the background of the button to blue if selected
+              * text-white sets the text color to be white if selected
+              * shadow-sm adds a small shadow in all directions if selected
+              * bg-white sets the background to be white if not selected
+              * hover:bg-blue-100 sets the background to be lighter blue if not selected but hovered
+              * text-gray-700 sets the text color to be gray if not selected
+              * 
+              */}
+            {item.title}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 }
-
