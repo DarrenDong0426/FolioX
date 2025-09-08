@@ -1,8 +1,9 @@
 // Imports
-import { use } from "react"
+import PDFViewer from "../components/PDFViewer"
 import Header from "../components/Header"
 import Sidebar from "../components/Sidebar"
 import getDocuments from "../hooks/getDocuments"
+import pdf from "../assets/documents/Software_Engineering_Resume.pdf"
 
 /* *
  * Documents page
@@ -92,6 +93,7 @@ export default function Documents(){
                     <p>
                         {documents[currDoc].desc}
                     </p>
+                    <PDFViewer fileUrl={pdf}/>
                 </div>
              </main>
         </div>
