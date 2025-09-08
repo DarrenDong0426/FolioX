@@ -60,33 +60,38 @@ export default function Documents(){
                 *  
                 */}
             <Header/>
-            <main className='flex-1 overflow-y-auto'>
+            <main className='flex flex-1 overflow-y-auto flex-row'>
                 {/* Main: Labels the main component of the screen
-                  * 
+                  *  
+                  * flex: Sets the container in flex format
+                  * flex-row: Sets the children of the container to be in row
                   * flex-1: Sets the component to be grow
                   * overflow-y-auto: Shows the vertical scrollbar only when it is needed
                   * 
                 */}
-                <div className="flex flex-[1]">
+                <div className="flex-[1]">
                     {/* Div: Context Wrapper for the Sidebar
                       * 
-                      * flex: Sets the container to be in flex format
-                      * flex-[1]: Sets the container to take up 1/4 the size of sibling components
+                      * flex-[1]: Sets the container to take up 1/5 the size of sibling components
                       * 
                     */}
                     <Sidebar items={documents} currIndex={currDoc} setCurrDoc={setCurrDoc}/>
                 </div>
-                <div className="flex flex-[4] justify-center">
+                <div className="flex flex-[4] items-start flex-col">
                     {/* Div: Context Wrapper for the document pdf itself 
                       * 
                       * flex: Sets the container to be in flex format
-                      * flex-[4]: Sets the container size to be 4 times the size of other sibling components
-                      * justify-center: Allows children components to be in the center along the x axis
+                      * flex-[4]: Sets the container size to be 4/5 of the size of the parent 
+                      * items-start: Sets children components to start from the top
+                      * flex-col: Sets the children components to be in a column
                       * 
                       */}
-                    <div>
-                        
-                    </div>
+                    <h1 className="p-4 text-2xl font-bold self-center text-center w-full">
+                        {documents[currDoc].title}
+                    </h1>
+                    <p>
+                        {documents[currDoc].desc}
+                    </p>
                 </div>
              </main>
         </div>
