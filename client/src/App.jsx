@@ -5,7 +5,8 @@ import {
 } from 'react-router-dom';
 import Home from './pages/Home';                  // Import custom "Home" component from ./pages/Home
 import Projects from './pages/Projects';          // Import custom "Projects" component from ./pages/Projects
-import Documents from './pages/Documents';              // Import custom "Resume" component from ./pages/Resume
+import Documents from './pages/Documents';        // Import custom "Documents" component from ./pages/Documents
+import Timeline from './pages/Timeline';          // Import custom "Timeline" component from ./pages/Timeline
 
 /* Defines the App component
  *
@@ -23,7 +24,8 @@ export default function App() {
       <Routes>                                                {/* Container for all Route components */} 
         <Route path="/" element={<Home />} />                 {/* Maps the root path "/" to render the Home component */}
         <Route path="/Projects" element={<Projects />} />     {/* Maps the path "/Projects" to render the Projects component */}
-        <Route path="/Documents" element={<Documents />} />         {/* Maps the path "/Resume" to render the Resume component */}
+        <Route path="/Documents" element={<Documents />} />   {/* Maps the path "/Documents" to render the Documents component */}
+        <Route path="/Timeline" element={<Timeline/>}/>       {/* Maps the path "/Timeline" to render the Timeline component */}
       </Routes>
     </BrowserRouter>
   );

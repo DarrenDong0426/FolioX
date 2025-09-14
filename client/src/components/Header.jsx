@@ -1,4 +1,3 @@
-import React from 'react';                              // Import React to allow React components to be made
 import { Link } from 'react-router-dom';                // Import Link from React-router-DOM to link certain component to a path
 
 /* Defines the Header Component 
@@ -48,7 +47,7 @@ export default function Header() {
             <nav className="space-x-4">
                 <Link to="/Projects" className="text-gray-600 hover:text-blue-500">Projects</Link>
                 <Link to="/Documents" className="text-gray-600 hover:text-blue-500">Documents</Link>
-                <Link to="/Highlights" className="text-gray-600 hover:text-blue-500">Highlights</Link>
+                <Link to="/Timeline" className="text-gray-600 hover:text-blue-500">Timeline</Link>
                 <Link to="/FAQs" className="text-gray-600 hover:text-blue-500">FAQs</Link>
                 <Link to="/Changelog" className="text-gray-600 hover:text-blue-500">Changelog</Link>
             </nav>

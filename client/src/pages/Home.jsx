@@ -4,6 +4,7 @@ import Header from "../components/Header";              // Imports the Header co
 import Intro from "../sections/Home/Intro";             // Imports the Intro component from the path ../sections/Home/Intro.jsx
 import Projects from '../sections/Home/Projects';       // Imports the Project component from the path ../sections/Home/Projects.jsx
 import Documents from '../sections/Home/Documents';     // Imports the Documents component from the path ../sections/Home/Documents.jsx
+import Timeline from '../sections/Home/Timeline';
 
 /* Defines the Home component
  *
@@ -55,6 +56,9 @@ export default function Home(){
               * px-6 applies horizontal padding to both sides. 6 * 0.25rem = 1.5rem 
               *   
               */}
+          <section className='h-screen flex items-center justify-center px-6 shadow-2xl'>
+              <Timeline/>
+          </section>
       </main>
     </div>
   );

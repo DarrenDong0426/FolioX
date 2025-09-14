@@ -1,5 +1,4 @@
 // Imports 
-import wordCloud from "../../assets/images/project_word_cloud.png";     // Imports wordCloud image from path ../assets/images/project_word_cloud.png
 import documents from "../../assets/images/documents.png";              // Imports documents image from path ../assets/images/documents.png
 import { Link } from "react-router-dom";
 
