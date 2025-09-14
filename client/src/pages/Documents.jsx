@@ -98,6 +98,9 @@ export default function Documents(){
                         */}
                         {documents[currDoc].title}
                     </h1>
+                    <p className="text-center w-full text-gray-500">
+                        Last Updated: {documents[currDoc].month_year}
+                    </p>
                     <p className="p-4">
                         {documents[currDoc].desc}
                     </p>
