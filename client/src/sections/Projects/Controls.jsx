@@ -74,6 +74,7 @@ export default function Controls() {
           filterOpen={filterOpen}
           setFilterOpen={setFilterOpen}
           filterSections={filterSections}
+          setCurrentPage={setCurrentPage}
         />
     </div>
   );

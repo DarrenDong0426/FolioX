@@ -3,7 +3,6 @@ import PDFViewer from "../components/PDFViewer"
 import Header from "../components/Header"
 import Sidebar from "../components/Sidebar"
 import getDocuments from "../hooks/getDocuments"
-import pdf from "../assets/documents/Software_Engineering_Resume.pdf"
 
 /* *
  * Documents page
@@ -87,13 +86,22 @@ export default function Documents(){
                       * flex-col: Sets the children components to be in a column
                       * 
                       */}
-                    <h1 className="p-4 text-2xl font-bold self-center text-center w-full">
+                    <h1 className="p-4 text-2xl font-bold text-center w-full">
+                        {/* Div: Context Wrapper for the document pdf itself 
+                          * 
+                          * p-4 adds a padding of 4 * 0.25rem = 1rem in all directions
+                          * text-2xl sets the text to be large x2
+                          * font-bold sets the text to be bolded
+                          * text-center sets the text to be in the center of the container
+                          * w-full uses the entire width of the container
+                          * 
+                        */}
                         {documents[currDoc].title}
                     </h1>
-                    <p>
+                    <p className="p-4">
                         {documents[currDoc].desc}
                     </p>
-                    <PDFViewer fileUrl={pdf}/>
+                    <PDFViewer fileUrl={documents[currDoc].file_path}/>
                 </div>
              </main>
         </div>

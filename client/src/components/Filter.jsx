@@ -10,7 +10,7 @@ import Tag from './Tag';                                                // Impor
  * setFilterOpen param modifies the filterOpen state when on hover
  *  
 */
-export default function Filter( {filters, setFilters, filterOpen, setFilterOpen, filterSections }) {
+export default function Filter( {filters, setFilters, filterOpen, setFilterOpen, filterSections, setCurrentPage }) {
 
     {/* Toggle Category function
         *   
@@ -122,7 +122,10 @@ export default function Filter( {filters, setFilters, filterOpen, setFilterOpen,
                     <input
                       type="checkbox"
                       checked={filters.category.includes(option)}
-                      onChange={() => toggleCategory(option)}
+                      onChange={() => {
+                        toggleCategory(option);
+                        setCurrentPage(1)
+                      }}
                     />
                     <Tag label={option} type={section.type} />
                   </label>

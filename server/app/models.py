@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy                                         
 # Initialize a database for list of projects 
 db = SQLAlchemy()
 
-# Projects class define scheme for db
+# Projects class define scheme for project db
 class Projects(db.Model):       
     id = db.Column(db.Integer, primary_key=True)                      # Unique Project ID
     name = db.Column(db.String(20), unique=True, nullable=False)      # Name of each Project (max 20 chars)
@@ -15,8 +15,10 @@ class Projects(db.Model):
     language = db.Column(db.JSON, nullable=False)                     # Stores an array of languages used 
     type = db.Column(db.JSON, nullable=False)                         # Type of projects
 
-class Documents(db.Model):       
-    id = db.Column(db.Integer, primary_key = True)
-    title = db.Column(db.String(20), unique=True, nullable=False)
-    desc = db.Column(db.String(500))
-    last_updated = db.Column(db.Date, nullable=False)
+# Documents class define schema for documents db
+class Documents(db.Model):          
+    id = db.Column(db.Integer, primary_key = True)                    # Unique Document ID
+    title = db.Column(db.String(20), unique=True, nullable=False)     # Title of each document (max 20 chars)
+    desc = db.Column(db.String(500))                                  # Desc of each document (max 500 chars)
+    last_updated = db.Column(db.Date, nullable=False)                 # Last Updated (month, year) of when document is last updated
+    file_path = db.Column(db.String(500), nullable=False)             # File path for path of documents

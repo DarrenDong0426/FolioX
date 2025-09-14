@@ -1,6 +1,5 @@
 # Imports
 from flask import Blueprint, jsonify, request                                 # Import flask functions and classes from flask library
-from sqlalchemy import desc, or_, asc                                         # Import ascneding, descending func and or operatior from sqlalchemy
 from ..models import Documents                                                 # Import Projects database scheme from ..models
 
 # Create Blueprint objects
@@ -18,5 +17,6 @@ def get_documents():
             "title": d.title,                                       # Get name of project
             "desc": d.desc,                                       # Get desc of project
             "month_year": d.last_updated.strftime("%B %Y"),         # Get date (month year) of project
+            "file_path": d.file_path
           } for d in documents                                     # Iterate through each project 
         ]})                               # Total number of items (used to see how many pages to list)
