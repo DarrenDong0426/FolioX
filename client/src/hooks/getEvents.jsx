@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';                                    
  */
 const getEvents = () => {
 
-    const [events, getEvents] = useState([]);                                     // document state to hold list of documents 
+    const [events, setEvents] = useState([]);                                     // document state to hold list of documents 
     const [year, setYear] = useState(new Date().getFullYear());                             
     const [filters, setFilters] = useState({category: []});                       // filters state for categories with useState hook initialized to empty array
     const [filterOpen, setFilterOpen] = useState(false);                          // filter open flag initialized to false
@@ -26,7 +26,6 @@ const getEvents = () => {
         .then(data => {
             setEvents(data.events)                                          // Set the document to list of fetched items
             setLoading(false)                                                     // Set loading flag to false
-            setCurrDoc(0)                                                         // Set the current document index to 0
         })
         .catch(err => {                                                           // Error handling
           console.error('Error fetching projects:', err);   
@@ -34,7 +33,7 @@ const getEvents = () => {
           setLoading(false);                                                      // set loading to false
         });
     }, []);                                                                       // useEffect renders once on load
-    return { events, setEvents, loading, error };                    // Return documents
+    return { events, setEvents, loading, error, year, setYear, filters, setFilters, filterOpen, setFilterOpen, getEvents };                    // Return documents
   };
   
   export default getEvents;

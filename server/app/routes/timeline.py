@@ -6,7 +6,7 @@ from ..models import Events                                                 # Im
 timeline_bp = Blueprint('timeline', __name__, url_prefix="/api")              # Create a blueprint of routes for documents 
 
 # Define a route on the blueprint
-@timeline_bp.route("/timeline", methods=["GET"], strict_slashes=False)        # Create GET request for /documents with queries 
+@timeline_bp.route("/events", methods=["GET"], strict_slashes=False)        # Create GET request for /documents with queries 
 def get_events():
     events = Events.query
 
