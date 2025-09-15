@@ -2,7 +2,7 @@ from datetime import date
 from flask import Flask
 from flask_cors import CORS
 from config import DATABASE_FILENAME                                        # Imports Flask
-from .models import db, Projects, Documents                                 # Imports database and schemas from models
+from .models import db, Projects, Documents, Events                                 # Imports database and schemas from models
 from datetime import date                                                   # Import data format from datetime
 
 # Function to hardcode the project database 
@@ -102,6 +102,17 @@ def hardcode_documents_database(app):
         db.session.commit()                                            # Commit changes to documents table
         print("Database created and populated.")
 
+def hardcode_timeline_database(app):
+     with app.app_context():                                                 # Descriptor to access Flask obect (the database here)                            
+        Events.query.delete()                                            # Delete all rows in Documents table
+
+        Event1 = Events(title="Event 1", desc="dfkgkdlshfh.dslugf", tags=["Academics", "Projects"], date=date(2023, 10, 23), images=["/documents/Transcript.pdf"])
+
+        db.session.add_all([
+            Event1
+        ])
+        db.session.commit()                                            # Commit changes to documents table
+        print("Database created and populated.")
 
 def create_app():
     app = Flask(__name__)                                                       # Initialize Flask Object
@@ -114,11 +125,13 @@ def create_app():
         db.drop_all()                                                           # Drop all tables in the database
         db.create_all()                                                         # Create all tables in the database
     hardcode_projects_database(app)                                             # Code to reset projects database (TODO: binarize this later)
-    hardcode_documents_database(app)                                            # Code to reset coduments database (TODO: binarize this later)
+    hardcode_documents_database(app)                                            # Code to reset documents database (TODO: binarize this later)
+    hardcode_timeline_database(app)                                             # Code to reset coduments database (TODO: binarize this later)
 
     # Register Blueprints       
-    from .routes import projects_bp, documents_bp                               # Import blueprint for projects route
+    from .routes import projects_bp, documents_bp, timeline_bp                  # Import blueprint for projects route
     app.register_blueprint(projects_bp)                                         # Access the projects route
     app.register_blueprint(documents_bp)                                        # Access the documents route
+    app.register_blueprint(timeline_bp)                                         # Access the timeline route
 
     return app                                                                  # Return app
