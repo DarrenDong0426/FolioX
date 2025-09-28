@@ -107,9 +107,23 @@ def hardcode_timeline_database(app):
         Events.query.delete()                                            # Delete all rows in Documents table
 
         Event1 = Events(title="Event 1", desc="dfkgkdlshfh.dslugf", tags=["Academics", "Projects"], date=date(2023, 10, 23), images=["/documents/Transcript.pdf"])
+        Event2 = Events(title="Event 2", desc="dfkgkdlshfh.dslugf", tags=["Academics", "Projects"], date=date(2024, 10, 23), images=["/documents/Transcript.pdf"])
+        Event3 = Events(title="Event 3", desc="dfkgkdlshfh.dslugf", tags=["Academics", "Projects"], date=date(2025, 10, 23), images=["/documents/Transcript.pdf"])
+        Event4 = Events(title="Event 4", desc="dfkgkdlshfh.dslugf", tags=["Academics", "Projects"], date=date(2025, 1, 22), images=["/documents/Transcript.pdf"])
+        Event5 = Events(title="Event 5", desc="dfkgkdlshfh.dslugf", tags=["Academics", "Projects"], date=date(2025, 10, 22), images=["/documents/Transcript.pdf"])
+        Event6 = Events(title="Event 6", desc="dfkgkdlshfh.dslugf", tags=["Academics", "Projects"], date=date(2025, 10, 23), images=["/documents/Transcript.pdf"])
+        Event7 = Events(title="Event 7", desc="dfkgkdlshfh.dslugf", tags=["Academics", "Projects"], date=date(2025, 12, 23), images=["/documents/Transcript.pdf"])
+        Event8 = Events(title="Event 8", desc="dfkgkdlshfh.dslugf", tags=["Academics", "Projects"], date=date(2025, 4, 23), images=["/documents/Transcript.pdf"])
 
         db.session.add_all([
-            Event1
+            Event1, 
+            Event2, 
+            Event3, 
+            Event4, 
+            Event5, 
+            Event6, 
+            Event7, 
+            Event8, 
         ])
         db.session.commit()                                            # Commit changes to documents table
         print("Database created and populated.")

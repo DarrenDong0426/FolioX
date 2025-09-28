@@ -18,7 +18,7 @@ const getEvents = () => {
     const [error, setError] = useState(null);                                     // error flag with useState hook
 
     useEffect(() => {                                                             // useEffect to call api projects
-      fetch(`http://localhost:9000/api/events`)
+      fetch(`http://localhost:9000/api/events?year=${year}`)                      // Fetch api events with query param year
         .then(response => {
           if (!response.ok) throw new Error('Network response was not ok');       // Throw error if response unsuccessful             
           return response.json();                                                 // Return json response on success
@@ -32,7 +32,7 @@ const getEvents = () => {
           setError(err);                                                          // set error flag
           setLoading(false);                                                      // set loading to false
         });
-    }, []);                                                                       // useEffect renders once on load
+    }, [year]);                                                                       // useEffect renders once on load
     return { events, setEvents, loading, error, year, setYear, filters, setFilters, filterOpen, setFilterOpen, getEvents };                    // Return documents
   };
   

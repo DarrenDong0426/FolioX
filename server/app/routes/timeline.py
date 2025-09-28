@@ -1,6 +1,8 @@
 # Imports
 from flask import Blueprint, jsonify, request                                 # Import flask functions and classes from flask library
 from ..models import Events                                                 # Import Projects database scheme from ..models
+from sqlalchemy import extract
+from datetime import datetime
 
 # Create Blueprint objects
 timeline_bp = Blueprint('timeline', __name__, url_prefix="/api")              # Create a blueprint of routes for documents 
@@ -8,7 +10,10 @@ timeline_bp = Blueprint('timeline', __name__, url_prefix="/api")              # 
 # Define a route on the blueprint
 @timeline_bp.route("/events", methods=["GET"], strict_slashes=False)        # Create GET request for /documents with queries 
 def get_events():
-    events = Events.query
+    year = request.args.get("year", datetime.now().year, type=int)          # Get year form query. Default to current year
+
+    # Query rows of events table from the filtered entries ordered by least recent on top. 
+    events = Events.query.filter(extract('year', Events.date)==year).order_by(Events.date.asc()).all()                 
 
     return jsonify({  
         "events": [           
