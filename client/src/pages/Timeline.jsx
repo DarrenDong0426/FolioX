@@ -23,13 +23,14 @@ export default function Timeline(){
             *  
           */}
           <Header/>
-          <main className='flex-1 overflow-y-auto px-4 py-8'>
+          <main className='flex flex-col flex-1 px-4 py-8 min-h-0'>
             {/* Main: Content Wrapper over all sections. Main is used to identify the "main" part of this page
               *
               * flex-1 fills in the flex direction (column here)
               * overflow-y-auto shows scrollbar if children overflow. Otherwise, no scrollbar
               * px-4 sets the horizontal padding 
               * py-8 sets the vertical padding 
+              * min-h-0 ensures that the main can shrink below its content size when inside a flex container
               *  
               */}
             <h1 className='text-4xl font-bold mb-8 text-center'>Timeline</h1>

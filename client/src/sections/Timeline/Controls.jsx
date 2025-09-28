@@ -1,65 +1,110 @@
-// Imports
-import Filter from '../../components/Filter';                   // Import Filter component from path ../../components/Filter
+import Filter from '../../components/Filter';
 import { useEvents } from '../../hooks/eventsContext';
 
-/* Defines the Controls section component
- *
- * Calls the search bar component
- * Calls the legend box component
- * Calls the filter option component
- * 
-*/
 export default function Controls() {
+  // Get the current year for upper bound
+  const currentYear = new Date().getFullYear();
 
-  // Get query, pagination, and dropdown states from useProjects 
-  const { 
-      events, setEvents, loading, 
-      error, year, setYear, 
-      filters, setFilters, filterOpen, 
-      setFilterOpen, getEvents
-    } = useEvents();         
+  // Get for timeline states from context 
+  const {
+    year, setYear, filters, setFilters, filterOpen, setFilterOpen,
+  } = useEvents();
 
-  
-  // Define the sections and options for each section for the filter
+  // Get filter sections
   const filterSections = [
-      {
-        title: "Categories",
-        type: "type",
-        options: ["Academics", "Personal", "Projects", "Professional"]
-      },
-    ];
+    {
+      title: "Categories",
+      type: "type",
+      options: ["Academics", "Personal", "Projects", "Professional"]
+    },
+  ];
 
   return (
-    <div className="flex flex-wrap items-center justify-between w-full max-w-4xl mx-auto mb-6 gap-4 px-4">
-        {/* Div: Context wrapper for control section of Projects page
-          *  
-          * flex sets the format as flexbox
-          * flex-wrap allows children components to wrap to next line
-          * items-center aligns children item perpendicular to the axis (vertical here)
-          * justify-between puts children items at the beginning and end first and fill the middle
-          * w-full allows the whole width to be taken up
-          * max-w-4xl limits the max width size
-          * mx-auto adds margins in the horizontal direction based on amount of space left
-          * mb-6 adds a bottom margin
-          * gap-4 adds a gap in all directions
-          * px-4 adds padding in the horizontal direction
-          * 
+    <div className="w-full max-w-screen-xl mx-auto mb-6 px-4 flex justify-center">
+      {/* Context wrapper for Controls for the Timeline Page
+        * 
+        * w-full: Component takes up the full width of the container
+        * m-wax-screen-xl: Maximum width is set to extra-large screen size
+        * mx-auto: Horizontally centers the component within its parent
+        * mb-6: Adds margin below the component for spacing
+        * px-4: Adds horizontal padding inside the component
+        * flex: Uses Flexbox layout for arranging child elements
+        * justify-center: Centers child elements horizontally within the component
+        * 
         */}
-      <div className="flex-1">
-        {/* Div: Context wrapper over the search bar 
+      <div className="flex items-center space-x-4">
+        {/* Navigation controls 
+          *
+          * flex : Uses Flexbox layout for arranging child elements
+          * items-center : Vertically centers child elements within the container
+          * space-x-4 : Adds horizontal spacing between child elements
           * 
-          * flex-1 allows children components to take all extra space
-          * 
-        */}
-       
+          */}
+        <button
+          onClick={() => setYear(year - 1)}
+          className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-md text-gray-700 font-semibold transition-colors duration-200"
+        >
+          {/* Button to Go to previous year
+            * px-3 : Adds horizontal padding inside the button
+            * py-1 : Adds vertical padding inside the button
+            * bg-gray-200 : Sets the background color to light gray
+            * hover:bg-gray-300 : Darkens the background on hover for interactivity
+            * rounded-md : Applies medium border radius for rounded corners
+            * text-gray-700 : Sets the text color to dark gray
+            * font-semibold : Uses semi-bold font weight for better readability
+            * transition-colors : Smoothly transitions color changes on hover
+            * duration-200 : Sets the transition duration to 200 milliseconds
+            * 
+            */}
+          ←
+        </button>
+        <div className="px-4 py-1 bg-gray-100 rounded-md font-medium text-gray-800 shadow-sm">
+          {/* Context Wrapper for year display
+            * 
+            * px-4 : Adds horizontal padding inside the container
+            * py-1 : Adds vertical padding inside the container
+            * bg-gray-100 : Sets a very light gray background color
+            * rounded-md : Applies medium border radius for rounded corners
+            * font-medium : Uses medium font weight for better readability
+            * text-gray-800 : Sets the text color to very dark gray for contrast
+            * shadow-sm : Adds a small shadow for subtle depth effect
+            *
+          */}
+          {year}
+        </div>
+        <button
+          onClick={() => setYear(y => Math.min(currentYear, year + 1))}
+          className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-md text-gray-700 font-semibold transition-colors duration-200"
+        >
+          {/* Button to go to next year
+            * px-3 : Adds horizontal padding inside the button
+            * py-1 : Adds vertical padding inside the button
+            * bg-gray-200 : Sets the background color to light gray
+            * hover:bg-gray-300 : Darkens the background on hover for interactivity
+            * rounded-md : Applies medium border radius for rounded corners
+            * text-gray-700 : Sets the text color to dark gray
+            * font-semibold : Uses semi-bold font weight for better readability
+            * transition-colors : Smoothly transitions color changes on hover
+            * duration-200 : Sets the transition duration to 200 milliseconds
+            *
+          */}
+          →
+        </button>
+        <div className="ml-4">
+          {/* Filter component wrapper
+            * 
+            * ml-4 : Adds left margin to separate from previous elements
+            *
+          */}
+          <Filter
+            filters={filters}
+            setFilters={setFilters}
+            filterOpen={filterOpen}
+            setFilterOpen={setFilterOpen}
+            filterSections={filterSections}
+          />
+        </div>
       </div>
-        <Filter 
-          filters={filters}
-          setFilters={setFilters}
-          filterOpen={filterOpen}
-          setFilterOpen={setFilterOpen}
-          filterSections={filterSections}
-        />
     </div>
   );
 }

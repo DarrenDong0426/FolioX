@@ -1,5 +1,5 @@
 // Imports
-import timeline from "../../assets/images/documents.png";              // Imports documents image from path ../assets/images/documents.png
+import timeline from "../../assets/images/timeline.png";              // Imports documents image from path ../assets/images/documents.png
 import { Link } from "react-router-dom";
 
 export default function Timeline(){
