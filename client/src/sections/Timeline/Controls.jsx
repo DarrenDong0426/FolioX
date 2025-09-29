@@ -1,7 +1,18 @@
-import Filter from '../../components/Filter';
-import { useEvents } from '../../hooks/eventsContext';
+// Imports
+import { useState, useRef } from 'react';                       // Import useState and useRef from React       
+import Filter from '../../components/Filter';                   // Import Filter component
+import { useEvents } from '../../hooks/eventsContext';         // Import custom hook to fetch events      
 
+{/* Controls component for the Timeline page
+  *
+  * A navigation bar with the current date
+  * Arrows on both sides to toggle to previous and future years limited by 2020 and the current year
+  * Click on the year to edit it directly
+  * A filter button to open the filter menu
+  *  
+  */}
 export default function Controls() {
+  
   // Get the current year for upper bound
   const currentYear = new Date().getFullYear();
 
@@ -9,6 +20,26 @@ export default function Controls() {
   const {
     year, setYear, filters, setFilters, filterOpen, setFilterOpen,
   } = useEvents();
+
+  const [editing, setEditing] = useState(false);            // State to track if the year is being edited 
+  const [temp, setTemp] = useState(year);                     // Temporary state to hold the year input value     
+  const inputRef = useRef();                                // Ref for the year input field    
+
+  // Function to update year and temp value on edit 
+  const startEdit = () => {
+    setYear(year);
+    setEditing(true);
+    setTimeout(() => inputRef.current && inputRef.current.focus(), 0);
+  };
+
+  // Function to save clamped year on exit or timeout
+  const finishEdit = () => {
+    setEditing(false);
+    let clamped = Math.max(2020, Math.min(currentYear, Number(temp)));
+    setTemp(clamped.toString());
+    if (clamped.toString() !== year && temp) setYear(clamped.toString());
+    setTimeout(() => inputRef.current && inputRef.current.focus(), 0);     //  Refocus the input field after updating the year
+  };
 
   // Get filter sections
   const filterSections = [
@@ -41,7 +72,14 @@ export default function Controls() {
           * 
           */}
         <button
-          onClick={() => setYear(year - 1)}
+          onClick={() => {
+            setYear(prev => {
+              const newYear = Math.max(2020, prev - 1);
+              setYear(newYear);
+              setTemp(newYear.toString());
+              return newYear;
+            });
+          }}
           className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-md text-gray-700 font-semibold transition-colors duration-200"
         >
           {/* Button to Go to previous year
@@ -58,7 +96,27 @@ export default function Controls() {
             */}
           ←
         </button>
-        <div className="px-4 py-1 bg-gray-100 rounded-md font-medium text-gray-800 shadow-sm">
+        {editing ? (
+          // Input field for editing year
+          // ref sets the input field reference
+          // type is text to allow numeric input
+          // value is bound to temp state
+          // onChange updates temp state with numeric input only using regex
+          // onBlur and onKeyDown handle finishing edit
+          // className styles the input field
+          <input
+            ref={inputRef}
+            type="text"
+            value={temp}
+            onChange={e => setTemp(e.target.value.replace(/[^0-9]/g, ""))}
+            onBlur={finishEdit}
+            onKeyDown={e => e.key === "Enter" && finishEdit()}
+            className="px-4 py-1 bg-white rounded-md font-medium text-gray-800 shadow-sm w-20 text-center"
+          />
+        ) : (
+          <div className="px-4 py-1 bg-gray-100 rounded-md font-medium text-gray-800 shadow-sm"
+            onDoubleClick={startEdit}
+            title="Double-click to edit">
           {/* Context Wrapper for year display
             * 
             * px-4 : Adds horizontal padding inside the container
@@ -72,8 +130,17 @@ export default function Controls() {
           */}
           {year}
         </div>
+        )}
+  
         <button
-          onClick={() => setYear(y => Math.min(currentYear, year + 1))}
+          onClick={() => {
+            setYear(prev => {
+              const newYear = Math.min(currentYear, year + 1);
+              setYear(newYear);
+              setTemp(newYear.toString());
+              return newYear;
+            });
+          }}
           className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-md text-gray-700 font-semibold transition-colors duration-200"
         >
           {/* Button to go to next year

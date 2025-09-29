@@ -1,8 +1,8 @@
 // Imports
 import { useState } from "react";                                           // Import useState from react
-import { useEvents } from "../../hooks/eventsContext";                     // Import custom hook to fetch events    
-import Controls from "./Controls";                                       // Import Controls component     
-import Card from "../../components/Card";                             // Import Card component      
+import { useEvents } from "../../hooks/eventsContext";                      // Import custom hook to fetch events    
+import Controls from "./Controls";                                          // Import Controls component     
+import Card from "../../components/Card";                                   // Import Card component      
 
 {/* Event Sections of the Timeline page  
   * 
@@ -11,7 +11,6 @@ import Card from "../../components/Card";                             // Import 
   *
   */}
 export default function Events() {
-
   // Fetch events using custom hook
   const { events, loading, error } = useEvents();
 
@@ -21,7 +20,6 @@ export default function Events() {
   // Handle loading and error states
   if (loading) return <p className='text-center text-gray-600'>LOADING...</p>
   if (error) return <p className='text-center text-red-600'>Error: {error.message}</p>
-
 
   return (
     <div className="flex flex-col flex-1 min-h-0 bg-gray-50 py-8">
