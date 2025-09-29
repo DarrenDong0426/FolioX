@@ -12,6 +12,14 @@ import { useProjects } from '../../hooks/projectListContext';   // Import usePro
  * 
 */
 export default function ProjectsList(){
+
+  // ColorCode Function for filter
+  function colorCodeFunc(type) {
+    return type === "type" ?                                                 // Set the background and text color based on type of tag (language or project type)
+        "bg-blue-100 text-blue-800" : 
+        "bg-green-100 text-green-800";
+  }
+
   const { 
     projects, loading, error, 
     currentPage, setCurrentPage, 
@@ -120,18 +128,18 @@ export default function ProjectsList(){
                       * gap-2 sets a gap in the direction of the flexbox (horizontal here)
                       *  
                       */}
-                    {project.type.includes("Software") && <Tag label="Software" type="type" />}
-                    {project.type.includes("Hardware") && <Tag label="Hardware" type="type" />}
-                    {project.type.includes("AI/ML") && <Tag label="AI/ML" type="type" />}
-                    {project.language.includes("C++") && <Tag label="C++" type="language" />}
-                    {project.language.includes("Java") && <Tag label="Java" type="language" />}
-                    {project.language.includes("Python") && <Tag label="Python" type="language" />}
-                    {project.language.includes("Shell") && <Tag label="Shell" type="language" />}
-                    {project.language.includes("HTML") && <Tag label="HTML" type="language" />}
-                    {project.language.includes("CSS") && <Tag label="CSS" type="language" />}
-                    {project.language.includes("JavaScript") && <Tag label="JavaScript" type="language" />}
-                    {project.language.includes("C") && <Tag label="C" type="language" />}
-                    {project.language.includes("Dart") && <Tag label="Dart" type="language" />}
+                    {project.type.includes("Software") && <Tag label="Software" type="type" colorCodeFunc={colorCodeFunc} />}
+                    {project.type.includes("Hardware") && <Tag label="Hardware" type="type" colorCodeFunc={colorCodeFunc}/>}
+                    {project.type.includes("AI/ML") && <Tag label="AI/ML" type="type" colorCodeFunc={colorCodeFunc}/>}
+                    {project.language.includes("C++") && <Tag label="C++" type="language" colorCodeFunc={colorCodeFunc}/>}
+                    {project.language.includes("Java") && <Tag label="Java" type="language" colorCodeFunc={colorCodeFunc}/>}
+                    {project.language.includes("Python") && <Tag label="Python" type="language" colorCodeFunc={colorCodeFunc}/>}
+                    {project.language.includes("Shell") && <Tag label="Shell" type="language" colorCodeFunc={colorCodeFunc}/>}
+                    {project.language.includes("HTML") && <Tag label="HTML" type="language" colorCodeFunc={colorCodeFunc}/>}
+                    {project.language.includes("CSS") && <Tag label="CSS" type="language" colorCodeFunc={colorCodeFunc}/>}
+                    {project.language.includes("JavaScript") && <Tag label="JavaScript" type="language" colorCodeFunc={colorCodeFunc}/>}
+                    {project.language.includes("C") && <Tag label="C" type="language" colorCodeFunc={colorCodeFunc}/>}
+                    {project.language.includes("Dart") && <Tag label="Dart" type="language" colorCodeFunc={colorCodeFunc}/>}
                   </div>
                 </div>
               </li>

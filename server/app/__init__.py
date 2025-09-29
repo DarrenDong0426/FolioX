@@ -115,6 +115,8 @@ def hardcode_timeline_database(app):
         Event7 = Events(title="Event 7", desc="dfkgkdlshfh.dslugf", tags=["Academics", "Projects"], date=date(2025, 12, 23), images=["/documents/Transcript.pdf"])
         Event8 = Events(title="Event 8", desc="dfkgkdlshfh.dslugf", tags=["Academics", "Projects"], date=date(2025, 4, 23), images=["/documents/Transcript.pdf"])
 
+        
+
         db.session.add_all([
             Event1, 
             Event2, 

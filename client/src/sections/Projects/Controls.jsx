@@ -16,22 +16,38 @@ export default function Controls() {
   // Get query, pagination, and dropdown states from useProjects 
   const { query, setQuery, setCurrentPage, options, dropDown, setDropDown, isOpen, setIsOpen, filters, setFilters, filterOpen, setFilterOpen } = useProjects();
   
+  // ColorCode Function for filter
+  function colorCodeFunc(type) {
+    return type === "type" ?                                                 // Set the background and text color based on type of tag (language or project type)
+        "bg-blue-100 text-blue-800" : 
+        "bg-green-100 text-green-800";
+  }
+
   // Define the sections and options for each section for the filter
   const filterSections = [
-      {
-        title: "Project Category",
-        type: "type",
-        options: ["AI/ML", "Hardware", "Software"],
-      },
-      {
-        title: "Languages",
-        type: "language",
-        options: [
-          "C", "C++", "CSS", "Dart", "HTML", 
-          "Java", "JavaScript", "Python", "Shell"
-        ],
-      },
-    ];
+  {
+    title: "Project Category",
+    options: [
+      { label: "AI/ML", type: "type" }, 
+      { label: "Hardware", type: "type" },
+      { label: "Software", type: "type" }
+    ],
+  },
+  {
+    title: "Languages",
+    options: [
+      { label: "C", type: "language" },
+      { label: "C++", type: "language" },
+      { label: "CSS", type: "language" },
+      { label: "Dart", type: "language" },
+      { label: "HTML", type: "language" },
+      { label: "Java", type: "language" },
+      { label: "JavaScript", type: "language" },
+      { label: "Python", type: "language" },
+      { label: "Shell", type: "language" }
+    ]
+  }
+];
 
   return (
     <div className="flex flex-wrap items-center justify-between w-full max-w-4xl mx-auto mb-6 gap-4 px-4">
@@ -75,6 +91,7 @@ export default function Controls() {
           setFilterOpen={setFilterOpen}
           filterSections={filterSections}
           setCurrentPage={setCurrentPage}
+          colorCode={colorCodeFunc}
         />
     </div>
   );

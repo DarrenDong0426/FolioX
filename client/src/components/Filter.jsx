@@ -10,7 +10,7 @@ import Tag from './Tag';                                                // Impor
  * setFilterOpen param modifies the filterOpen state when on hover
  *  
 */
-export default function Filter( {filters, setFilters, filterOpen, setFilterOpen, filterSections, setCurrentPage }) {
+export default function Filter( {filters, setFilters, filterOpen, setFilterOpen, filterSections, setCurrentPage, colorCode}) {
 
     {/* Toggle Category function
         *   
@@ -111,7 +111,7 @@ export default function Filter( {filters, setFilters, filterOpen, setFilterOpen,
                   * 
                 */}
                 {section.options.map((option) => (
-                  <label key={option} className="flex items-center space-x-2">
+                  <label key={option.label} className="flex items-center space-x-2">
                     {/* Label: Context wrapper over each category option (same format for all options)
                       * 
                       * flex sets the format as flexbox for children components
@@ -121,13 +121,13 @@ export default function Filter( {filters, setFilters, filterOpen, setFilterOpen,
                     */}
                     <input
                       type="checkbox"
-                      checked={filters.category.includes(option)}
+                      checked={filters.category.includes(option.label)}
                       onChange={() => {
-                        toggleCategory(option);
-                        setCurrentPage(1)
+                        toggleCategory(option.label);
+                        if (setCurrentPage) setCurrentPage(1); 
                       }}
                     />
-                    <Tag label={option} type={section.type} />
+                    <Tag label={option.label} type={option.type} colorCodeFunc={colorCode} />
                   </label>
                 ))}
               </div>

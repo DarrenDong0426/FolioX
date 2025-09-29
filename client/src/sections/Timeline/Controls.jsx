@@ -41,14 +41,36 @@ export default function Controls() {
     setTimeout(() => inputRef.current && inputRef.current.focus(), 0);     //  Refocus the input field after updating the year
   };
 
+
+  // ColorCode Function for filter
+  function colorCodeFunc(type) {
+    switch (type.toLowerCase()) {
+      case "academics":
+        return "bg-blue-100 text-blue-800";
+      case "professional":
+        return "bg-green-100 text-green-800";
+      case "personal":
+        return "bg-pink-100 text-pink-800";
+      case "projects":
+        return "bg-yellow-100 text-yellow-800";
+      default:
+        // fallback color
+        return "bg-gray-100 text-gray-800";
+    }
+  }
+
   // Get filter sections
   const filterSections = [
-    {
-      title: "Categories",
-      type: "type",
-      options: ["Academics", "Personal", "Projects", "Professional"]
-    },
-  ];
+  {
+    title: "Categories",
+    options: [
+      { label: "Academics", type: "Academics" },
+      { label: "Personal",  type: "Personal"   },
+      { label: "Projects",  type: "Projects"      },
+      { label: "Professional", type: "Professional" }
+    ]
+  }
+];
 
   return (
     <div className="w-full max-w-screen-xl mx-auto mb-6 px-4 flex justify-center">
@@ -169,6 +191,7 @@ export default function Controls() {
             filterOpen={filterOpen}
             setFilterOpen={setFilterOpen}
             filterSections={filterSections}
+            colorCode={colorCodeFunc}
           />
         </div>
       </div>

@@ -7,10 +7,8 @@ import React from "react";                                          // Imports R
  * Sets the Tag component with different labels for each project
  * 
  */
-export default function Tag({ label, type }){
-    const color = type === "type" ?                                                 // Set the background and text color based on type of tag (language or project type)
-        "bg-blue-100 text-blue-800" : 
-        "bg-green-100 text-green-800";
+export default function Tag({ label, type, colorCodeFunc }) {
+    const color = colorCodeFunc(type);  // Get the color code based on the type using the passed colorCodeFunc
 
     return (
         <div className={`${color} rounded-full px-3 py-1 text-sm font-medium`}>
