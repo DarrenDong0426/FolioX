@@ -14,6 +14,38 @@ export default function Events() {
   // Fetch events using custom hook
   const { events, loading, error } = useEvents();
 
+  function colorCodeFunc(type) {
+    switch (type.toLowerCase()) {
+      case "academics":
+        return "bg-blue-100 text-blue-800";
+      case "professional":
+        return "bg-green-100 text-green-800";
+      case "personal":
+        return "bg-pink-100 text-pink-800";
+      case "projects":
+        return "bg-yellow-100 text-yellow-800";
+      case "research":
+        return "bg-purple-100 text-purple-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  }
+
+  const timelineWidth = 2000; // px, or dynamically from a ref/resize observer
+  const itemSpacing = 16;    // px gap/padding per item
+  const minWidth = 50;       // px
+  const maxWidth = 140;      // px
+
+  const labelMaxWidth = events.length
+    ? Math.max(
+        minWidth,
+        Math.min(
+          maxWidth,
+          ((timelineWidth - (events.length * itemSpacing)) / events.length)
+        )
+      )
+    : maxWidth;
+
   // State to track which event is currently hovered or focused
   const [hoveredEventId, setHoveredEventId] = useState(null);
 
@@ -127,7 +159,7 @@ export default function Events() {
                           */}
                         <Card
                           title={event.title}
-                          desc={event.description}
+                          desc={event.desc}
                           tags={event.tags}
                           date={event.date}
                           images={event.images}
@@ -135,7 +167,7 @@ export default function Events() {
                       </div>
                     )}
                     <div
-                      className="w-5 h-5 bg-blue-600 rounded-full border-2 border-white shadow-md cursor-pointer transition outline-none"
+                      className={`w-5 ${colorCodeFunc(event.tags[0])} h-5 rounded-full border-2 border-white shadow-md cursor-pointer transition outline-none`}
                       tabIndex={0}
                       onMouseEnter={() => setHoveredEventId(event.id)}
                       onMouseLeave={() => setHoveredEventId(null)}
@@ -186,23 +218,28 @@ export default function Events() {
                         * 
                         */}
                       <span
-                        className="
+                        className={`
                           inline-block
                           px-3 py-1
                           rounded-full
-                          bg-gradient-to-r from-blue-100 via-white to-yellow-100
+                          ${colorCodeFunc(event.tags[0])}
                           text-blue-700
                           font-semibold
-                          text-sm
+                          text-xs
                           shadow
                           border border-blue-200
                           tracking-wide
                           transition
                           duration-150
                           hover:scale-105
-                        "
+                          break-words
+                          text-center
+                        `}
                         style={{
                           filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.07))",
+                          maxWidth: labelMaxWidth + "px", 
+                          wordBreak: "break-word",                 // Extra insurance for wrapping
+                          whiteSpace: "normal",                    // Allow line wrap
                         }}
                       >
                         {/* Span for the event title

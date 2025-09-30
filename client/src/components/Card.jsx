@@ -15,8 +15,31 @@ export default function Card({ title, desc, tags = [], date, images = [] }) {
     ? [...images].sort(() => 0.5 - Math.random()).slice(0, 4)
     : images;
 
+  function truncateText(text, maxLength = 100) {
+    if (!text) return "";
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength).trimEnd() + "…";
+  }
+
+  function colorCodeFunc(type) {
+    switch (type.toLowerCase()) {
+      case "academics":
+        return "bg-blue-100 text-blue-800";
+      case "professional":
+        return "bg-green-100 text-green-800";
+      case "personal":
+        return "bg-pink-100 text-pink-800";
+      case "projects":
+        return "bg-yellow-100 text-yellow-800";
+      case "research":
+        return "bg-purple-100 text-purple-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  }
+
   return (
-    <div className="min-w-[220px] max-w-xs bg-gradient-to-br from-white via-blue-50 to-yellow-50 border border-blue-100 shadow-2xl rounded-2xl px-5 py-4 text-slate-800 z-30">
+    <div className={`min-w-[220px] max-w-xs ${colorCodeFunc(tags[0])} border border-blue-100 shadow-2xl rounded-2xl px-5 py-4 text-slate-800 z-30`}>
         {/* Div context wrapper for the card
           * 
           * min-w-[220px]: Ensure a minimum width for the card
@@ -60,7 +83,7 @@ export default function Card({ title, desc, tags = [], date, images = [] }) {
         </div>
         
       )}
-      <div className="mb-2 text-slate-700 leading-relaxed">{desc}</div>
+      <div className="mb-2 text-slate-700 leading-relaxed text-xs">{truncateText(desc)}</div>
       {/** Div context wrapper for the tags
        * 
        * mb-2: Margin bottom for spacing from the description

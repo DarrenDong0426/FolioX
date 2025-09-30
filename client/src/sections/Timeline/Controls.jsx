@@ -53,8 +53,9 @@ export default function Controls() {
         return "bg-pink-100 text-pink-800";
       case "projects":
         return "bg-yellow-100 text-yellow-800";
+      case "research":
+        return "bg-purple-100 text-purple-800";
       default:
-        // fallback color
         return "bg-gray-100 text-gray-800";
     }
   }
@@ -67,7 +68,8 @@ export default function Controls() {
       { label: "Academics", type: "Academics" },
       { label: "Personal",  type: "Personal"   },
       { label: "Projects",  type: "Projects"      },
-      { label: "Professional", type: "Professional" }
+      { label: "Professional", type: "Professional" },
+      { label: "Research", type: "Research" }
     ]
   }
 ];
