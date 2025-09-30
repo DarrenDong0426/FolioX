@@ -104,7 +104,7 @@ def hardcode_documents_database(app):
 
 def hardcode_timeline_database(app):
      with app.app_context():                                                 # Descriptor to access Flask obect (the database here)                            
-        Events.query.delete()                                            # Delete all rows in Documents table
+        Events.query.delete()                                               # Delete all rows in Documents table
 
         tictactoe_event = Events(
             title="TictacToe",
@@ -287,7 +287,7 @@ def hardcode_timeline_database(app):
             desc="Collaborated with Professor Ron Eglash to design and prototype affordable Arduino-based hardware for Detroit’s minority-owned urban farms and fabrication shops. I developed and tested real-time systems integrating sensors, servos, and durable, weather-resistant components—most notably a greenhouse ventilation system capable of responding to temperature changes within two seconds and completing full shutter motion in under ten. Built for under $100 and designed for accessibility, these solutions emphasized sustainability and community empowerment, aligning technical innovation with social justice and the broader goals of generative justice.",
             tags=["Research", "Academics", "Professional"],
             date=date(2023, 5, 1),
-            images=[]
+            images=["/events/greenhouse/greenhouse1.jpg", "/events/greenhouse/greenhouse2.jpg", "/events/greenhouse/greenhouse3.jpg", "/events/greenhouse/greenhouse4.jpg", "/events/greenhouse/greenhouse5.jpg"]
         )
 
         shanghai_study_abroad = Events(
@@ -295,7 +295,7 @@ def hardcode_timeline_database(app):
             desc="Studied abroad at the Shanghai Jiao Tong University (SJTU) in Shanghai, China, immersing myself in a new culture while continuing my computer science education. Completed courses in Dynamics and Vibration (ME 240 Equivalent), Artificial Inelligence (EECS 392 Equivalent), and a Chinese Culture class.",
             tags=["Personal", "Academics"],
             date=date(2024, 5, 1),
-            images=[]
+            images=["/events/shanghai/shanghai1.jpg", "/events/shanghai/shanghai2.jpg", "/events/shanghai/shanghai3.jpg", "/events/shanghai/shanghai4.jpg", "/events/shanghai/shanghai5.jpg"]
         )
 
         kdp_internship = Events(
@@ -303,7 +303,15 @@ def hardcode_timeline_database(app):
             desc="Piloted automated shelf image analysis using GenAI and computer vision to detect product voids and prevent potential revenue loss, with current testing focused on optimizing image resolution and model accuracy. I also designed and began piloting an operator-support chatbot for the Allentown plant, targeting a 20% reduction in troubleshooting downtime and an estimated $300K in annual revenue growth through OEE improvements. In parallel, I collaborated with Google, Microsoft, and internal teams to assess open-source and multimodal AI tools, incorporating user feedback and technical constraints to refine adoption strategies. I regularly delivered interim findings and live technical demonstrations to business leaders, shaping the future roadmap for AI integration in manufacturing and retail operations.", 
             tags=["Professional"],
             date=date(2025, 6, 1),
-            images=[]
+            images=["/events/kdp/kdp1.jpg", "/events/kdp/kdp2.jpg", "/events/kdp/kdp3.jpg", "/events/kdp/kdp4.jpg", "/events/kdp/kdp5.jpg"]
+        )
+
+        japan_trip = Events(
+            title="Japan Trip 2025",
+            desc="Traveling to Japan for 2 weeks in with friends to explore the culture, food, and sights of Tokyo, Kyoto, Osaka, and Hiroshima.",
+            tags=["Personal"],
+            date=date(2025, 5, 1),
+            images=["/events/japan2025/japan1.jpg", "/events/japan2025/japan2.jpg", "/events/japan2025/japan3.jpg", "/events/japan2025/japan4.jpg", "/events/japan2025/japan5.jpg", "/events/japan2025/japan6.jpg", "/events/japan2025/japan7.jpg", "/events/japan2025/japan8.jpg", "/events/japan2025/japan9.jpg"]
         )
 
 
@@ -332,7 +340,8 @@ def hardcode_timeline_database(app):
             eecs482_p4_file_system_event,
             research_summer, 
             shanghai_study_abroad,
-            kdp_internship
+            kdp_internship,
+            japan_trip
         ])
         db.session.commit()                                            # Commit changes to documents table
         print("Database created and populated.")
