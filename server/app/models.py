@@ -28,6 +28,7 @@ class Events(db.Model):
     title = db.Column(db.String(20), unique=True, nullable=False)     # Title of each document (max 20 chars)
     desc = db.Column(db.String(500))                                  # Desc of each document (max 500 chars)
     tags = db.Column(db.JSON, nullable=False)                         # Tags for Filtering
-    date = db.Column(db.Date, nullable=False)                         # Date (month, year) of event
+    start = db.Column(db.Date, nullable=False)                         # Date (month, year) of event
+    end = db.Column(db.Date, nullable=False)                         # Date (month, year) of event
     images = db.Column(db.JSON, nullable=False)                       # Images of events
     

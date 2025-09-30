@@ -161,7 +161,7 @@ export default function Events() {
                           title={event.title}
                           desc={event.desc}
                           tags={event.tags}
-                          date={event.date}
+                          date={event.start}
                           images={event.images}
                         />
                       </div>

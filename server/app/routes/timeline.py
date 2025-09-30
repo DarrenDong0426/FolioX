@@ -29,7 +29,18 @@ def get_events():
 
 
     # Query rows of events table from the filtered entries ordered by least recent on top. 
-    events = Events.query.filter(extract('year', Events.date)==year).filter(filter_condition).order_by(Events.date.asc()).all()                 
+    events = (
+        Events.query
+        .filter(
+            or_(
+                extract('year', Events.start) == year,
+                extract('year', Events.end) == year
+            )
+        )
+        .filter(filter_condition)
+        .order_by(Events.start.asc())
+        .all()
+    )
 
     return jsonify({  
         "events": [           
@@ -37,7 +48,8 @@ def get_events():
             "id": e.id,                                             # Get id of project
             "title": e.title,                                       # Get name of project
             "desc": e.desc,                                         # Get desc of project
-            "date": e.date.strftime("%B %Y"),                       # Get date (month year) of project
+            "start": e.start.strftime("%B %Y"),                       # Get date (month year) of project
+            "end": e.end.strftime("%B %Y"),                       # Get date (month year) of project
             "tags": e.tags, 
             "images": e.images  
           } for e in events                                     # Iterate through each project 
