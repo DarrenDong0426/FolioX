@@ -159,7 +159,7 @@ export default function Controls() {
         <button
           onClick={() => {
             setYear(prev => {
-              const newYear = Math.min(currentYear, year + 1);
+              const newYear = Math.min(currentYear, prev + 1);
               setYear(newYear);
               setTemp(newYear.toString());
               return newYear;

@@ -340,7 +340,6 @@ def hardcode_timeline_database(app):
             images=["/events/japan2025/japan1.jpg", "/events/japan2025/japan2.jpg", "/events/japan2025/japan3.jpg", "/events/japan2025/japan4.jpg", "/events/japan2025/japan5.jpg", "/events/japan2025/japan6.jpg", "/events/japan2025/japan7.jpg", "/events/japan2025/japan8.jpg", "/events/japan2025/japan9.jpg"]
         )
 
-
         db.session.add_all([
             tictactoe_event,
             recipEats_app_event,

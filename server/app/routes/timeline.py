@@ -1,7 +1,7 @@
 # Imports
 from flask import Blueprint, jsonify, request                                 # Import flask functions and classes from flask library
 from ..models import Events                                                 # Import Projects database scheme from ..models
-from sqlalchemy import extract, or_                                         # Import extract func and or operatior from sqlalchemy
+from sqlalchemy import extract, or_, and_                                        # Import extract func and or operatior from sqlalchemy
 from datetime import datetime
 
 # Create Blueprint objects
@@ -32,9 +32,9 @@ def get_events():
     events = (
         Events.query
         .filter(
-            or_(
-                extract('year', Events.start) == year,
-                extract('year', Events.end) == year
+            and_(
+                Events.start <= f"{year}-12-31",  # event starts before end of year
+                Events.end >= f"{year}-01-01"     # event ends after start of year
             )
         )
         .filter(filter_condition)
