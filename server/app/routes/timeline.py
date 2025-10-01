@@ -13,19 +13,11 @@ def get_events():
     year = request.args.get("year", datetime.now().year, type=int)          # Get year form query. Default to current year
     filters = request.args.get("filters", "", type=str).strip().split(",")    # Get a list of filters if exist or a set of empty string if not
 
-    if filters != ['']:                                                       # If filters is not an a set of empty string
-        tag_conditions = []                                              # Array to store projects that matches language criteria
-        tag_conditions = []                                                  # Array to store project that matches type critieria
-        for f in filters:                                                     # Iterate through each filter value
-            tag_conditions.extend([                                      # Add to language array if any of the following match
-                Events.tags == f'["{f}"]',                              # Language is stored as a JSON in database (a string s = '[item1, item2, ...]')
-                Events.tags.like(f'["{f}",%'),                          # Parses language JSON based on singular item ([] on both side), first item ([item, ]), last item ([, item]), or middle item ([, item])
-                Events.tags.like(f'%, "{f}"]'),
-                Events.tags.like(f'%, "{f}",%')
-            ])       
-        filter_condition = or_(*tag_conditions, *tag_conditions)        # Take the or of both types so projects in either array are accepted
+    if filters != [""]:   # If filters provided
+        tag_conditions = [Events.tags == f for f in filters]   # Direct equality
+        filter_condition = or_(*tag_conditions)                # OR together
     else:
-        filter_condition = True                                               # If filter is empty, return true so all projects are accepted
+        filter_condition = True                                # No filtering if empty
 
 
     # Query rows of events table from the filtered entries ordered by least recent on top. 

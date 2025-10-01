@@ -65,7 +65,6 @@ export default function Controls() {
   {
     title: "Categories",
     options: [
-      { label: "Academics", type: "Academics" },
       { label: "Personal",  type: "Personal"   },
       { label: "Projects",  type: "Projects"      },
       { label: "Professional", type: "Professional" },

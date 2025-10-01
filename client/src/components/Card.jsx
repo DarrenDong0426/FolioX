@@ -39,7 +39,7 @@ export default function Card({ title, desc, tags = [], date, images = [] }) {
   }
 
   return (
-    <div className={`min-w-[220px] max-w-xs ${colorCodeFunc(tags[0])} border border-blue-100 shadow-2xl rounded-2xl px-5 py-4 text-slate-800 z-30`}>
+    <div className={`min-w-[220px] max-w-xs ${colorCodeFunc(tags)} border border-blue-100 shadow-2xl rounded-2xl px-5 py-4 text-slate-800 z-30`}>
         {/* Div context wrapper for the card
           * 
           * min-w-[220px]: Ensure a minimum width for the card
@@ -101,27 +101,24 @@ export default function Card({ title, desc, tags = [], date, images = [] }) {
           * mt-1: Margin top for slight spacing from description
           *  
           */}
-          {tags.map((tag, i) => (
-            <span
-              key={i}
-              className="bg-gradient-to-r from-blue-100 via-white to-yellow-100 text-blue-800 border border-blue-200 font-semibold px-2 py-0.5 rounded-full text-xs shadow-sm transition hover:bg-blue-200"
-            >
-            {/* Span context wrapper for each tag
-              * 
-              * bg-gradient-to-r from-blue-100 via-white to-yellow-100: Gradient background for visual interest
-              * text-blue-800: Blue text color for readability
-              * border border-blue-200: Light blue border for definition
-              * font-semibold: Semi-bold text for emphasis
-              * px-2 py-0.5: Padding for spacing around the tag text
-              * rounded-full: Fully rounded corners for a pill shape
-              * text-xs: Smaller text size for tags 
-              * shadow-sm: Subtle shadow for slight depth
-              * transition hover:bg-blue-200: Smooth background color change on hover for interactivity
-              * 
-              */}
-              #{tag}
-            </span>
-          ))}
+          <span
+            className="bg-gradient-to-r from-blue-100 via-white to-yellow-100 text-blue-800 border border-blue-200 font-semibold px-2 py-0.5 rounded-full text-xs shadow-sm transition hover:bg-blue-200"
+          >
+          {/* Span context wrapper for each tag
+            * 
+            * bg-gradient-to-r from-blue-100 via-white to-yellow-100: Gradient background for visual interest
+            * text-blue-800: Blue text color for readability
+            * border border-blue-200: Light blue border for definition
+            * font-semibold: Semi-bold text for emphasis
+            * px-2 py-0.5: Padding for spacing around the tag text
+            * rounded-full: Fully rounded corners for a pill shape
+            * text-xs: Smaller text size for tags 
+            * shadow-sm: Subtle shadow for slight depth
+            * transition hover:bg-blue-200: Smooth background color change on hover for interactivity
+            * 
+            */}
+            #{tags}
+          </span>
         </div>
       )}
 

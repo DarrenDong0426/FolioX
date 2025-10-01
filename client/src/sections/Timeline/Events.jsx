@@ -75,19 +75,26 @@ export default function Events() {
         * 
         */}
       <Controls />
-      <div className="flex border-b border-gray-300 mb-4">
-        <div className="w-40"></div> 
-        <div className="flex-1 relative">
+      <div className="flex border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white rounded-t-lg shadow-sm mb-4">
+        <div className="w-40 bg-gray-100 flex items-center justify-center text-sm font-semibold text-gray-700">
+          Events
+        </div>
+        <div className="flex-1 relative h-12">
           {monthLabels.map((month, idx) => {
             const percent = timeToPercent(month.getTime());
             return (
-              <span
+              <div
                 key={idx}
-                className="absolute -translate-x-1/2 text-xs text-gray-700"
-                style={{ left: `${percent}%` }}
+                className="absolute flex flex-col items-center text-xs"
+                style={{ left: `${percent}%`, transform: "translateX(-50%)" }}
               >
-                {month.toLocaleString("default", { month: "short" })}
-              </span>
+                {/* Guideline */}
+                <div className="h-6 w-px bg-gray-300"></div>
+                {/* Month pill */}
+                <span className="mt-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-medium shadow-sm">
+                  {month.toLocaleString("default", { month: "short" })}
+                </span>
+              </div>
             );
           })}
         </div>
@@ -110,25 +117,16 @@ export default function Events() {
         const endPercent = timeToPercent(clippedEnd);
         const widthPercent = endPercent - startPercent || 2;
 
-        const secondaryColors = event.tags.slice(1).map(tag => colorCodeFunc(tag).bg);
-        const borderGradient = secondaryColors.length
-          ? `repeating-linear-gradient(45deg, ${secondaryColors
-              .map((c, i) => `${c} ${i * 10}px ${(i + 1) * 10}px`)
-              .join(", ")})`
-          : "transparent";
-
         return (
-          <div key={event.id || idx} className="flex items-center border-b"
+          <div key={event.id || idx} className="flex items-center border-b border-gray-300"
               onMouseEnter={() => setHoveredEventId(event.id)}
               onMouseLeave={() => setHoveredEventId(null)}>
             {/* Event name */}
             <div
               className={`w-40 text-right pr-4 text-sm font-semibold m-1`}
               style={{
-                backgroundColor: colorCodeFunc(event.tags[0]).bg,
-                borderWidth: "10px",
-                borderStyle: secondaryColors.length ? "solid" : "none",
-                borderImage: secondaryColors.length ? `${borderGradient} 1` : undefined,
+                backgroundColor: colorCodeFunc(event.tags).bg,
+                borderWidth: "5px",
               }}
             >
               {event.title}
@@ -139,7 +137,7 @@ export default function Events() {
                 className={`absolute h-8 rounded shadow cursor-pointer`}
                 style={{ left: `${startPercent}%`, 
                           width: `${widthPercent}%`,
-                          backgroundColor: colorCodeFunc(event.tags[0]).bg, }}
+                          backgroundColor: colorCodeFunc(event.tags).bg, }}
               ></div>
 
               {/* Time label */}
