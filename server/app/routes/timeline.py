@@ -25,8 +25,8 @@ def get_events():
         Events.query
         .filter(
             and_(
-                Events.start <= f"{year}-12-31",  # event starts before end of year
-                Events.end >= f"{year}-01-01"     # event ends after start of year
+                Events.start <= f"{year}-12-31",                # event starts before end of year
+                Events.end >= f"{year}-01-01"                   # event ends after start of year
             )
         )
         .filter(filter_condition)
