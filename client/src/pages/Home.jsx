@@ -5,6 +5,7 @@ import Intro from "../sections/Home/Intro";             // Imports the Intro com
 import Projects from '../sections/Home/Projects';       // Imports the Project component from the path ../sections/Home/Projects.jsx
 import Documents from '../sections/Home/Documents';     // Imports the Documents component from the path ../sections/Home/Documents.jsx
 import Timeline from '../sections/Home/Timeline';
+import Information from '../sections/Home/Information'
 
 /* Defines the Home component
  *
@@ -58,6 +59,9 @@ export default function Home(){
               */}
           <section className='h-screen flex items-center justify-center px-6 shadow-2xl'>
               <Timeline/>
+          </section>
+          <section className='h-screen flex items-center justify-center px-6 shadow-2xl'>
+              <Information/>
           </section>
       </main>
     </div>

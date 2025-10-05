@@ -7,6 +7,8 @@ import Home from './pages/Home';                  // Import custom "Home" compon
 import Projects from './pages/Projects';          // Import custom "Projects" component from ./pages/Projects
 import Documents from './pages/Documents';        // Import custom "Documents" component from ./pages/Documents
 import Timeline from './pages/Timeline';          // Import custom "Timeline" component from ./pages/Timeline
+import FaQs from './pages/FaQs';
+import Changelog from './pages/Changelog';
 
 /* Defines the App component
  *
@@ -26,6 +28,8 @@ export default function App() {
         <Route path="/Projects" element={<Projects />} />     {/* Maps the path "/Projects" to render the Projects component */}
         <Route path="/Documents" element={<Documents />} />   {/* Maps the path "/Documents" to render the Documents component */}
         <Route path="/Timeline" element={<Timeline/>}/>       {/* Maps the path "/Timeline" to render the Timeline component */}
+        <Route path="/FaQs" element={<FaQs/>}/>       {/* Maps the path "/Timeline" to render the Timeline component */}
+        <Route path="/Changelog" element={<Changelog/>}/>       {/* Maps the path "/Timeline" to render the Timeline component */}
       </Routes>
     </BrowserRouter>
   );
