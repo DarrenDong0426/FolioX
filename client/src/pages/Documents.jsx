@@ -85,7 +85,7 @@ export default function Documents(){
                 *  
             */}
             <Header/>
-            <main className='flex flex-1 overflow-y-auto flex-row'>
+            <main className='flex flex-1 overflow-y-auto flex-row ' >
                 {/* Main: Labels the main component of the screen
                   *  
                   * flex: Sets the container in flex format
