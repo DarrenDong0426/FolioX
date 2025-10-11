@@ -1,4 +1,4 @@
-
+import { useTheme } from "../hooks/themeContext.jsx";   // <-- Add this import for theme support
 
 /* *
  * Sidebar Component
@@ -10,27 +10,38 @@
  * 
  */
 export default function Sidebar({ items, currIndex, setCurrDoc }) {
+  const { isWarmthMode } = useTheme();   // Get current theme
+
   return (
-    <div className="h-screen w-64 border-r border-gray-300 bg-gray-50 p-4 flex flex-col">
+    <div className={`
+      h-screen w-64 border-r
+      ${isWarmthMode ? "border-[#ffe6ea] bg-[#fff7f7]" : "border-cyan-900 bg-[#161b22]/95"}
+      p-4 flex flex-col
+    `}>
       {/* Div: Context wrapper over sidebar component
         * 
         * h-screen sets the height to be the size of the screen
         * w-64 sets the width of the component to 16rem (64 is the value set by CSS)
         * border-r adds a border to the right side of the component
-        * border-gray-300 sets the color of the border to gray
-        * bg-gray-50 sets the color of the background to gray
+        * border-gray-300 sets the color of the border to gray (now theme-aware)
+        * bg-gray-50 sets the color of the background to gray (now theme-aware)
         * p-4 adds a padding of size 4 * 0.25rem = 1rem in all directions
         * flex sets the container to be in flex format
         * flex-col sets the children on the container to be in a column
         * 
         */}
-      <h2 className="text-xl font-semibold mb-6 text-gray-800">Documents</h2>
+      <h2 className={`
+        text-xl font-semibold mb-6
+        ${isWarmthMode ? "text-[#E94E41]" : "text-cyan-300"}
+      `}>
+        Documents
+      </h2>
       {/* h2: header to indicate Documents
         * 
         * text-xl sets the size of the text to extra large
         * font-semibold sets the font of the text to semibold
         * mb-6 sets the bottom margin to 6 * 0.25 = 1.5rem
-        * text-gray-800 sets the color of the text to gray
+        * text-gray-800 sets the color of the text to gray (now theme-aware)
         * 
       */}
       <div className="space-y-2 overflow-y-auto">
@@ -45,12 +56,15 @@ export default function Sidebar({ items, currIndex, setCurrDoc }) {
           <button
             key={item.id}                                                 // Sets the key of each item to be the id
             onClick={() => setCurrDoc(index)}                             // On click, use setCurrDoc to set the new index to index
-            className={`                            
+            className={`
               w-full text-left px-4 py-2 rounded-xl transition-colors
-              ${
-                index === currIndex
-                  ? "bg-blue-500 text-white shadow-sm"
-                  : "bg-white hover:bg-blue-100 text-gray-700"
+              ${index === currIndex
+                ? isWarmthMode
+                  ? "bg-[#E94E41]/90 text-white shadow-sm"
+                  : "bg-cyan-700 text-cyan-50 shadow-sm"
+                : isWarmthMode
+                  ? "bg-white hover:bg-[#ffe6ea] text-[#E94E41]"
+                  : "bg-[#232940] hover:bg-cyan-950 text-cyan-300"
               }
             `}
           >
@@ -62,12 +76,12 @@ export default function Sidebar({ items, currIndex, setCurrDoc }) {
               * py-2 adds a padding in the y direction by 2 * 0.25rem = 0.5rem
               * rounded-xl sets the container to be rounded on the corners
               * transition-color adds a transition in the color change
-              * bg-blue-500 sets the background of the button to blue if selected
+              * bg-blue-500 sets the background of the button to blue if selected (now theme-aware)
               * text-white sets the text color to be white if selected
               * shadow-sm adds a small shadow in all directions if selected
               * bg-white sets the background to be white if not selected
               * hover:bg-blue-100 sets the background to be lighter blue if not selected but hovered
-              * text-gray-700 sets the text color to be gray if not selected
+              * text-gray-700 sets the text color to be gray if not selected (now theme-aware)
               * 
               */}
             {item.title}

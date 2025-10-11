@@ -60,7 +60,7 @@ export default function Controls() {
 
   return (
     <div className={`
-      flex flex-wrap items-center justify-between w-full max-w-4xl mx-auto mb-6 gap-4 px-4
+      flex flex-wrap items-center justify-between w-full max-w-4xl mx-auto mb-3 gap-4 px-4
       rounded-xl shadow border
       transition-colors duration-500
       ${isWarmthMode

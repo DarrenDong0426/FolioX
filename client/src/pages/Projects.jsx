@@ -41,17 +41,17 @@ export default function Projects(){
           * py-4 sets the vertical padding 
           *  
          */}
-        <h1 className={`
-          text-4xl font-bold mb-8 text-center
+       <h1
+        style={{ fontFamily: "'Orbitron', 'Arial', sans-serif" }}
+        className={`
+          text-4xl font-bold mb-3 text-center
           transition-colors
+          tracking-wide uppercase
           ${isWarmthMode ? "text-[#E94E41]" : "text-cyan-300"}
-        `}>
-          {/* h1: Overall project heading of the page 
-           *
-           * color adapts to theme for best readability/accent
-           */}
-          Projects
-        </h1>
+        `}
+      >
+        Projects
+      </h1>
         {/* Wrap the ProjectsList component with ProjectListProvider to provide context */}
         <ProjectListProvider>
           <ProjectsList/>

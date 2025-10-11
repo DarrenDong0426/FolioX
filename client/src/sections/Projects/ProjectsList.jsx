@@ -64,7 +64,7 @@ export default function ProjectsList(){
   return ( 
    <>
     <div className={`
-      min-h-screen w-screen transition-colors duration-500 pt-20
+      min-h-screen w-screen transition-colors duration-500 pt-5
       flex flex-col
       ${isWarmthMode
         ? "bg-[radial-gradient(ellipse_80%_60%_at_20%_10%,rgba(255,226,237,0.7)_60%,#fff8f3_100%)]"

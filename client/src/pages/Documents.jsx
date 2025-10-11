@@ -3,6 +3,7 @@ import PDFViewer from "../components/PDFViewer"
 import Header from "../components/Header"
 import Sidebar from "../components/Sidebar"
 import getDocuments from "../hooks/getDocuments"
+import { useTheme } from "../hooks/themeContext.jsx"      // Import useTheme for theme support
 
 /* *
  * Documents page
@@ -14,16 +15,40 @@ import getDocuments from "../hooks/getDocuments"
  */
 export default function Documents(){
     const { documents, setCurrDoc, currDoc, error, loading } = getDocuments()   // Get documents data from fetched data
+    const { isWarmthMode } = useTheme();                                        // Get current theme
     
-    if (loading){                                                           // If loading (no error and fetching data)
+    const hasDocuments = Array.isArray(documents) && documents.length > 0      // Check if documents exist
+    const validDoc = hasDocuments && currDoc >= 0 && currDoc < documents.length// Check if currDoc is a valid index
+
+    // Classes for color theming, theme-aware
+    const bgClass = isWarmthMode
+        ? "bg-[#fff7f7]"
+        : "bg-[radial-gradient(ellipse_80%_60%_at_20%_10%,rgba(32,46,65,0.96)_48%,rgba(16,28,44,0.93)_75%,rgba(9,16,29,0.97)_90%,#101727_100%)]";
+    const headingClass = isWarmthMode
+        ? "text-[#E94E41]"
+        : "text-cyan-300";
+    const subTextClass = isWarmthMode
+        ? "text-[#a96871]"
+        : "text-cyan-400";
+    const descTextClass = isWarmthMode
+        ? "text-[#6b3030]"
+        : "text-cyan-100";
+    const errorTextClass = isWarmthMode
+        ? "text-red-600"
+        : "text-[#F38BA3]";
+    const loadingTextClass = isWarmthMode 
+        ? "text-gray-600"
+        : "text-cyan-200";
+
+    if (loading){ // If loading (no error and fetching data)
         return (
-            <div className='min-h-screen flex flex-col bg-gray-50'>
+            <div className={`min-h-screen flex flex-col ${bgClass}`}>
                 <Header/>
-                <p className='text-center text-gray-600'>
+                <p className={`text-center ${loadingTextClass}`}>
                     {/* p: Paragraph for the text
                     *
                     * text-center puts the element at the center  
-                    * text-gray-600 sets the color of the text to gray
+                    * text-gray-600/text-cyan-200 sets the color of the text based on theme
                     *  
                     */}
                     LOADING...
@@ -32,15 +57,15 @@ export default function Documents(){
         )
     }
 
-    if (error){                                                            // If error (failed to fetch data)
+    if (error){ // If error (failed to fetch data)
         return (
-            <div className='min-h-screen flex flex-col bg-gray-50'>
+            <div className={`min-h-screen flex flex-col ${bgClass}`}>
                 <Header/>
-                <p className='text-center text-red-600'>
+                <p className={`text-center ${errorTextClass}`}>
                 {/* p: Paragraph for the text
                 *
                 * text-center puts the element at the center 
-                * text-red-600 sets the color of the text to red
+                * text-red-600/text-[#F38BA3] sets the color of the text to red/pink for light/dark
                 *  
                 */}
                 Error: {error.message}
@@ -50,15 +75,15 @@ export default function Documents(){
     }
         
     return (
-        <div className='min-h-screen flex flex-col bg-gray-50'>
+        <div className={`min-h-screen flex flex-col ${bgClass}`}>
             {/* Div: Context wrapper for full screen
                 *
                 * min-h-screen sets the minimimum height to be the entire screen
                 * flex sets the children components to be in flex
                 * flex-col sets the children components to be in a solumn
-                * bg-gray-50 sets the background to be light gray
+                * bg-... sets the background to be theme-aware
                 *  
-                */}
+            */}
             <Header/>
             <main className='flex flex-1 overflow-y-auto flex-row'>
                 {/* Main: Labels the main component of the screen
@@ -85,26 +110,46 @@ export default function Documents(){
                       * items-start: Sets children components to start from the top
                       * flex-col: Sets the children components to be in a column
                       * 
-                      */}
-                    <h1 className="p-4 text-2xl font-bold text-center w-full">
-                        {/* Div: Context Wrapper for the document pdf itself 
-                          * 
-                          * p-4 adds a padding of 4 * 0.25rem = 1rem in all directions
-                          * text-2xl sets the text to be large x2
-                          * font-bold sets the text to be bolded
-                          * text-center sets the text to be in the center of the container
-                          * w-full uses the entire width of the container
-                          * 
-                        */}
-                        {documents[currDoc].title}
-                    </h1>
-                    <p className="text-center w-full text-gray-500">
-                        Last Updated: {documents[currDoc].month_year}
-                    </p>
-                    <p className="p-4">
-                        {documents[currDoc].desc}
-                    </p>
-                    <PDFViewer fileUrl={documents[currDoc].file_path}/>
+                    */}
+                    {validDoc ? (
+                        <>
+                            <h1 className={`p-4 text-3xl font-bold text-center w-full font-mono tracking-tight uppercase ${headingClass}`}>
+                                {/* h1: Context Wrapper for document title 
+                                  *
+                                  * font-mono gives a cool, modern/tech style
+                                  * tracking-tight for compact spacing
+                                  * uppercase for accent
+                                  * text-center centers the text
+                                  * w-full fills the parent
+                                  * color adapts to theme
+                                */}
+                                {documents[currDoc].title}
+                            </h1>
+                            <p className={`text-center w-full ${subTextClass}`}>
+                                {/* p: Paragraph for last updated information
+                                  *
+                                  * text-center puts the element at the center
+                                  * w-full uses the entire width of the container
+                                  * text color adapts to theme
+                                */}
+                                Last Updated: {documents[currDoc].month_year}
+                            </p>
+                            <p className={`p-4 ${descTextClass}`}>
+                                {/* p: Paragraph for document description
+                                  *
+                                  * p-4 adds a padding of 4 * 0.25rem = 1rem in all directions
+                                  * text color adapts to theme
+                                */}
+                                {documents[currDoc].desc}
+                            </p>
+                            <PDFViewer fileUrl={documents[currDoc].file_path}/>
+                        </>
+                    ) : (
+                        <div className="w-full p-12 flex flex-col items-center justify-center">
+                            {/* Div: Shown if there are no documents available */}
+                            <p className={`text-center ${subTextClass}`}>No documents found.</p>
+                        </div>
+                    )}
                 </div>
              </main>
         </div>
