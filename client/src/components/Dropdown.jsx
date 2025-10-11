@@ -1,3 +1,5 @@
+import { useTheme } from '../hooks/themeContext.jsx'; // Import theme context
+
 /* Defines the Dropdown Component 
  *
  * Options param sets array of options that a user can choose from
@@ -8,6 +10,8 @@
  *  
 */
 export default function Dropdown({ options, dropDown, setDropDown, isOpen, setIsOpen }) {
+  const { isWarmthMode } = useTheme();
+
   return (
     <div
       className="relative flex items-center space-x-2"
@@ -21,83 +25,60 @@ export default function Dropdown({ options, dropDown, setDropDown, isOpen, setIs
           * onMouseLeave lets the dropdown menu close up when not hover via setIsOpen 
           * 
         */}
-      <label className="font-medium">Sort By:</label>
-      {/* Label: Indicate dropdown is for sort by 
-        * 
-        * font-medium sets the emphasis of the text 
-        * 
-      */}
-      <div className="relative w-40"> 
-        {/* Div: Context Wrapper over the DropDown itself
+      <label className={`
+        font-medium transition-colors
+        ${isWarmthMode ? "text-gray-700" : "text-cyan-200"}
+      `}>
+        {/* Label: Indicate dropdown is for sort by 
           * 
-          * relative allows children component to be position relative to this component
-          * w-40 hardcodes the width of the dropdown box 
+          * font-medium sets the emphasis of the text
+          * color adapts by theme
           * 
         */}
+        Sort By:
+      </label>
+      <div className="relative w-40">
         <button
-          className="w-full px-4 py-2 bg-white border rounded shadow hover:bg-gray-100 text-left"
+          className={`
+            w-full px-4 py-2 border rounded shadow text-left transition-colors duration-200
+            ${isWarmthMode
+              ? "bg-white border-gray-300 text-gray-900 hover:bg-gray-100"
+              : "bg-[#232b39] border-cyan-900 text-cyan-100 hover:bg-cyan-900"
+            }
+          `}
         >
           {dropDown}
         </button>
-         {/* Button: Button of the current dropdown option
-          * 
-          * w-full allows the component to take up all of the parent component's width
-          * px-4 adds horizontal padding
-          * py-2 adds vertical padding
-          * bg-white sets the background to white
-          * border gives the dropdown box a border
-          * rounded removes the corner of the box to be round
-          * shadow gives the box a shadow on the bottom
-          * hover:bg-gray-100 sets the background color to a bit gray on hover
-          * text-left sets the text to start on the left size of the container
-          * 
-        */}
-        {/* DropDown other options if isOpen */}
         {isOpen && (
           <div
-            className="absolute w-full bg-white border border-gray-200 rounded shadow-lg z-10 flex flex-col"
+            className={`
+              absolute w-full border rounded shadow-lg z-10 flex flex-col
+              transition-colors duration-200
+              ${isWarmthMode
+                ? "bg-white border-gray-200"
+                : "bg-[#192534] border-cyan-700"
+              }
+            `}
             role="menu"
             aria-orientation="vertical"
             aria-labelledby="options-menu"
           >
-            {/* Div: Context Wrapper over all other options when dropdown menu opens
-              * 
-              * absolute sets the children component relative to the nearest relative parent component. It defaults to topleft of parent component which is the bottom in HTML stacking
-              * w-full allows the component to take up all of its parent's width
-              * bg-white adds a white background to the component
-              * border gives a border to the component
-              * border-gray-200 sets the color of the border to be gray
-              * rounded removes the corner of the box to be round
-              * shadow gives the box a large shadow on the bottom
-              * z-10 sets the z-index to 10 so that it would overlap on top of other components
-              * flex sets the formatting to be in a flexbox
-              * flex-col sets the flexbox to grow vertically 
-              * role helps screen readers read the component
-              * aria-orientation indicates vertical placement for screen readers
-              * aria-labelledby is a id for the aria component
-              * 
-            */}
-            {/* Options filters out the current dropbox and create a button for the remaining options via map()  */}
             {options
               .filter(option => option !== dropDown)
               .map(option => (
                 <button
                   key={option}
-                  className="w-full px-4 py-2 text-left hover:bg-gray-100"
+                  className={`
+                    w-full px-4 py-2 text-left transition-colors
+                    ${isWarmthMode
+                      ? "text-gray-800 hover:bg-gray-100"
+                      : "text-cyan-100 hover:bg-cyan-800"
+                    }
+                  `}
                   onClick={() => setDropDown(option)}
                 >
-                {/* Button: Other dropdown options 
-                  * 
-                  * w-full allows the button to take up its parents width in its entirety
-                  * px-4 adds horizontal padding 
-                  * py-2 adds vertical padding
-                  * text-left sets the text to start on the left
-                  * hover:bg-gray-100 sets the background color to gray on hover  
-                  * 
-                */}
                   {option}
                 </button>
-                
               ))}
           </div>
         )}

@@ -3,7 +3,7 @@ import Tag from '../../components/Tag';                 // Import Tag component 
 import Pagination from '../../components/Pagination';   // Import Pagination component from path ../../components/Pagination
 import Controls from './Controls';                      // Import Controls component from path ./Controls
 import { useProjects } from '../../hooks/projectListContext';   // Import useProjects hook from path ../../hooks/projectListContext
-
+import { useTheme } from '../../hooks/themeContext.jsx';        // Import theme context
 
 /* Defines the ProjectsList section component
  *
@@ -13,22 +13,29 @@ import { useProjects } from '../../hooks/projectListContext';   // Import usePro
 */
 export default function ProjectsList(){
 
-  // ColorCode Function for filter
+  // ColorCode Function for filter (tag) background/text
   function colorCodeFunc(type) {
-    return type === "type" ?                                                 // Set the background and text color based on type of tag (language or project type)
-        "bg-blue-100 text-blue-800" : 
-        "bg-green-100 text-green-800";
+    // Add theme-AWARE colors if you do tags here
+    return type === "type"
+      ? isWarmthMode
+        ? "bg-blue-100 text-blue-800"
+        : "bg-cyan-900 text-cyan-200"
+      : isWarmthMode
+        ? "bg-green-100 text-green-800"
+        : "bg-green-900 text-green-200";
   }
 
   const { 
     projects, loading, error, 
     currentPage, setCurrentPage, 
     totalPage
-  } = useProjects();                                                      // Get projects, loading, error state, and pagination data from useProjects() from from projectListContext 
+  } = useProjects();   // Get projects, loading, error state, and pagination data from useProjects() from projectListContext 
 
-  if (loading){                                                           // If loading (no error and fetching daa)
+  const { isWarmthMode } = useTheme(); // Get theme switch
+
+  if (loading){ // If loading (no error and fetching daa)
     return (
-      <p className='text-center text-gray-600'>
+      <p className={`text-center ${isWarmthMode ? "text-gray-600" : "text-cyan-200"}`}>
         {/* p: Paragraph for the text
         *
         * text-center puts the element at the center  
@@ -40,94 +47,74 @@ export default function ProjectsList(){
     )
   }
 
-  if (error){                                                            // If error (failed to fetch data)
+  if (error){ // If error (failed to fetch data)
     return (
-        <p className='text-center text-red-600'>
+      <p className={`text-center ${isWarmthMode ? "text-red-600" : "text-[#F38BA3]"}`}>
         {/* p: Paragraph for the text
         *
         * text-center puts the element at the center 
-        * text-red-600 sets the color of the text to red
+        * text-red-600 sets the color of the text to red (or pink for dark mode)
         *  
         */}
          Error: {error.message}
-        </p>
+      </p>
     )
   }
 
-  return (                                                              // If data successfully retrieved, list out each project with map()
+  return ( 
    <>
-    <Controls/>
-    <ul className='px-4 max-w-7xl mx-auto'>
-        {/* ul: Unordered list for each project
-          *
-          * px-4 add horizontal padding
-          * max-w-7xl sets the max width to be extra large x7 
-          * mx-auto sets margins automatically based on remaining space
-          *  
-          */}
+    <div className={`
+      min-h-screen w-screen transition-colors duration-500 pt-20
+      flex flex-col
+      ${isWarmthMode
+        ? "bg-[radial-gradient(ellipse_80%_60%_at_20%_10%,rgba(255,226,237,0.7)_60%,#fff8f3_100%)]"
+        : "bg-[radial-gradient(ellipse_80%_60%_at_20%_10%,rgba(32,46,65,0.96)_48%,rgba(16,28,44,0.93)_75%,rgba(9,16,29,0.97)_90%,#101727_100%)]"
+      }
+    `}>
+
+      <div className="max-w-7xl w-full mx-auto px-4 pb-10">
+        <Controls/>
+
+        <ul className='pt-4'>
+
           {projects.map(project => (
-              <li key={project.id} className='bg-white shadow-md rounded-2xl p-6 mb-6 border border-gray-200'>
+              <li key={project.id} className={`
+                ${isWarmthMode
+                  ? "bg-white border-[#e2eafc]"
+                  : "bg-[#1b2433]/95 border-cyan-900"
+                }
+                shadow-md rounded-2xl p-6 mb-6 border transition-colors duration-500
+              `}>
                 {/* li: List item as project 
                   *
-                  * bg-white sets each project component as white
-                  * shadow-md sets a medium shadow beneath each project component
-                  * rounded-2xl makes the component edge rounded 2xl
-                  * p-6 adds padding in all four directions
-                  * mb-6 add margins to the bottom
-                  * border adds a border around the component
-                  * border-gray-200 sets the color of the border to gray
-                  *  
+                  * bg color themes to mode
+                  * border changes theme too
                   */}
                 <div className='flex items-center gap-2 mb-2'>
-                  {/* div: context wrapper over the project component
-                  *
-                  * flex sets the children component to be as flexbox
-                  * items-center sets the children to be centered on the flex direction (horizontal here)
-                  * gap-2 adds a gap in the direction of the flex (horizontal here)
-                  * mb-2 adds a margin to the bottom
-                  *  
-                  */}
                   {project.lock && <span title="Private">🔒</span>}
                   {project.wip && <span title="Work in progress">🚧</span>}
-                  <h3 className='text-2xl font-bold hover:text-blue-600'>
-                    {/* h3: project header
-                      *
-                      * text-2xl sets the text size to extra large 2x
-                      * fond-bold sets the text emphasis to bold
-                      * hover:text-blue-600 sets the text color to blue on hover
-                      *  
-                      */}
+                  <h3 className={`
+                    text-2xl font-bold transition-colors duration-200
+                    ${isWarmthMode ? "text-[#264653] hover:text-[#E94E41]" : "text-cyan-200 hover:text-cyan-400"}
+                    hover:underline hover:underline-offset-2
+                  `}>
                     {project.name}
                   </h3>
-                  <p className='ml-auto text-gray-500 text-sm'>
-                    {/* p: project timeline
-                      *
-                      * ml-auto sets the left margin of the flex box based on remaining space in the left
-                      * text-gray-500 sets the text color as gray
-                      * text-sm sets the text size to small
-                      *  
-                      */}
+                  <p className={`
+                    ml-auto text-sm
+                    ${isWarmthMode ? "text-gray-500" : "text-cyan-400"}
+                  `}>
                     ({project.month_year})
                   </p>
                 </div>
                 <div>
-                  <p className='text-gray-700 mb-4'>
-                    {/* p: project description
-                      *
-                      * text-gray-700 sets the text color as gray
-                      * mb-4 sets the bottom padding 
-                      *  
-                      */}
+                  <p className={`
+                    mb-4 transition-colors
+                    ${isWarmthMode ? "text-gray-700" : "text-cyan-100"}
+                  `}>
                     {project.desc}
                   </p>
                   <div className='flex flex-wrap gap-2'>
-                    {/* div: context wrapper for each tag of the project
-                      *
-                      * flex sets the parent and children elements as a flexbox
-                      * flex-wrap forces children elements to wrap around when no horizontal space left
-                      * gap-2 sets a gap in the direction of the flexbox (horizontal here)
-                      *  
-                      */}
                     {project.type.includes("Software") && <Tag label="Software" type="type" colorCodeFunc={colorCodeFunc} />}
                     {project.type.includes("Hardware") && <Tag label="Hardware" type="type" colorCodeFunc={colorCodeFunc}/>}
                     {project.type.includes("AI/ML") && <Tag label="AI/ML" type="type" colorCodeFunc={colorCodeFunc}/>}
@@ -144,13 +131,16 @@ export default function ProjectsList(){
                 </div>
               </li>
           ))}
-      </ul>
-      <Pagination             
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-        totalPage={totalPage}
-      />
-    </>
+        </ul>
+
+        <Pagination             
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          totalPage={totalPage}
+        />
+      </div>
+    </div>
+   </>
   )
 
 }

@@ -1,3 +1,5 @@
+import { useTheme } from '../hooks/themeContext.jsx'; // Import theme context
+
 /* Defines the SearchBar Component
  *
  * SearchBar with query
@@ -7,6 +9,8 @@
  *  
 */
 export default function SearchBar({ query, setQuery, setCurrentPage }) {
+  const { isWarmthMode } = useTheme(); // Get theme mode from context
+
   return (
     <div className="flex items-center space-x-2 w-full">
         {/* Div: Context Wrapper on Search Bar Component
@@ -17,11 +21,13 @@ export default function SearchBar({ query, setQuery, setCurrentPage }) {
           * w-full lets the search bar take the whole width
           * 
         */}
-      <label htmlFor="search-input" className="text-gray-700 font-medium">
+      <label htmlFor="search-input" className={`
+        font-medium transition-colors
+        ${isWarmthMode ? "text-gray-700" : "text-cyan-200"}
+      `}>
         {/* Label: A text to label the input bar
           * 
-          * text-gray-700 sets the color of the label text
-          * font-medium sets the emphasis of the text to medium boldness
+          * text-gray-700 for warmth, text-cyan-200 for tech/dark mode
           * 
         */}
         Search:
@@ -34,26 +40,21 @@ export default function SearchBar({ query, setQuery, setCurrentPage }) {
           setQuery(e.target.value);
           setCurrentPage(1);
         }}
-        className="border border-gray-300 rounded-md p-2 w-full max-w-xl
-                   focus:outline-none focus:ring-2 focus:ring-blue-400
-                   transition duration-200"
+        className={`
+          border rounded-md p-2 w-full max-w-xl
+          focus:outline-none focus:ring-2 transition duration-200
+          ${isWarmthMode
+            ? "border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:ring-blue-400"
+            : "border-cyan-800 bg-[#192534] text-cyan-100 placeholder-cyan-400 focus:ring-cyan-400"
+          }
+        `}
         placeholder="Type to search..."
       />
       {/* Input: input bar to act as search bar
           * 
-          * border adds a border around the input box
-          * border-gray-300 sets the color of the border
-          * rounded-md curve the corner of the input box
-          * p-2 adds padding in all four direction
-          * w-full sets the width to the max width size
-          * max-w-xl sets the max width size to extra large
-          * focus:outline-none removes the outline when using the search bar
-          * focus:ring-2 sets a ring around the search bar when used
-          * focus:ring-blue-400 sets the color of the ring when using the search bar
-          * transition allows the ring to appear smoothly
-          * duration-200 sets how fast the transition is
-          * placeholder value is set to "Type to search..."
-          * 
+          * border and background change for theme
+          * text and placeholder adapt for legibility
+          * ring color adapts 
         */}
     </div>
   );
