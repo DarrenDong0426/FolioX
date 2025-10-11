@@ -1,43 +1,52 @@
 // Imports
-import Dropdown from '../../components/Dropdown';               // Import Dropdown component
-import Filter from '../../components/Filter';                   // Import Filter component
-import SearchBar from '../../components/SearchBar';             // Import SearchBar component  
-import { useProjects } from '../../hooks/projectListContext';   // Import useProjects hook
-import { useTheme } from '../../hooks/themeContext.jsx';        // Import theme context
+import Dropdown from '../../components/Dropdown';
+import Filter from '../../components/Filter';
+import SearchBar from '../../components/SearchBar';
+import { useProjects } from '../../hooks/projectListContext';
+import { useTheme } from '../../hooks/themeContext.jsx';
 
 /* Defines the Controls section component
  *
- * Calls the search bar component
- * Calls the legend box component
- * Calls the filter option component
- * 
-*/
+ * Calls the search bar, dropdown, and filter components
+ */
 export default function Controls() {
+  const { 
+    query, setQuery, setCurrentPage, 
+    options, dropDown, setDropDown, 
+    isOpen, setIsOpen, filters, setFilters, 
+    filterOpen, setFilterOpen 
+  } = useProjects();
 
-  // Get query, pagination, and dropdown states from useProjects 
-  const { query, setQuery, setCurrentPage, options, dropDown, setDropDown, isOpen, setIsOpen, filters, setFilters, filterOpen, setFilterOpen } = useProjects();
-  const { isWarmthMode } = useTheme(); // Get theme from context
+  const { isWarmthMode } = useTheme();
 
-  // ColorCode Function for filter tags/labels/icons (theme-aware!)
-  function colorCodeFunc(type) {
-    // Use theme-adaptive backgrounds & text
-    if (type === "type") {
-      return isWarmthMode
-        ? "bg-blue-100 text-blue-800 border-blue-300"
-        : "bg-cyan-900 text-cyan-100 border-cyan-700";
-    } else {
-      return isWarmthMode
-        ? "bg-green-100 text-green-800 border-green-300"
-        : "bg-green-900 text-green-100 border-green-700";
+  // Unified theme-aware color function for tags/filters
+  function colorCodeFunc(type, label) {
+    switch ((type || label)?.toLowerCase()) {
+      case "academics": 
+        return { bg: isWarmthMode ? "#FFE6CC" : "#0f1120", text: isWarmthMode ? "#3B185F" : "#0ff" };
+      case "professional": 
+        return { bg: isWarmthMode ? "#CCF9F0" : "#10141c", text: isWarmthMode ? "#166534" : "#0f0" };
+      case "personal": 
+        return { bg: isWarmthMode ? "#FFE0EB" : "#1a0d1f", text: isWarmthMode ? "#BE185D" : "#f0f" };
+      case "projects": 
+        return { bg: isWarmthMode ? "#FFF9CC" : "#1c1a10", text: isWarmthMode ? "#78350F" : "#ff0" };
+      case "research": 
+        return { bg: isWarmthMode ? "#EAE8FF" : "#100f1e", text: isWarmthMode ? "#6B21A8" : "#a0f" };
+      case "type": 
+        return { bg: isWarmthMode ? "#CCF9F0" : "#10141c", text: isWarmthMode ? "#166534" : "#0f0" };
+      case "language": 
+        return { bg: isWarmthMode ? "#FFE6CC" : "#1c1a10", text: isWarmthMode ? "#78350F" : "#ff0" };
+      default: 
+        return { bg: isWarmthMode ? "#F3F4F6" : "#101010", text: isWarmthMode ? "#1F2937" : "#fff" };
     }
   }
 
-  // Define the sections and options for filter with theme-aware types
+  // Filter sections
   const filterSections = [
     {
       title: "Project Category",
       options: [
-        { label: "AI/ML", type: "type" }, 
+        { label: "AI/ML", type: "type" },
         { label: "Hardware", type: "type" },
         { label: "Software", type: "type" }
       ],
@@ -61,17 +70,12 @@ export default function Controls() {
   return (
     <div className={`
       flex flex-wrap items-center justify-between w-full max-w-4xl mx-auto mb-3 gap-4 px-4
-      rounded-xl shadow border
-      transition-colors duration-500
+      rounded-xl shadow border transition-colors duration-500
       ${isWarmthMode
         ? "bg-[#FFF8F3]/60 border-[#E94E41]"
-        : "bg-[#172230]/90 border-cyan-700"
+        : "bg-[#101727]/90 border-cyan-700"
       }
     `}>
-      {/* Div: Context wrapper for control section of Projects page
-        * flex, flex-wrap, items-center, justify-between for layout
-        * rounded-xl, shadow, border, bg: theme-adaptive appearance
-      */}
       <div className="flex-1">
         <SearchBar
           query={query}

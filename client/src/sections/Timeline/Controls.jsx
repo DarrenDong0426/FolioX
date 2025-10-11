@@ -2,6 +2,7 @@
 import { useState, useRef } from 'react';                       // Import useState and useRef from React       
 import Filter from '../../components/Filter';                   // Import Filter component
 import { useEvents } from '../../hooks/eventsContext';         // Import custom hook to fetch events      
+import { useTheme } from "../../hooks/themeContext";           // Add: Import theme context
 
 {/* Controls component for the Timeline page
   *
@@ -12,7 +13,9 @@ import { useEvents } from '../../hooks/eventsContext';         // Import custom 
   *  
   */}
 export default function Controls() {
-  
+
+  const { isWarmthMode } = useTheme(); // Add: Get theme state
+
   // Get the current year for upper bound
   const currentYear = new Date().getFullYear();
 
@@ -46,35 +49,51 @@ export default function Controls() {
   function colorCodeFunc(type) {
     switch (type.toLowerCase()) {
       case "academics":
-        return "bg-blue-100 text-blue-800";
+        return isWarmthMode
+          ? "bg-blue-100 text-blue-800"
+          : "bg-[#1a2238] text-[#4ef3ff]";
       case "professional":
-        return "bg-green-100 text-green-800";
+        return isWarmthMode
+          ? "bg-green-100 text-green-800"
+          : "bg-[#0e2a15] text-[#00ffae]";
       case "personal":
-        return "bg-pink-100 text-pink-800";
+        return isWarmthMode
+          ? "bg-pink-100 text-pink-800"
+          : "bg-[#28001c] text-[#ff3ecf]";
       case "projects":
-        return "bg-yellow-100 text-yellow-800";
+        return isWarmthMode
+          ? "bg-yellow-100 text-yellow-800"
+          : "bg-[#2e2500] text-[#fff338]";
       case "research":
-        return "bg-purple-100 text-purple-800";
+        return isWarmthMode
+          ? "bg-purple-100 text-purple-800"
+          : "bg-[#1f002a] text-[#d074ff]";
       default:
-        return "bg-gray-100 text-gray-800";
+        return isWarmthMode
+          ? "bg-gray-100 text-gray-800"
+          : "bg-[#23272e] text-gray-100";
     }
   }
 
   // Get filter sections
   const filterSections = [
-  {
-    title: "Categories",
-    options: [
-      { label: "Personal",  type: "Personal"   },
-      { label: "Projects",  type: "Projects"      },
-      { label: "Professional", type: "Professional" },
-      { label: "Research", type: "Research" }
-    ]
-  }
-];
+    {
+      title: "Categories",
+      options: [
+        { label: "Personal",  type: "Personal"   },
+        { label: "Projects",  type: "Projects"      },
+        { label: "Professional", type: "Professional" },
+        { label: "Research", type: "Research" }
+      ]
+    }
+  ];
 
   return (
-    <div className="w-full max-w-screen-xl mx-auto mb-6 px-4 flex justify-center">
+    <div className={`w-full max-w-screen-xl mx-auto mb-6 px-4 flex justify-center ${
+      isWarmthMode
+        ? "bg-[#fff7f7]"
+        : "bg-[#181b20]"
+    }`}>
       {/* Context wrapper for Controls for the Timeline Page
         * 
         * w-full: Component takes up the full width of the container
@@ -103,30 +122,17 @@ export default function Controls() {
               return newYear;
             });
           }}
-          className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-md text-gray-700 font-semibold transition-colors duration-200"
+          className={`px-3 py-1 rounded-md font-semibold transition-colors duration-200 border ${
+            isWarmthMode
+              ? "bg-[#ffeaea] hover:bg-[#fae1e1] text-[#d45d5d] border-[#ffd0d0]"
+              : "bg-[#23272e] hover:bg-[#32373f] text-cyan-300 border-cyan-900"
+          }`}
         >
-          {/* Button to Go to previous year
-            * px-3 : Adds horizontal padding inside the button
-            * py-1 : Adds vertical padding inside the button
-            * bg-gray-200 : Sets the background color to light gray
-            * hover:bg-gray-300 : Darkens the background on hover for interactivity
-            * rounded-md : Applies medium border radius for rounded corners
-            * text-gray-700 : Sets the text color to dark gray
-            * font-semibold : Uses semi-bold font weight for better readability
-            * transition-colors : Smoothly transitions color changes on hover
-            * duration-200 : Sets the transition duration to 200 milliseconds
-            * 
-            */}
+          {/* Button to Go to previous year */}
           ←
         </button>
         {editing ? (
           // Input field for editing year
-          // ref sets the input field reference
-          // type is text to allow numeric input
-          // value is bound to temp state
-          // onChange updates temp state with numeric input only using regex
-          // onBlur and onKeyDown handle finishing edit
-          // className styles the input field
           <input
             ref={inputRef}
             type="text"
@@ -134,27 +140,27 @@ export default function Controls() {
             onChange={e => setTemp(e.target.value.replace(/[^0-9]/g, ""))}
             onBlur={finishEdit}
             onKeyDown={e => e.key === "Enter" && finishEdit()}
-            className="px-4 py-1 bg-white rounded-md font-medium text-gray-800 shadow-sm w-20 text-center"
+            className={`px-4 py-1 rounded-md font-semibold shadow-sm w-20 text-center border-2 transition-colors duration-200 focus:outline-none ${
+              isWarmthMode
+                ? "bg-white text-[#E94E41] border-[#ffd9cf] focus:border-[#E94E41]"
+                : "bg-[#23272e] text-cyan-300 border-cyan-800 focus:border-cyan-400"
+            }`}
           />
         ) : (
-          <div className="px-4 py-1 bg-gray-100 rounded-md font-medium text-gray-800 shadow-sm"
+          <div
+            className={`px-4 py-1 rounded-md font-semibold shadow-sm cursor-pointer border transition-colors duration-200 ${
+              isWarmthMode
+                ? "bg-[#fff3ea] text-[#e94e41] border-[#ffd8d7] hover:border-[#E94E41]"
+                : "bg-[#1c2232] text-cyan-300 border-cyan-900 hover:border-cyan-300"
+            }`}
             onDoubleClick={startEdit}
-            title="Double-click to edit">
-          {/* Context Wrapper for year display
-            * 
-            * px-4 : Adds horizontal padding inside the container
-            * py-1 : Adds vertical padding inside the container
-            * bg-gray-100 : Sets a very light gray background color
-            * rounded-md : Applies medium border radius for rounded corners
-            * font-medium : Uses medium font weight for better readability
-            * text-gray-800 : Sets the text color to very dark gray for contrast
-            * shadow-sm : Adds a small shadow for subtle depth effect
-            *
-          */}
+            title="Double-click to edit"
+          >
+          {/* Context Wrapper for year display */}
           {year}
-        </div>
+          </div>
         )}
-  
+
         <button
           onClick={() => {
             setYear(prev => {
@@ -164,28 +170,17 @@ export default function Controls() {
               return newYear;
             });
           }}
-          className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-md text-gray-700 font-semibold transition-colors duration-200"
+          className={`px-3 py-1 rounded-md font-semibold transition-colors duration-200 border ${
+            isWarmthMode
+              ? "bg-[#ffeaea] hover:bg-[#fae1e1] text-[#d45d5d] border-[#ffd0d0]"
+              : "bg-[#23272e] hover:bg-[#32373f] text-cyan-300 border-cyan-900"
+          }`}
         >
-          {/* Button to go to next year
-            * px-3 : Adds horizontal padding inside the button
-            * py-1 : Adds vertical padding inside the button
-            * bg-gray-200 : Sets the background color to light gray
-            * hover:bg-gray-300 : Darkens the background on hover for interactivity
-            * rounded-md : Applies medium border radius for rounded corners
-            * text-gray-700 : Sets the text color to dark gray
-            * font-semibold : Uses semi-bold font weight for better readability
-            * transition-colors : Smoothly transitions color changes on hover
-            * duration-200 : Sets the transition duration to 200 milliseconds
-            *
-          */}
+          {/* Button to go to next year */}
           →
         </button>
         <div className="ml-4">
-          {/* Filter component wrapper
-            * 
-            * ml-4 : Adds left margin to separate from previous elements
-            *
-          */}
+          {/* Filter component wrapper */}
           <Filter
             filters={filters}
             setFilters={setFilters}

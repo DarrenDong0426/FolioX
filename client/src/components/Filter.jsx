@@ -4,14 +4,14 @@ import { useTheme } from '../hooks/themeContext.jsx';
 
 /* Defines the Filter Component 
  *
- * filters param is a array of currently selected filter
- * setFilters param modifies the filter array through appending
- * filterOpen param indicates if the filter menu is open
- * setFilterOpen param modifies the filterOpen state when on hover/click
-*/
+ * filters param is an array of currently selected filters
+ * setFilters modifies the filter array through appending
+ * filterOpen indicates if the filter menu is open
+ * setFilterOpen modifies the filterOpen state when on hover/click
+ */
 export default function Filter({
   filters, setFilters, filterOpen, setFilterOpen,
-  filterSections, setCurrentPage, colorCode,
+  filterSections, setCurrentPage,
 }) {
   const { isWarmthMode } = useTheme();
 
@@ -23,6 +23,62 @@ export default function Filter({
       return { ...prev, category: categories };
     });
   };
+
+  // Same color logic as Card/Events
+  const colorCodeFunc = (type, label) => {
+  const t = type?.toLowerCase();
+  const l = label?.toLowerCase();
+
+  // Handle project categories (types)
+  if (t === "type") {
+    switch (l) {
+      case "ai/ml":
+        return { bg: isWarmthMode ? "#E0F7FA" : "#1c2a2f", text: isWarmthMode ? "#006064" : "#0ff" };
+      case "hardware":
+        return { bg: isWarmthMode ? "#FEF3C7" : "#3b2f1c", text: isWarmthMode ? "#78350F" : "#ff0" };
+      case "software":
+        return { bg: isWarmthMode ? "#E0F2FE" : "#2c2d3f", text: isWarmthMode ? "#0369a1" : "#0ff" };
+      default:
+        return { bg: isWarmthMode ? "#CCF9F0" : "#2d3c45", text: isWarmthMode ? "#166534" : "#0f0" };
+    }
+  }
+
+  // Handle languages
+  if (t === "language") {
+    switch (l) {
+      case "c":
+      case "c++":
+        return { bg: isWarmthMode ? "#E0F2FE" : "#2c2d3f", text: isWarmthMode ? "#0369a1" : "#0ff" };
+      case "java":
+        return { bg: isWarmthMode ? "#FEF3C7" : "#3b2f1c", text: isWarmthMode ? "#78350F" : "#ff0" };
+      case "python":
+        return { bg: isWarmthMode ? "#E0F2F1" : "#1f2a2f", text: isWarmthMode ? "#065f46" : "#0f0" };
+      case "javascript":
+        return { bg: isWarmthMode ? "#FEF9C3" : "#3b351f", text: isWarmthMode ? "#78350F" : "#ff0" };
+      case "html":
+        return { bg: isWarmthMode ? "#FFE6E6" : "#3a1f1f", text: isWarmthMode ? "#b91c1c" : "#f0f" };
+      case "css":
+        return { bg: isWarmthMode ? "#DBEAFE" : "#1e2c3b", text: isWarmthMode ? "#1e40af" : "#0ff" };
+      case "dart":
+        return { bg: isWarmthMode ? "#E0F7FA" : "#1c2a2f", text: isWarmthMode ? "#006064" : "#0ff" };
+      case "shell":
+        return { bg: isWarmthMode ? "#F3F4F6" : "#2a2a2a", text: isWarmthMode ? "#374151" : "#fff" };
+      default:
+        return { bg: isWarmthMode ? "#F3F4F6" : "#2a2a2a", text: isWarmthMode ? "#1F2937" : "#fff" };
+    }
+  }
+
+  // Fallback for unknown type
+  switch (type?.toLowerCase()) {
+      case "academics": return { bg: isWarmthMode ? "#FFE6CC" : "#0f1120", text: isWarmthMode ? "#3B185F" : "#0ff" };
+      case "professional": return { bg: isWarmthMode ? "#CCF9F0" : "#10141c", text: isWarmthMode ? "#166534" : "#0f0" };
+      case "personal": return { bg: isWarmthMode ? "#FFE0EB" : "#1a0d1f", text: isWarmthMode ? "#BE185D" : "#f0f" };
+      case "projects": return { bg: isWarmthMode ? "#FFF9CC" : "#1c1a10", text: isWarmthMode ? "#78350F" : "#ff0" };
+      case "research": return { bg: isWarmthMode ? "#EAE8FF" : "#100f1e", text: isWarmthMode ? "#6B21A8" : "#a0f" };
+      default: return { bg: isWarmthMode ? "#F3F4F6" : "#101010", text: isWarmthMode ? "#1F2937" : "#fff" };
+    }
+};
+
 
   return (
     <div
@@ -50,10 +106,10 @@ export default function Filter({
             absolute right-0 mt-2 w-72 z-40 flex flex-col p-4
             rounded-2xl shadow-2xl border
             transition-all duration-200
-            ring-1 ${isWarmthMode ? "ring-[#FFD7B5]/40" : "ring-cyan-600/20"}
+            ring-1 ${isWarmthMode ? "ring-[#FFD7B5]/40" : "ring-cyan-600/30"}
             ${isWarmthMode
-              ? "bg-[#fffaf7]/95 border-[#E94E41] backdrop-blur-sm"
-              : "bg-gradient-to-br from-[#202234]/95 to-[#181F2A] border-cyan-700 backdrop-blur-xl"
+              ? "bg-[#fffaf7] border-[#E94E41] backdrop-blur-sm"
+              : "bg-gradient-to-br from-[#1a1f2e]/95 to-[#161921]/95 border-cyan-700 backdrop-blur-xl"
             }
           `}
           role="menu"
@@ -90,7 +146,11 @@ export default function Filter({
                           : "accent-cyan-400 focus:ring-cyan-800"}
                       `}
                     />
-                    <Tag label={option.label} type={option.type} colorCodeFunc={colorCode} />
+                    <Tag 
+                      label={option.label} 
+                      type={option.type} 
+                      colorCodeFunc={colorCodeFunc} 
+                    />
                   </label>
                 ))}
               </div>
