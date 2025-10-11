@@ -30,10 +30,10 @@ export default function Home(){
           * overflow-y-auto shows scrollbar if children overflow. Otherwise, no scrollbar
           *  
           */}
-          <section className='h-screen flex items-center justify-center px-6 shadow-2xl'>
+          <section className='h-screen flex items-center justify-center shadow-2xl'>
               <Intro/>
           </section>
-          <section className='h-screen flex items-center justify-center px-6 shadow-2xl'>
+          <section className='h-screen flex items-center justify-center shadow-2xl'>
               <Projects/>
           </section>
             {/* Section: Content Wrapper for each section. Section is used to group similar content together
@@ -45,7 +45,7 @@ export default function Home(){
               * px-6 applies horizontal padding to both sides. 6 * 0.25rem = 1.5rem 
               *   
               */}
-          <section className='h-screen flex items-center justify-center px-6 shadow-2xl'>
+          <section className='h-screen flex items-center justify-center shadow-2xl'>
               <Documents/>
           </section>
             {/* Section: Content Wrapper for each section. Section is used to group similar content together
@@ -57,10 +57,10 @@ export default function Home(){
               * px-6 applies horizontal padding to both sides. 6 * 0.25rem = 1.5rem 
               *   
               */}
-          <section className='h-screen flex items-center justify-center px-6 shadow-2xl'>
+          <section className='h-screen flex items-center justify-center shadow-2xl'>
               <Timeline/>
           </section>
-          <section className='h-screen flex items-center justify-center px-6 shadow-2xl'>
+          <section className='h-screen flex items-center justify-center shadow-2xl'>
               <Information/>
           </section>
       </main>

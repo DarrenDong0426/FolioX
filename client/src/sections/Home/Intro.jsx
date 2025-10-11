@@ -1,75 +1,109 @@
-// Imports 
-import profilePic from '../../assets/images/darren.jpg';  // Import profile picture from path ../../assets/profile.jpg   
+import { useTheme } from '../../hooks/themeContext.jsx'; // Adjust path as necessary
+import profilePic from '../../assets/images/darren.jpg';
+import linkedinLogo from '../../assets/images/linkedin_logo.png'
+import githubLogo from '../../assets/images/github_logo.png'
 
-/* Defines the Intro component
- *
- * Give an overview of the website
- * Contains an profile picture and a introductory blurb. 
- * 
- */
 export default function Intro(){
-    return(
+    const { isWarmthMode } = useTheme();
+
+    return (
         <>
-        {/* A React fragment that wrap multiple elements. <div> can also be used but since there is no CSS styling, fragment is enough as it is simplier on the DOM */}
-        <div className='flex max-w-5xl w-full gap-10 flex-[1]'>
-            {/* Div: Context Wrapper for the profile picture
-              * 
-              * flex sets the layout and children elements as a flexbox
-              * max-w-5xl sets the max width of the context wrapper to extra large x5
-              * w-full allows the element to use up to the full parent width or the max width even if the content requires smaller width
-              * gap-10 sets a gap for every children in the both direction of the flex (default to horizontal here). 10 * 0.25rem = 4rem
-              * flex-[1] sets flex-grow = 1 (allows item to fill in available space), flex-shrink = 1 (allows item to shrink), flex-basis = 0% (start with a base size of 0%)
-              * 
-            */}
-            <img 
-                src={profilePic}
-                alt="Intro"
-                className="w-96 h-96 rounded-full object-cover shadow-2xl flex-shrink-0" 
-            />
-            {/* Img Element: Circular element that holds the profile image
-              *
-              * w-96 sets the width to a fixed size. 96 * 0.25rem = 24rem
-              * h-96: sets the height to a fixed size. 96 * 0.25rem = 24rem 
-              * rounded-full sets the corner of the wrapper to be completed round. Same fixed width and height results in a circle
-              * object-cover sets the object (image here) cover the container entire while maintaining aspect ratio
-              * shadow-2xl sets the shadow on the circular element with extra extra large shadow
-              * flex-shrink-0 disables the item to shrink if the container is too small
-              * 
-            */}
+        {/* Outermost screen-filling container, now also supports tech/dark mode */}
+        <div className={`
+            w-screen min-h-screen flex items-center justify-center relative overflow-hidden
+            transition-colors duration-500
+            ${isWarmthMode
+                // LIGHT/WARMTH MODE GRADIENTS & BG
+                ? "bg-[radial-gradient(ellipse_80%_60%_at_20%_10%,rgba(255,226,237,0.75)_60%,rgba(247,243,234,1)_100%)]"
+                  + " before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_70%_30%_at_90%_95%,rgba(203,230,246,0.5)_30%,rgba(255,255,255,0)_100%)] before:z-0"
+                  + " after:pointer-events-none after:absolute after:inset-0 after:bg-[radial-gradient(ellipse_90%_65%_at_62%_55%,rgba(255,246,223,0.3)_20%,rgba(250,226,200,0)_99%)] after:z-0"
+                // DARK/TECH MODE GRADIENTS & BG
+                : "bg-[radial-gradient(ellipse_80%_60%_at_20%_10%,rgba(22,34,57,0.8)_60%,rgba(18,32,47,1)_100%)]"
+                  + " before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_70%_30%_at_90%_95%,rgba(65,211,252,0.09)_40%,rgba(37,60,94,0)_100%)] before:z-0"
+                  + " after:pointer-events-none after:absolute after:inset-0 after:bg-[radial-gradient(ellipse_90%_65%_at_62%_55%,rgba(0,208,255,0.08)_25%,rgba(22,34,57,0)_100%)] after:z-0"
+            }
+        `} style={{zIndex: 0}}>
+            {/* Main card */}
+            <div className={
+              `z-10 flex max-w-5xl w-full gap-10 flex-[1] rounded-3xl shadow-xl p-6 mx-auto border-2
+              ${isWarmthMode
+                ? "border-[#E94E41] bg-[#FAF3E3]/90"
+                : "border-cyan-700 bg-[#151C26]/90"}
+              backdrop-blur-[2px]`
+            }>
+                {/* Div: Context Wrapper for the profile picture */}
+                <div className="flex items-center">
+                    <div className={
+                        isWarmthMode
+                        ? "bg-gradient-to-b from-[#FFE2ED] to-[#FAF3E3] rounded-full p-2 border-4 border-[#E94E41] shadow-lg"
+                        : "bg-gradient-to-b from-[#3DAEFF] to-[#223042] rounded-full p-2 border-4 border-cyan-700 shadow-lg"
+                    }>
+                        <img 
+                            src={profilePic}
+                            alt="Intro"
+                            className={`w-64 h-64 md:w-96 md:h-96 rounded-full object-cover shadow-2xl flex-shrink-0 border-4
+                            ${isWarmthMode ? "border-white" : "border-[#151C26]"}`}
+                        />
+                    </div>
+                </div>
+                <div className='flex flex-col justify-center flex-[2]'>
+                    {/* Context Wrapper for the intro blurb */}
+                    <div
+                      className={`
+                        rounded-xl border-l-8 shadow-inner p-7 transition-colors duration-500
+                        ${isWarmthMode
+                          ? "bg-[#FFF8F3] border-[#264653]"
+                          : "bg-[#212838]/90 border-cyan-700"
+                        }
+                      `}
+                    >
+                        <h1 className={`text-3xl lg:text-4xl font-bold mb-4 text-center tracking-wide 
+                          ${isWarmthMode ? "text-[#E94E41]" : "text-cyan-400"}`}>
+                          Welcome to FolioX – My Digital Portfolio!
+                        </h1>
+                        <p className={`mb-4 ${isWarmthMode ? "text-[#264653]" : "text-gray-300"}`}>
+                            I’m Darren Dong, a senior undergraduate at the University of Michigan, Ann Arbor, pursuing a Bachelor’s degree in Computer Science with a minor in Electrical Engineering. My interests lie in system design and the integration of Artificial Intelligence and Machine Learning with both software and embedded systems. I primarily work with C++ and Python in my projects, but I’m always eager to expand my toolkit and explore new technologies and methodologies.
+                        </p>
+                        <p className={`mb-4 ${isWarmthMode ? "text-[#39536B]" : "text-gray-300"}`}>
+                            Here, you’ll find an overview of my work in the Projects section, downloadable resumes summarizing my skills and experience in Resume, key moments and formative experiences in Highlights, and answers to common questions about this site in FAQs. Use the navigation bar above to explore each section in more detail.
+                        </p>
+                        <p className={`mb-4 ${isWarmthMode ? "text-[#39536B]" : "text-gray-300"}`}>
+                            Feel free to explore the site, reach out with any inquiries, and dive deeper into the sections that interest you. I always appreciate feedback, which will be considered for future improvements.
+                        </p>
+                        <div className="flex gap-4 mt-2 justify-center">
+                            <a 
+                                href="https://www.linkedin.com/in/darren-dong-108841210/" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                aria-label="LinkedIn"
+                                className={`
+                                  rounded-full border-2 transition p-2 shadow
+                                  ${isWarmthMode
+                                    ? "border-[#E94E41] bg-[#FFE2ED] hover:bg-[#E94E41]/20"
+                                    : "border-cyan-500 bg-[#232b39] hover:bg-cyan-800/20"}
+                                `}
+                            >
+                                <img src={linkedinLogo} alt="LinkedIn Logo" className="w-8 h-8"/>
+                            </a>
+                            <a 
+                                href="https://github.com/DarrenDong0426" 
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="GitHub"
+                                className={`
+                                  rounded-full border-2 transition p-2 shadow
+                                  ${isWarmthMode
+                                    ? "border-[#264653] bg-[#e2eafc] hover:bg-[#264653]/20"
+                                    : "border-cyan-500 bg-[#232b39] hover:bg-cyan-800/20"}
+                                `}
+                            >
+                                <img src={githubLogo} alt="GitHub Logo" className="w-8 h-8"/>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div className='flex flex-col justify-center flex-[2]'>
-            {/* Div: Context Wrapper for the intro blurb
-              * 
-              * flex sets the layout and children elements as a flexbox
-              * flex-col arranges children items vertically in a column  
-              * justify-center aligns children items to start in the center rather than the default location (start)
-              * flex-[2] fills 2x the available space to any elements with fill-1
-              *   
-            */}
-            <h1 className='text-4xl font-bold mb-4 text-center'>Welcome to FolioX – My Digital Portfolio!</h1>
-            {/* H1: Title of the intro blurb 
-              * 
-              * text-4xl sets the text size to extra large (x4)
-              * font-bold sets the text as bolded
-              * mb-4 sets the bottom marge. 4 * 0.25rem = 1rem
-              * text-center positions the header in the center of its wrapper
-              *   
-            */}
-            <p className="mb-4">
-                I’m Darren Dong, a senior undergraduate at the University of Michigan, Ann Arbor, pursuing a Bachelor’s degree in Computer Science with a minor in Electrical Engineering. My interests lie in system design and the integration of Artificial Intelligence and Machine Learning with both software and embedded systems. I primarily work with C++ and Python in my projects, but I’m always eager to expand my toolkit and explore new technologies and methodologies.
-            </p>
-            <p className="mb-4">
-                Here, you’ll find an overview of my work in the Projects section, downloadable resumes summarizing my skills and experience in Resume, key moments and formative experiences in Highlights, and answers to common questions about this site in FAQs. Use the navigation bar above to explore each section in more detail.
-            </p>
-            <p className="mb-4">
-                Feel free to explore the site, reach out with any inquiries, and dive deeper into the sections that interest you. I always appreciate feedback, which will be considered for future improvements.
-            </p>
-            {/* p: Paragraph of the intro blurb
-              * 
-              * mb-4 sets the bottom marge. 4 * 0.25rem = 1rem
-              *   
-            */}
-        </div>
-    </>
+        </>
     )
 }

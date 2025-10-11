@@ -1,5 +1,5 @@
 // Imports
-import React from 'react';                        // Import React to enable creation of React components                          
+import { ThemeProvider } from './hooks/themeContext';                   
 import { 
   BrowserRouter, Routes, Route                    // Import React Router components for client-side routing
 } from 'react-router-dom';
@@ -22,15 +22,17 @@ import Changelog from './pages/Changelog';
  */
 export default function App() {
   return (
-    <BrowserRouter>                                           {/* Enables browser history API for routing and navigation */}         
-      <Routes>                                                {/* Container for all Route components */} 
-        <Route path="/" element={<Home />} />                 {/* Maps the root path "/" to render the Home component */}
-        <Route path="/Projects" element={<Projects />} />     {/* Maps the path "/Projects" to render the Projects component */}
-        <Route path="/Documents" element={<Documents />} />   {/* Maps the path "/Documents" to render the Documents component */}
-        <Route path="/Timeline" element={<Timeline/>}/>       {/* Maps the path "/Timeline" to render the Timeline component */}
-        <Route path="/FaQs" element={<FaQs/>}/>       {/* Maps the path "/Timeline" to render the Timeline component */}
-        <Route path="/Changelog" element={<Changelog/>}/>       {/* Maps the path "/Timeline" to render the Timeline component */}
-      </Routes>
-    </BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>                                           {/* Enables browser history API for routing and navigation */}         
+        <Routes>                                                {/* Container for all Route components */} 
+          <Route path="/" element={<Home />} />                 {/* Maps the root path "/" to render the Home component */}
+          <Route path="/Projects" element={<Projects />} />     {/* Maps the path "/Projects" to render the Projects component */}
+          <Route path="/Documents" element={<Documents />} />   {/* Maps the path "/Documents" to render the Documents component */}
+          <Route path="/Timeline" element={<Timeline/>}/>       {/* Maps the path "/Timeline" to render the Timeline component */}
+          <Route path="/FaQs" element={<FaQs/>}/>       {/* Maps the path "/Timeline" to render the Timeline component */}
+          <Route path="/Changelog" element={<Changelog/>}/>       {/* Maps the path "/Timeline" to render the Timeline component */}
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
