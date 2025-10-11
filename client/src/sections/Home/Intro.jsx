@@ -8,22 +8,25 @@ export default function Intro(){
 
     return (
         <>
-        {/* Outermost screen-filling container, now also supports tech/dark mode */}
         <div className={`
             w-screen min-h-screen flex items-center justify-center relative overflow-hidden
             transition-colors duration-500
             ${isWarmthMode
-                // LIGHT/WARMTH MODE GRADIENTS & BG
                 ? "bg-[radial-gradient(ellipse_80%_60%_at_20%_10%,rgba(255,226,237,0.75)_60%,rgba(247,243,234,1)_100%)]"
                   + " before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_70%_30%_at_90%_95%,rgba(203,230,246,0.5)_30%,rgba(255,255,255,0)_100%)] before:z-0"
                   + " after:pointer-events-none after:absolute after:inset-0 after:bg-[radial-gradient(ellipse_90%_65%_at_62%_55%,rgba(255,246,223,0.3)_20%,rgba(250,226,200,0)_99%)] after:z-0"
-                // DARK/TECH MODE GRADIENTS & BG
                 : "bg-[radial-gradient(ellipse_80%_60%_at_20%_10%,rgba(22,34,57,0.8)_60%,rgba(18,32,47,1)_100%)]"
                   + " before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_70%_30%_at_90%_95%,rgba(65,211,252,0.09)_40%,rgba(37,60,94,0)_100%)] before:z-0"
                   + " after:pointer-events-none after:absolute after:inset-0 after:bg-[radial-gradient(ellipse_90%_65%_at_62%_55%,rgba(0,208,255,0.08)_25%,rgba(22,34,57,0)_100%)] after:z-0"
             }
         `} style={{zIndex: 0}}>
-            {/* Main card */}
+            {/* Div component
+              * 
+              * before and after: Psuedo-elements that CSS creates that are layered over the main div to create more dynamic design
+              *   - pointer-events-none: Allows these layers to not interfere with any button events if there are any
+              *   - inset-0: Sets the position of the layer to 0 in all direction, giving full coverage
+              * 
+              */}
             <div className={
               `z-10 flex max-w-5xl w-full gap-10 flex-[1] rounded-3xl shadow-xl p-6 mx-auto border-2
               ${isWarmthMode
@@ -31,7 +34,6 @@ export default function Intro(){
                 : "border-cyan-700 bg-[#151C26]/90"}
               backdrop-blur-[2px]`
             }>
-                {/* Div: Context Wrapper for the profile picture */}
                 <div className="flex items-center">
                     <div className={
                         isWarmthMode
@@ -47,7 +49,6 @@ export default function Intro(){
                     </div>
                 </div>
                 <div className='flex flex-col justify-center flex-[2]'>
-                    {/* Context Wrapper for the intro blurb */}
                     <div
                       className={`
                         rounded-xl border-l-8 shadow-inner p-7 transition-colors duration-500

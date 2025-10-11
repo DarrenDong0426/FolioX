@@ -2,7 +2,7 @@
 import React from "react";                                              // Imports React to create React component
 import wordCloud from "../../assets/images/project_word_cloud.png";     // Imports wordCloud image from path ../assets/images/project_word_cloud.png
 import { Link } from "react-router-dom";
-import { useTheme } from '../../hooks/themeContext.jsx'; // Adjust path as necessary
+import { useTheme } from '../../hooks/themeContext.jsx'; 
 
 /* Defines the Project component
  *
@@ -10,11 +10,10 @@ import { useTheme } from '../../hooks/themeContext.jsx'; // Adjust path as neces
  * 
  */
 export default function Projects() {
-    const { isWarmthMode } = useTheme(); // <-- Get theme from context
+    const { isWarmthMode } = useTheme(); 
 
     return (
         <>
-            {/* Outermost container with theme-aware background */}
             <div className={`
                 min-h-screen w-screen flex flex-col items-center justify-center 
                 px-4 py-6 
@@ -24,7 +23,16 @@ export default function Projects() {
                     : "bg-[radial-gradient(ellipse_80%_60%_at_20%_10%,rgba(22,34,57,0.8)_60%,rgba(18,32,47,1)_100%)]"
                 }
             `}>
-                {/* Main card area */}
+                {/* Div component 
+                  * 
+                  *  bg-[radial-gradient(ellipse_80%_60%_at_20%_10%,rgba(22,34,57,0.8)_60%,rgba(18,32,47,1)_100%)] 
+                  *     - defines a radial-gradient radiating outward from the central point.  
+                  *     - ellipse 80% 60% at 20% 10%: The shape of the radial and the position (here 80% wide and 60% tall from 20% from the left and 10% from the top)
+                  *     - rgba(22,34,57,0.8)_60%: Defines the color at 0% until the 60% of the radius
+                  *     - rgba(18,32,47,1)_100%: Defines the color at 60% until the 100% of the radius
+                  * 
+                  */}
+
                 <div className={`
                     flex flex-col md:flex-row max-w-5xl w-full gap-12 
                     rounded-3xl shadow-xl border-2 p-6 my-6
@@ -34,7 +42,7 @@ export default function Projects() {
                         : "bg-[#151C26]/90 border-cyan-700"
                     }
                 `}>
-                    {/* Project Text Block */}
+
                     <div className="flex flex-col justify-center flex-[2]">
                         <h1 className={`
                             text-3xl lg:text-4xl font-bold mb-4 text-center tracking-wide
@@ -67,7 +75,7 @@ export default function Projects() {
                             </Link>
                         </p>
                     </div>
-                    {/* Project Word Cloud Image Block */}
+                    
                     <div className="flex w-full md:w-auto flex-[1] items-center justify-center">
                         <img
                             src={wordCloud}

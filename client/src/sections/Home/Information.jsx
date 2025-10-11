@@ -39,7 +39,6 @@ export default function Information() {
         </h1>
 
         <div className="flex flex-col lg:flex-row w-full gap-16 items-stretch">
-          {/* Div Context wrapper for the entire resource content */}
           <div className="flex flex-col flex-1 gap-6">
             <div className={`
               p-6 rounded-lg shadow-md flex-1 flex flex-col justify-between border

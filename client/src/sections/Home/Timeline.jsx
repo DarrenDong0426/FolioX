@@ -8,7 +8,6 @@ export default function Timeline() {
 
     return (
         <>
-            {/* Outermost container: theme-adaptive background */}
             <div className={`
                 min-h-screen w-screen flex items-center justify-center px-4 py-6
                 transition-colors duration-500
@@ -17,7 +16,6 @@ export default function Timeline() {
                   : "bg-[radial-gradient(ellipse_80%_60%_at_20%_10%,rgba(17,26,34,0.8)_60%,rgba(18,32,47,1)_100%)]"
                 }
             `}>
-                {/* Main card */}
                 <div className={`
                     flex flex-col md:flex-row max-w-6xl w-full gap-10 rounded-3xl shadow-xl border-2 p-6 my-6 z-10
                     ${isWarmthMode
@@ -25,7 +23,6 @@ export default function Timeline() {
                         : "bg-[#151C26]/90 border-cyan-700"
                     }
                 `}>
-                    {/* Timeline text block */}
                     <div className="flex flex-col justify-center flex-[2]">
                         <h1 className={`
                             text-3xl lg:text-4xl font-bold mb-4 text-center tracking-wide
@@ -56,7 +53,6 @@ export default function Timeline() {
                             </Link>
                         </p>
                     </div>
-                    {/* Timeline image block */}
                     <div className="flex w-full md:w-auto flex-[1] items-center justify-center">
                         <img
                             src={timeline}
