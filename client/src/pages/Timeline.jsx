@@ -3,6 +3,7 @@ import Header from "../components/Header";                               // Impo
 import { EventProvider } from "../hooks/eventsContext";                  // Import EventProvider from the path ../hooks/eventsContext.jsx
 import Events from "../sections/Timeline/Events";                        // Import Events component from the path ../sections/Timeline/Events.jsx
 import { useTheme } from '../hooks/themeContext.jsx';                   // Import theme context
+import Footer from "../components/Footer.jsx";
 
 /* *
  * Timeline page
@@ -80,6 +81,7 @@ export default function Timeline(){
             {/* Wrap the Events component with EventProvider to provide context */}
             <Events/>
           </EventProvider>
+          <Footer/>
         </main>
       </div>
     </div>

@@ -6,6 +6,7 @@ import Projects from '../sections/Home/Projects';       // Imports the Project c
 import Documents from '../sections/Home/Documents';     // Imports the Documents component from the path ../sections/Home/Documents.jsx
 import Timeline from '../sections/Home/Timeline';
 import Information from '../sections/Home/Information'
+import Footer from '../components/Footer';
 
 /* Defines the Home component
  *
@@ -64,6 +65,7 @@ export default function Home(){
               <Information/>
           </section>
       </main>
+      <Footer/>
     </div>
   );
 }

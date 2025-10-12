@@ -1,5 +1,6 @@
 // Imports
 import Header from "../components/Header";
+import Footer from "../components/Footer.jsx";
 import { useTheme } from "../hooks/themeContext.jsx";
 
 export default function Changelog() {
@@ -24,6 +25,7 @@ export default function Changelog() {
           </p>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

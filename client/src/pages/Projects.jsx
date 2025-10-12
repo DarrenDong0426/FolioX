@@ -3,6 +3,7 @@ import Header from "../components/Header";                          // Imports t
 import ProjectsList from '../sections/Projects/ProjectsList';       // Import Projects component from the path ../sections/Projects/Projects.jsx
 import { ProjectListProvider } from '../hooks/projectListContext';  // Import ProjectListProvider from the path ../hooks/projectListContext.jsx
 import { useTheme } from '../hooks/themeContext.jsx';               // Import theme context
+import Footer from "../components/Footer.jsx";
 
 /* Defines the Project page component
  *
@@ -57,6 +58,7 @@ export default function Projects(){
           <ProjectsList/>
         </ProjectListProvider>
       </main>
+      <Footer/>
     </div>
   );
 }

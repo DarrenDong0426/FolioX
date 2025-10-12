@@ -2,6 +2,7 @@
 import Header from "../components/Header";
 import { useState } from "react";
 import { useTheme } from "../hooks/themeContext.jsx";
+import Footer from "../components/Footer.jsx";
 
 export default function FaQs() {
   const { isWarmthMode } = useTheme(); // get theme
@@ -71,6 +72,7 @@ export default function FaQs() {
           ))}
         </div>
       </div>
+      <Footer/>
     </div>
   );
 }

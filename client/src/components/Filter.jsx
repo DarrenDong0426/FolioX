@@ -68,15 +68,15 @@ export default function Filter({
     }
   }
 
-  // Fallback for unknown type
   switch (type?.toLowerCase()) {
-      case "academics": return { bg: isWarmthMode ? "#FFE6CC" : "#0f1120", text: isWarmthMode ? "#3B185F" : "#0ff" };
-      case "professional": return { bg: isWarmthMode ? "#CCF9F0" : "#10141c", text: isWarmthMode ? "#166534" : "#0f0" };
-      case "personal": return { bg: isWarmthMode ? "#FFE0EB" : "#1a0d1f", text: isWarmthMode ? "#BE185D" : "#f0f" };
-      case "projects": return { bg: isWarmthMode ? "#FFF9CC" : "#1c1a10", text: isWarmthMode ? "#78350F" : "#ff0" };
-      case "research": return { bg: isWarmthMode ? "#EAE8FF" : "#100f1e", text: isWarmthMode ? "#6B21A8" : "#a0f" };
-      default: return { bg: isWarmthMode ? "#F3F4F6" : "#101010", text: isWarmthMode ? "#1F2937" : "#fff" };
-    }
+    case "professional": return { bg: isWarmthMode ? "#E6F9F0" : "#0b1e13", text: isWarmthMode ? "#16A34A" : "#0f0" };
+    case "personal":     return { bg: isWarmthMode ? "#E8F0FF" : "#0a1a2f", text: isWarmthMode ? "#1F51FF" : "#04D9FF" };
+    case "projects":     return { bg: isWarmthMode ? "#FFFBE6" : "#332600", text: isWarmthMode ? "#D97706" : "#FF5F1F" };
+    case "research":     return { bg: isWarmthMode ? "#F3E8FF" : "#1a0f2e", text: isWarmthMode ? "#7C3AED" : "#a0f" };
+    default:             return { bg: isWarmthMode ? "#F3F4F6" : "#121212", text: isWarmthMode ? "#1F2937" : "#fff" };
+  }
+
+
 };
 
 
@@ -103,7 +103,7 @@ export default function Filter({
       {filterOpen && (
         <div
           className={`
-            absolute right-0 mt-2 w-72 z-40 flex flex-col p-4
+            absolute right-0 mt-0.5 w-72 z-40 flex flex-col p-4
             rounded-2xl shadow-2xl border
             transition-all duration-200
             ring-1 ${isWarmthMode ? "ring-[#FFD7B5]/40" : "ring-cyan-600/30"}

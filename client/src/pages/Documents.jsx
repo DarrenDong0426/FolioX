@@ -4,6 +4,7 @@ import Header from "../components/Header"
 import Sidebar from "../components/Sidebar"
 import getDocuments from "../hooks/getDocuments"
 import { useTheme } from "../hooks/themeContext.jsx"      // Import useTheme for theme support
+import Footer from "../components/Footer.jsx"
 
 /* *
  * Documents page
@@ -152,6 +153,7 @@ export default function Documents(){
                     )}
                 </div>
              </main>
+             <Footer/>
         </div>
     )
 }

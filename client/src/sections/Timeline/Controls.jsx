@@ -45,36 +45,6 @@ export default function Controls() {
   };
 
 
-  // ColorCode Function for filter
-  function colorCodeFunc(type) {
-    switch (type.toLowerCase()) {
-      case "academics":
-        return isWarmthMode
-          ? "bg-blue-100 text-blue-800"
-          : "bg-[#1a2238] text-[#4ef3ff]";
-      case "professional":
-        return isWarmthMode
-          ? "bg-green-100 text-green-800"
-          : "bg-[#0e2a15] text-[#00ffae]";
-      case "personal":
-        return isWarmthMode
-          ? "bg-pink-100 text-pink-800"
-          : "bg-[#28001c] text-[#ff3ecf]";
-      case "projects":
-        return isWarmthMode
-          ? "bg-yellow-100 text-yellow-800"
-          : "bg-[#2e2500] text-[#fff338]";
-      case "research":
-        return isWarmthMode
-          ? "bg-purple-100 text-purple-800"
-          : "bg-[#1f002a] text-[#d074ff]";
-      default:
-        return isWarmthMode
-          ? "bg-gray-100 text-gray-800"
-          : "bg-[#23272e] text-gray-100";
-    }
-  }
-
   // Get filter sections
   const filterSections = [
     {
@@ -187,7 +157,6 @@ export default function Controls() {
             filterOpen={filterOpen}
             setFilterOpen={setFilterOpen}
             filterSections={filterSections}
-            colorCode={colorCodeFunc}
           />
         </div>
       </div>

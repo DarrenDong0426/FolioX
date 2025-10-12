@@ -17,20 +17,39 @@ export default function Events() {
 
   function colorCodeFunc(type) {
     switch (type.toLowerCase()) {
-      case "academics":
-        return { bg: isWarmthMode ? "#FFF4E6" : "#0f1120", text: isWarmthMode ? "#3B185F" : "#0ff", bar: isWarmthMode ? "#EAB308" : "#0ff" }; 
       case "professional":
-        return { bg: isWarmthMode ? "#E6F9F0" : "#10141c", text: isWarmthMode ? "#166534" : "#0f0", bar: isWarmthMode ? "#16A34A" : "#0f0" };  
+        return { 
+          bg: isWarmthMode ? "#E6F9F0" : "#0b1e13",  // dark green
+          text: isWarmthMode ? "#16A34A" : "#0f0", 
+          bar: isWarmthMode ? "#16A34A" : "#0f0" 
+        };  
       case "personal":
-        return { bg: isWarmthMode ? "#FFF0F3" : "#1a0d1f", text: isWarmthMode ? "#BE185D" : "#f0f", bar: isWarmthMode ? "#DB2777" : "#f0f" };   
+        return { 
+          bg: isWarmthMode ? "#E8F0FF" : "#0a1a2f",  // navy
+          text: isWarmthMode ? "#1F51FF" : "#04D9FF", 
+          bar: isWarmthMode ? "#1F51FF" : "#04D9FF" 
+        };   
       case "projects":
-        return { bg: isWarmthMode ? "#FFFBE6" : "#1c1a10", text: isWarmthMode ? "#78350F" : "#ff0", bar: isWarmthMode ? "#D97706" : "#ff0" };  
+        return { 
+          bg: isWarmthMode ? "#FFFBE6" : "#332600",  // deep amber/brown
+          text: isWarmthMode ? "#D97706" : "#FF5F1F", 
+          bar: isWarmthMode ? "#D97706" : "#FF5F1F" 
+        };  
       case "research":
-        return { bg: isWarmthMode ? "#F3E8FF" : "#100f1e", text: isWarmthMode ? "#6B21A8" : "#a0f", bar: isWarmthMode ? "#7C3AED" : "#a0f" };  
+        return { 
+          bg: isWarmthMode ? "#F3E8FF" : "#1a0f2e",  // dark purple
+          text: isWarmthMode ? "#7C3AED" : "#a0f", 
+          bar: isWarmthMode ? "#7C3AED" : "#a0f" 
+        };  
       default:
-        return { bg: isWarmthMode ? "#F3F4F6" : "#101010", text: isWarmthMode ? "#1F2937" : "#fff", bar: isWarmthMode ? "#9CA3AF" : "#fff" };   
+        return { 
+          bg: isWarmthMode ? "#F3F4F6" : "#121212",  // neutral dark
+          text: isWarmthMode ? "#1F2937" : "#fff", 
+          bar: isWarmthMode ? "#9CA3AF" : "#fff" 
+        };   
     }
   }
+
 
   const [hoveredEventId, setHoveredEventId] = useState(null);
 
