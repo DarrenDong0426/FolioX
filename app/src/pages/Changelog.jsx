@@ -14,7 +14,7 @@ export default function Changelog() {
           Changelog
         </h1>
         <p className={`text-center text-sm ${isWarmthMode ? "text-gray-600" : "text-gray-400"}`}>
-          Last Updated: October 10, 2026
+          Last Updated: October 2025
         </p>
         <div className={`mt-4 w-full max-w-3xl p-4 rounded-xl shadow-lg border-2 ${
           isWarmthMode ? "bg-[#FFF8F0] border-[#E94E41]" : "bg-[#23232a] border-cyan-500"
@@ -23,6 +23,7 @@ export default function Changelog() {
             • Version 1.0.0 – Initial release of the portfolio.<br />
             {/* Add more changelog entries here */}
           </p>
+          
         </div>
       </div>
       <Footer />
