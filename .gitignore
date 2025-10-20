@@ -1,0 +1,19 @@
+# Environment & system files
+.env
+**/.env
+.DS_Store
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Node dependencies & build
+node_modules/
+build/
+dist/
+
+# Deployment & runtime
+.vercel/
+
+# Local scripts or secrets
+auth.py
