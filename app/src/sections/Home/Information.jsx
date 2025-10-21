@@ -1,17 +1,55 @@
 // Imports
 import { Link } from "react-router-dom";
-import { useTheme } from '../../hooks/themeContext.jsx'; // Adjust path as necessary
+import { useTheme } from '../../hooks/themeContext.jsx';
+import { useState } from "react";
 
-/** Defines the Information section of the home page
- * 
- * Briefly explain the FaQ and Changelog section as well as a navigation section
- * Includes a contact message with that can be anonymous in name and email. 
- * Email should be provided if reply is wanted. 
- * Mesasge must not be blank 
- * 
- */
 export default function Information() {
   const { isWarmthMode } = useTheme();
+
+  // ✅ Added React state for form control and feedback
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [status, setStatus] = useState(null);
+
+  // ✅ Handle input updates
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // ✅ Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus("loading");
+
+    try {
+      const response = await fetch("/api/email",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            desc: formData.message, // Flask expects 'desc'
+          }),
+        }
+      );
+
+      const data = await response.json();
+      if (response.ok) {
+        setStatus("success");
+        setFormData({ name: "", email: "", message: "" });
+      } else {
+        console.error(data.error);
+        setStatus("error");
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus("error");
+    }
+  };
 
   return (
     <div className={`
@@ -39,7 +77,9 @@ export default function Information() {
         </h1>
 
         <div className="flex flex-col lg:flex-row w-full gap-16 items-stretch">
+          {/* LEFT: FAQ + CHANGELOG */}
           <div className="flex flex-col flex-1 gap-6">
+            {/* FAQ */}
             <div className={`
               p-6 rounded-lg shadow-md flex-1 flex flex-col justify-between border
               transition-colors
@@ -77,6 +117,7 @@ export default function Information() {
               </div>
             </div>
 
+            {/* CHANGELOG */}
             <div className={`
               p-6 rounded-lg shadow-md flex-1 flex flex-col justify-between border
               transition-colors
@@ -114,6 +155,7 @@ export default function Information() {
             </div>
           </div>
 
+          {/* RIGHT: CONTACT FORM */}
           <div className="flex-1 flex flex-col">
             <div className={`
                 rounded-lg shadow-lg flex-1 flex flex-col border
@@ -135,9 +177,11 @@ export default function Information() {
               `}>
                 You can send a message anonymously by leaving the Name and Email fields empty.
                 Provide your email only if you expect a response.
-                <span className="text-red-500 font-semibold"> WIP:</span> This form is still a work in progress.
               </p>
-              <form action="/submit" method="POST" className="space-y-6 flex-1 flex flex-col justify-between">
+
+              {/* ✅ Connected form */}
+              <form onSubmit={handleSubmit} className="space-y-6 flex-1 flex flex-col justify-between">
+                {/* Name */}
                 <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
                   <label htmlFor="name" className={`md:w-28 font-semibold 
                     ${isWarmthMode ? "text-gray-700" : "text-gray-200"}
@@ -148,6 +192,8 @@ export default function Information() {
                     type="text"
                     id="name"
                     name="name"
+                    value={formData.name}
+                    onChange={handleChange}
                     className={`
                       flex-1 border rounded px-3 py-2
                       transition-colors outline-none
@@ -161,6 +207,7 @@ export default function Information() {
                   />
                 </div>
 
+                {/* Email */}
                 <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
                   <label htmlFor="email" className={`md:w-28 font-semibold 
                     ${isWarmthMode ? "text-gray-700" : "text-gray-200"}
@@ -171,6 +218,8 @@ export default function Information() {
                     type="email"
                     id="email"
                     name="email"
+                    value={formData.email}
+                    onChange={handleChange}
                     className={`
                       flex-1 border rounded px-3 py-2
                       transition-colors outline-none
@@ -184,6 +233,7 @@ export default function Information() {
                   />
                 </div>
 
+                {/* Message */}
                 <div className="flex flex-col md:flex-row md:items-start gap-2 md:gap-4 flex-1">
                   <label htmlFor="message" className={`md:w-28 font-semibold mt-2 md:mt-0 
                     ${isWarmthMode ? "text-gray-700" : "text-gray-200"}
@@ -196,6 +246,8 @@ export default function Information() {
                       name="message"
                       rows="5"
                       required
+                      value={formData.message}
+                      onChange={handleChange}
                       placeholder="Type your message here..."
                       className={`
                         border rounded px-3 py-2
@@ -210,10 +262,12 @@ export default function Information() {
                     <p className="text-sm text-gray-500 mt-1">This field is required.</p>
                   </div>
                 </div>
+
                 {/* Submit */}
                 <div className="flex justify-end">
                   <button
                     type="submit"
+                    disabled={status === "loading"}
                     className={`
                       px-6 py-2 rounded font-bold transition-colors
                       ${isWarmthMode
@@ -223,9 +277,21 @@ export default function Information() {
                       focus:outline-none focus:ring-2
                     `}
                   >
-                    Send
+                    {status === "loading" ? "Sending..." : "Send"}
                   </button>
                 </div>
+
+                {/* ✅ Success/Error messages */}
+                {status === "success" && (
+                  <p className="text-green-500 text-center font-semibold mt-2">
+                    ✅ Message sent successfully!
+                  </p>
+                )}
+                {status === "error" && (
+                  <p className="text-red-500 text-center font-semibold mt-2">
+                    ❌ Failed to send message. Please try again.
+                  </p>
+                )}
               </form>
             </div>
           </div>

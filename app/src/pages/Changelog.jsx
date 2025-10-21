@@ -21,7 +21,9 @@ export default function Changelog() {
         }`}>
           <p className={`text-sm ${isWarmthMode ? "text-gray-700" : "text-cyan-100"}`}>
             • Version 1.0.0 – Initial release of the portfolio.<br />
-            {/* Add more changelog entries here */}
+          </p>
+          <p className={`text-sm ${isWarmthMode ? "text-gray-700" : "text-cyan-100"}`}>
+            • Version 1.1.0 – Contact Form on Main Page Implemented.<br />
           </p>
           
         </div>
