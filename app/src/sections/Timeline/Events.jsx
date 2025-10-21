@@ -53,7 +53,7 @@ export default function Events() {
 
   const [hoveredEventId, setHoveredEventId] = useState(null);
 
-  if (loading) return <p className='text-center text-gray-600'>LOADING...</p>
+  if (loading) return <p className={`text-center ${isWarmthMode ? "text-gray-600" : "text-cyan-200"}`}>LOADING...</p>;
   if (error) return <p className='text-center text-red-600'>Error: {error.message}</p>
 
   return (

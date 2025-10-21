@@ -109,7 +109,7 @@ export default function ProjectsList() {
                   mb-4 transition-colors
                   ${isWarmthMode ? "text-gray-700" : "text-cyan-100"}
                 `}>
-                  {project.desc}
+                  {project.description}
                 </p>
                 <div className='flex flex-wrap gap-2'>
                   {project.type.includes("Software") && <Tag label="Software" type="type" colorCodeFunc={colorCodeFunc} />}
