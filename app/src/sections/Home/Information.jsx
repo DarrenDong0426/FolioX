@@ -2,11 +2,12 @@
 import { Link } from "react-router-dom";
 import { useTheme } from '../../hooks/themeContext.jsx';
 import { useState } from "react";
+import { motion } from "framer-motion"; // ✅ Framer Motion for scroll animations
 
 export default function Information() {
   const { isWarmthMode } = useTheme();
 
-  // ✅ Added React state for form control and feedback
+  // ✅ Form state
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -25,17 +26,15 @@ export default function Information() {
     setStatus("loading");
 
     try {
-      const response = await fetch("/api/email",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: formData.name,
-            email: formData.email,
-            desc: formData.message, // Flask expects 'desc'
-          }),
-        }
-      );
+      const response = await fetch("/api/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          desc: formData.message, // Flask expects 'desc'
+        }),
+      });
 
       const data = await response.json();
       if (response.ok) {
@@ -51,58 +50,109 @@ export default function Information() {
     }
   };
 
+  // ✅ Motion variants
+  const leftSlide = {
+    hidden: { opacity: 0, x: -80 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { type: "spring", stiffness: 70, damping: 20, duration: 0.8 },
+    },
+  };
+
+  const rightSlide = {
+    hidden: { opacity: 0, x: 80 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { type: "spring", stiffness: 70, damping: 20, duration: 0.8 },
+    },
+  };
+
+  const fadeUp = {
+    hidden: { opacity: 0, y: 40 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.7, ease: "easeOut" },
+    },
+  };
+
   return (
-    <div className={`
-      w-screen min-h-screen flex items-center justify-center relative overflow-hidden
-      transition-colors duration-500 
-      ${isWarmthMode
-        ? "bg-[radial-gradient(ellipse_80%_60%_at_20%_10%,rgba(255,226,237,0.7)_60%,rgba(247,243,234,1)_100%)]"
-        : "bg-[radial-gradient(ellipse_80%_60%_at_20%_10%,rgba(22,34,57,0.8)_60%,rgba(18,32,47,1)_100%)]"
-      }
-    `}>
-      <div className={`
-        max-w-6xl w-full mx-auto flex flex-col items-center gap-16 px-4 py-10
-        rounded-3xl shadow-xl border-2
-        z-10
+    <div
+      className={`
+        w-screen min-h-screen flex items-center justify-center relative overflow-hidden
+        transition-colors duration-500 
         ${isWarmthMode
-          ? "bg-[#FFF8F3]/90 border-[#E94E41]"
-          : "bg-[#151C26]/90 border-cyan-700"
+          ? "bg-[radial-gradient(ellipse_80%_60%_at_20%_10%,rgba(255,226,237,0.7)_60%,rgba(247,243,234,1)_100%)]"
+          : "bg-[radial-gradient(ellipse_80%_60%_at_20%_10%,rgba(22,34,57,0.8)_60%,rgba(18,32,47,1)_100%)]"
         }
-      `}>
-        <h1 className={`
-          text-4xl md:text-5xl font-extrabold text-center mb-2 transition-colors
-          ${isWarmthMode ? "text-gray-800" : "text-cyan-300"}
-        `}>
+      `}
+    >
+      <div
+        className={`
+          max-w-6xl w-full mx-auto flex flex-col items-center gap-16 px-4 py-10
+          rounded-3xl shadow-xl border-2
+          z-10
+          ${isWarmthMode
+            ? "bg-[#FFF8F3]/90 border-[#E94E41]"
+            : "bg-[#151C26]/90 border-cyan-700"
+          }
+        `}
+      >
+        {/* Heading animation */}
+        <motion.h1
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          className={`
+            text-4xl md:text-5xl font-extrabold text-center mb-2 transition-colors
+            ${isWarmthMode ? "text-gray-800" : "text-cyan-300"}
+          `}
+        >
           Resources
-        </h1>
+        </motion.h1>
 
         <div className="flex flex-col lg:flex-row w-full gap-16 items-stretch">
           {/* LEFT: FAQ + CHANGELOG */}
-          <div className="flex flex-col flex-1 gap-6">
+          <motion.div
+            className="flex flex-col flex-1 gap-6"
+            variants={leftSlide}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.8 }}
+          >
             {/* FAQ */}
-            <div className={`
-              p-6 rounded-lg shadow-md flex-1 flex flex-col justify-between border
-              transition-colors
-              ${isWarmthMode
-                ? "bg-gray-50 border-[#e2eafc]"
-                : "bg-[#19212b] border-cyan-700"
-              }
-            `}>
+            <div
+              className={`
+                p-6 rounded-lg shadow-md flex-1 flex flex-col justify-between border
+                transition-colors
+                ${isWarmthMode
+                  ? "bg-gray-50 border-[#e2eafc]"
+                  : "bg-[#19212b] border-cyan-700"
+                }
+              `}
+            >
               <div>
-                <h2 className={`text-2xl lg:text-3xl font-bold mb-2
-                  ${isWarmthMode ? "text-[#E94E41]" : "text-cyan-400"}
-                  `}>
+                <h2
+                  className={`text-2xl lg:text-3xl font-bold mb-2
+                    ${isWarmthMode ? "text-[#E94E41]" : "text-cyan-400"}
+                  `}
+                >
                   FAQs
                 </h2>
-                <p className={`
-                  mb-4
-                  ${isWarmthMode ? "text-gray-700" : "text-gray-200"}
-                `}>
+                <p
+                  className={`
+                    mb-4
+                    ${isWarmthMode ? "text-gray-700" : "text-gray-200"}
+                  `}
+                >
                   The FAQ (Frequently Asked Questions) page answers common questions visitors may have about this website and its content.
                 </p>
               </div>
               <div className="text-right mt-auto">
-                <Link 
+                <Link
                   to="/FaQs"
                   className={`
                     font-semibold underline underline-offset-2
@@ -118,28 +168,34 @@ export default function Information() {
             </div>
 
             {/* CHANGELOG */}
-            <div className={`
-              p-6 rounded-lg shadow-md flex-1 flex flex-col justify-between border
-              transition-colors
-              ${isWarmthMode
-                ? "bg-gray-50 border-[#e2eafc]"
-                : "bg-[#19212b] border-cyan-700"}
-            `}>
+            <div
+              className={`
+                p-6 rounded-lg shadow-md flex-1 flex flex-col justify-between border
+                transition-colors
+                ${isWarmthMode
+                  ? "bg-gray-50 border-[#e2eafc]"
+                  : "bg-[#19212b] border-cyan-700"}
+              `}
+            >
               <div>
-                <h2 className={`text-2xl lg:text-3xl font-bold mb-2
-                  ${isWarmthMode ? "text-[#E94E41]" : "text-cyan-400"}
-                  `}>
+                <h2
+                  className={`text-2xl lg:text-3xl font-bold mb-2
+                    ${isWarmthMode ? "text-[#E94E41]" : "text-cyan-400"}
+                  `}
+                >
                   Changelog
                 </h2>
-                <p className={`
-                  mb-4
-                  ${isWarmthMode ? "text-gray-700" : "text-gray-200"}
-                `}>
+                <p
+                  className={`
+                    mb-4
+                    ${isWarmthMode ? "text-gray-700" : "text-gray-200"}
+                  `}
+                >
                   The Changelog lists significant changes to the website after deployment, including new features, bug fixes, or news updates.
                 </p>
               </div>
               <div className="text-right mt-auto">
-                <Link 
+                <Link
                   to="/Changelog"
                   className={`
                     font-semibold underline underline-offset-2
@@ -153,11 +209,18 @@ export default function Information() {
                 </Link>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* RIGHT: CONTACT FORM */}
-          <div className="flex-1 flex flex-col">
-            <div className={`
+          <motion.div
+            className="flex-1 flex flex-col"
+            variants={rightSlide}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.3 }}
+          >
+            <div
+              className={`
                 rounded-lg shadow-lg flex-1 flex flex-col border
                 transition-colors p-6
                 ${isWarmthMode
@@ -166,15 +229,19 @@ export default function Information() {
                 }
               `}
             >
-              <h2 className={`
+              <h2
+                className={`
                   text-2xl lg:text-3xl font-bold mb-4 text-center
                   ${isWarmthMode ? "text-[#E94E41]" : "text-cyan-400"}
-                `}>
+                `}
+              >
                 Contact Me
               </h2>
-              <p className={`text-sm mb-6
-                ${isWarmthMode ? "text-gray-700" : "text-gray-400"}
-              `}>
+              <p
+                className={`text-sm mb-6
+                  ${isWarmthMode ? "text-gray-700" : "text-gray-400"}
+                `}
+              >
                 You can send a message anonymously by leaving the Name and Email fields empty.
                 Provide your email only if you expect a response.
               </p>
@@ -183,9 +250,12 @@ export default function Information() {
               <form onSubmit={handleSubmit} className="space-y-6 flex-1 flex flex-col justify-between">
                 {/* Name */}
                 <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-                  <label htmlFor="name" className={`md:w-28 font-semibold 
-                    ${isWarmthMode ? "text-gray-700" : "text-gray-200"}
-                  `}>
+                  <label
+                    htmlFor="name"
+                    className={`md:w-28 font-semibold 
+                      ${isWarmthMode ? "text-gray-700" : "text-gray-200"}
+                    `}
+                  >
                     Name: <span className="text-gray-500 text-sm">(optional)</span>
                   </label>
                   <input
@@ -209,9 +279,12 @@ export default function Information() {
 
                 {/* Email */}
                 <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-                  <label htmlFor="email" className={`md:w-28 font-semibold 
-                    ${isWarmthMode ? "text-gray-700" : "text-gray-200"}
-                  `}>
+                  <label
+                    htmlFor="email"
+                    className={`md:w-28 font-semibold 
+                      ${isWarmthMode ? "text-gray-700" : "text-gray-200"}
+                    `}
+                  >
                     Email: <span className="text-gray-500 text-sm">(optional)</span>
                   </label>
                   <input
@@ -235,9 +308,12 @@ export default function Information() {
 
                 {/* Message */}
                 <div className="flex flex-col md:flex-row md:items-start gap-2 md:gap-4 flex-1">
-                  <label htmlFor="message" className={`md:w-28 font-semibold mt-2 md:mt-0 
-                    ${isWarmthMode ? "text-gray-700" : "text-gray-200"}
-                  `}>
+                  <label
+                    htmlFor="message"
+                    className={`md:w-28 font-semibold mt-2 md:mt-0 
+                      ${isWarmthMode ? "text-gray-700" : "text-gray-200"}
+                    `}
+                  >
                     Message: <span className="text-red-500">*</span>
                   </label>
                   <div className="flex-1 flex flex-col">
@@ -294,7 +370,7 @@ export default function Information() {
                 )}
               </form>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>

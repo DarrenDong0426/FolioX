@@ -2,6 +2,25 @@ import { useTheme } from '../../hooks/themeContext.jsx'; // Adjust path as neces
 import profilePic from '../../assets/images/darren.jpg';
 import linkedinLogo from '../../assets/images/linkedin_logo.png'
 import githubLogo from '../../assets/images/github_logo.png'
+import { motion } from "framer-motion";
+
+const leftSlide = {
+  hidden: { opacity: 0, x: -80 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] },
+  },
+};
+
+const rightSlide = {
+  hidden: { opacity: 0, x: 80 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] },
+  },
+};
 
 export default function Intro(){
     const { isWarmthMode } = useTheme();
@@ -35,20 +54,32 @@ export default function Intro(){
               backdrop-blur-[2px]`
             }>
                 <div className="flex items-center">
-                    <div className={
+                  <motion.div
+                    className={
                         isWarmthMode
                         ? "bg-gradient-to-b from-[#FFE2ED] to-[#FAF3E3] rounded-full p-2 border-4 border-[#E94E41] shadow-lg"
                         : "bg-gradient-to-b from-[#3DAEFF] to-[#223042] rounded-full p-2 border-4 border-cyan-700 shadow-lg"
-                    }>
+                    }
+                    variants={leftSlide}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: false, amount: 0.3 }}
+                  >
                         <img 
                             src={profilePic}
                             alt="Intro"
                             className={`w-64 h-64 md:w-96 md:h-96 rounded-full object-cover shadow-2xl flex-shrink-0 border-4
                             ${isWarmthMode ? "border-white" : "border-[#151C26]"}`}
                         />
-                    </div>
+                    </motion.div>
                 </div>
-                <div className='flex flex-col justify-center flex-[2]'>
+                  <motion.div
+                    className="flex flex-col justify-center flex-[2]"
+                    variants={rightSlide}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: false, amount: 0.3 }}
+                  >
                     <div
                       className={`
                         rounded-xl border-l-8 shadow-inner p-7 transition-colors duration-500
@@ -102,7 +133,7 @@ export default function Intro(){
                             </a>
                         </div>
                     </div>
-                </div>
+                </motion.div>
             </div>
         </div>
         </>

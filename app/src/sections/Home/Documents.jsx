@@ -1,6 +1,25 @@
 import documents from "../../assets/images/documents.png";              // Imports documents image from path ../assets/images/documents.png
 import { Link } from "react-router-dom";
 import { useTheme } from '../../hooks/themeContext.jsx'; // Adjust path as necessary
+import { motion } from "framer-motion";
+
+const leftSlide = {
+  hidden: { opacity: 0, x: -80 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] },
+  },
+};
+
+const rightSlide = {
+  hidden: { opacity: 0, x: 80 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] },
+  },
+};
 
 /* Defines the Documents section in Home page
  *
@@ -27,7 +46,13 @@ export default function Documents(){
                   : "bg-[#151C26]/90 border-cyan-700"
                 }
               `}>
-                <div className="flex w-full md:w-auto flex-[1] items-center justify-center">
+                <motion.div
+                    className="flex w-full md:w-auto flex-[1] items-center justify-center"
+                    variants={leftSlide}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: false, amount: 0.3 }}
+                  >
                     <img 
                         src={documents}
                         alt="Documents Illustration"
@@ -38,8 +63,14 @@ export default function Documents(){
                           bg-white/70
                         `}
                     />
-                </div>
-                <div className="flex flex-col justify-center flex-[2]">
+                </motion.div>
+                <motion.div
+                  className="flex flex-col justify-center flex-[2]"
+                  variants={rightSlide}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: false, amount: 0.3 }}
+                >
                     <h1 className={`
                       text-3xl lg:text-4xl font-bold mb-4 text-center tracking-wide
                       ${isWarmthMode ? "text-[#E94E41]" : "text-cyan-400"}
@@ -77,7 +108,7 @@ export default function Documents(){
                           View Documents
                         </Link>
                     </div>
-                </div>
+                </motion.div>
               </div>
             </div>
         </>

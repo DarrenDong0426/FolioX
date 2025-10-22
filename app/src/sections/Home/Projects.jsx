@@ -3,6 +3,25 @@ import React from "react";                                              // Impor
 import wordCloud from "../../assets/images/project_word_cloud.png";     // Imports wordCloud image from path ../assets/images/project_word_cloud.png
 import { Link } from "react-router-dom";
 import { useTheme } from '../../hooks/themeContext.jsx'; 
+import { motion } from "framer-motion";
+
+const leftSlide = {
+  hidden: { opacity: 0, x: -80 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] },
+  },
+};
+
+const rightSlide = {
+  hidden: { opacity: 0, x: 80 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] },
+  },
+};
 
 /* Defines the Project component
  *
@@ -43,7 +62,13 @@ export default function Projects() {
                     }
                 `}>
 
-                    <div className="flex flex-col justify-center flex-[2]">
+                     <motion.div
+                        className="flex flex-col justify-center flex-[2]"
+                        variants={leftSlide}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: false, amount: 0.3 }}
+                        >
                         <h1 className={`
                             text-3xl lg:text-4xl font-bold mb-4 text-center tracking-wide
                             ${isWarmthMode ? "text-[#E94E41]" : "text-cyan-400"}
@@ -74,9 +99,15 @@ export default function Projects() {
                                 View Projects
                             </Link>
                         </p>
-                    </div>
+                    </motion.div>
                     
-                    <div className="flex w-full md:w-auto flex-[1] items-center justify-center">
+                    <motion.div
+                        className="flex w-full md:w-auto flex-[1] items-center justify-center"
+                        variants={rightSlide}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: false, amount: 0.3 }}
+                        >
                         <img
                             src={wordCloud}
                             alt="Project Word Cloud"
@@ -91,7 +122,7 @@ export default function Projects() {
                                 bg-white/70
                             `}
                         />
-                    </div>
+                    </motion.div>
                 </div>
             </div>
         </>
