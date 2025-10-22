@@ -6,7 +6,7 @@ export default function Footer() {
   return (
     <footer
       className={`
-        mt-auto border-t-4
+        mt-auto border-t-4 z-50 relative
         ${isWarmthMode 
           ? "border-[#E94E41] bg-[#FAF3E3] text-[#39536B]" 
           : "border-cyan-500 bg-neutral-900 text-cyan-200"}
