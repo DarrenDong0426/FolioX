@@ -101,7 +101,10 @@ export default function ProjectsList() {
                   ml-auto text-sm
                   ${isWarmthMode ? "text-gray-500" : "text-cyan-400"}
                 `}>
-                  ({project.month_year})
+                  {(() => {
+                    const d = new Date(project.month_year);
+                    return d.toLocaleString("en-US", { month: "short", year: "numeric" });
+                  })()}
                 </p>
               </div>
               <div>

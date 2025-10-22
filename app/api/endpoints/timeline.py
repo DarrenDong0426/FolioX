@@ -58,10 +58,10 @@ def get_events():
 
         # Format date fields
         for e in events:
-            if hasattr(e["start"], "strftime"):
-                e["start"] = e["start"].strftime("%B %Y")
-            if hasattr(e["end"], "strftime"):
-                e["end"] = e["end"].strftime("%B %Y")
+            if hasattr(e["start"], "isoformat"):
+                e["start"] = e["start"].isoformat()  
+            if hasattr(e["end"], "isoformat"):
+                e["end"] = e["end"].isoformat() 
 
         return jsonify({"events": events}), 200
 

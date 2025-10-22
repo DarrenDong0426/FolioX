@@ -13,7 +13,10 @@ export default function Events() {
 
   const timeToPercent = (time) => ((time - jan) / (dec - jan)) * 100;
   const monthLabels = Array.from({ length: 12 }, (_, i) => new Date(year, i, 1));
-  const formatMonthYear = (date) => new Date(date).toLocaleString("default", { month: "short", year: "numeric" });
+  const formatDate = (date) => {
+    return date.toLocaleString("en-US", { month: "short", year: "numeric" });
+  };
+
 
   function colorCodeFunc(type) {
     switch (type.toLowerCase()) {
@@ -114,8 +117,13 @@ export default function Events() {
 
       </div>
       {events.map((event, idx) => {
-        const eventStart = new Date(event.start);
-        const eventEnd = new Date(event.end || event.start);
+        // Convert YYYY-MM-DD string to [year, month, day] numbers
+        const [y, m, d] = event.start.split("-").map(Number);
+        const eventStart = new Date(y, m - 1); // m - 1 because JS months are 0-indexed
+
+        const [y2, m2, d2] = (event.end || event.start).split("-").map(Number);
+        const eventEnd = new Date(y2, m2 - 1);
+
 
         const janOfYear = new Date(year, 0, 1).getTime();   
         const decOfYear = new Date(year, 11, 31).getTime(); 
@@ -173,7 +181,7 @@ export default function Events() {
                     color: isWarmthMode ? "#4B5563" : "#0ff",
                   }}
                 >
-                  {formatMonthYear(event.start)} - {formatMonthYear(event.end || event.start)}
+                  {formatDate(eventStart)} - {formatDate(eventEnd)}
                 </div>
 
                 {/* Hover card */}
