@@ -1,123 +1,36 @@
-// Imports
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 import { useTheme } from '../../hooks/themeContext';
 
-/**
- * Login
- *
- * Admin login page using OTP (one-time password) flow.
- *
- * Pipeline:
- *   1. User enters email → submits.
- *   2. Frontend POSTs email to /api/admin/login.
- *   3. Backend checks email against ADMIN_EMAIL env var:
- *       - If match: generates 6-digit code, stores its hash with 10-min expiration,
- *         emails the code to the admin.
- *       - If no match: silently does nothing.
- *      Either way, returns 200 (prevents enumeration attacks).
- *   4. Frontend switches UI to OTP input field.
- *   5. User checks email, types 6-digit code, submits.
- *   6. Frontend POSTs { email, code } to /api/admin/verify.
- *   7. Backend hashes the code, looks it up:
- *       - If valid + not expired + not used: marks code as used,
- *         creates a session row, sets an HTTP-only session cookie.
- *       - If invalid/expired/used: returns 401.
- *   8. On success, frontend redirects to /Admin, where AdminRoute
- *      checks the session cookie via /api/admin/me and lets the user in.
- */
 const Login = () => {
   const { isWarmthMode } = useTheme();
+  const navigate = useNavigate(); // Fixed typo
 
-  // Email entered in stage 1
+  // State Management
   const [email, setEmail] = useState("");
-
-  // OTP entered in stage 2
   const [code, setCode] = useState("");
-
-  // Two-stage form: "email" shows the email input, "code" shows the OTP input
   const [stage, setStage] = useState("email");
-
-  // Async status for the current request: "idle" | "sending" | "verifying"
   const [status, setStatus] = useState("idle");
-
-  // Error message displayed below the form (cleared on each new submission)
   const [errorMsg, setErrorMsg] = useState("");
+  const [checkingAuth, setCheckingAuth] = useState(true); // Added missing state
 
-  /**
-   * Stage 1 → Stage 2 transition.
-   * Posts the email to /api/admin/login. Backend always returns 200, so we
-   * advance to the code-entry stage regardless of whether the email is valid.
-   */
-  const handleEmailSubmit = (e) => {
-    e.preventDefault();
-    setStatus("sending");
-    setErrorMsg("");
-
-    fetch('/api/admin/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ email }),
-    })
-      .then(response => {
-        if (!response.ok) throw new Error('Login request failed');
-        setStage("code");
-        setStatus("idle");
-      })
-      .catch(err => {
-        console.error('Login error:', err);
-        setErrorMsg("Something went wrong. Please try again.");
-        setStatus("idle");
-      });
-  };
-
-  /**
-   * Stage 2 submit.
-   * Posts { email, code } to /api/admin/verify. On success (200), the backend
-   * has set a session cookie via Set-Cookie; we redirect to /Admin, which
-   * goes through AdminRoute → /api/admin/me → renders dashboard.
-   */
-  const handleCodeSubmit = (e) => {
-    e.preventDefault();
-    setStatus("verifying");
-    setErrorMsg("");
-
-    fetch('/api/admin/verify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ email, code }),
-    })
-      .then(async response => {
-        if (!response.ok) {
-          const data = await response.json().catch(() => ({}));
-          throw new Error(data.error || 'Invalid code');
+  useEffect(() => {
+    fetch('/api/admin/me', { credentials: 'include' })
+      .then(res => {
+        if (res.ok) {
+          // Use navigate with replace: true to "delete" login from browser history
+          navigate('/Admin', { replace: true }); 
+        } else {
+          setCheckingAuth(false);
         }
-        // Full reload so AdminRoute re-runs its auth check with the fresh cookie
-        window.location.href = '/Admin';
       })
-      .catch(err => {
-        setErrorMsg(err.message);
-        setStatus("idle");
-      });
-  };
+      .catch(() => setCheckingAuth(false));
+  }, [navigate]); // Add navigate to dependency array
 
-  /** Go back to email entry — clears the code and any error. */
-  const handleBackToEmail = () => {
-    setStage("email");
-    setCode("");
-    setErrorMsg("");
-  };
-
-  return (
-    <div className="relative min-h-screen flex flex-col text-gray-900 overflow-hidden">
-
-      {/* =========================
-          BG (theme-aware)
-      ========================== */}
+  const Background = useMemo(() => {
+    return (
       <div className="absolute inset-0 z-0 pointer-events-none">
         {isWarmthMode ? (
           <>
@@ -177,9 +90,72 @@ const Login = () => {
           </>
         )}
       </div>
+    );
+  }, [isWarmthMode]);
 
+  const handleEmailSubmit = (e) => {
+    e.preventDefault();
+    setStatus("sending");
+    setErrorMsg("");
+
+    fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email }),
+    })
+      .then(response => {
+        if (!response.ok) throw new Error('Login request failed');
+        setStage("code");
+        setStatus("idle");
+      })
+      .catch(err => {
+        console.error('Login error:', err);
+        setErrorMsg("Something went wrong. Please try again.");
+        setStatus("idle");
+      });
+  };
+
+  const handleCodeSubmit = (e) => {
+    e.preventDefault();
+    setStatus("verifying");
+    setErrorMsg("");
+
+    fetch('/api/admin/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email, code }),
+    })
+      .then(async response => {
+        if (!response.ok) {
+          const data = await response.json().catch(() => ({}));
+          throw new Error(data.error || 'Invalid code');
+        }
+        window.location.href = '/Admin';
+      })
+      .catch(err => {
+        setErrorMsg(err.message);
+        setStatus("idle");
+      });
+  };
+
+  const handleBackToEmail = () => {
+    setStage("email");
+    setCode("");
+    setErrorMsg("");
+  };
+
+  // THIS IS THE KEY: If we're still checking auth, show NOTHING.
+  // This prevents the "flicker" of the login form.
+  if (checkingAuth) {
+    return null; 
+  }
+
+  return (
+    <div className="relative min-h-screen flex flex-col text-gray-900 overflow-hidden">
+      {Background}
       <Header />
-
       <main className="flex-1 relative z-10 flex items-center justify-center px-4">
         <motion.div
           className="w-full max-w-md bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-xl"
@@ -187,7 +163,6 @@ const Login = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
         >
-
           <h1 className="text-2xl font-semibold mb-2">Admin Login</h1>
           <p className="text-sm text-gray-600 mb-6">
             {stage === "email"
@@ -261,7 +236,6 @@ const Login = () => {
           <div className="mt-6 text-xs text-gray-500">
             <Link to="/" className="hover:underline">← Back to site</Link>
           </div>
-
         </motion.div>
       </main>
 

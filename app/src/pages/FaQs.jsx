@@ -1,7 +1,7 @@
 // Imports
 import { motion } from "framer-motion"
 import Header from "../components/Header";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTheme } from "../hooks/themeContext.jsx";
 import Footer from "../components/Footer.jsx";
 
@@ -41,7 +41,8 @@ export default function FaQs() {
   const questionText = isWarmthMode ? "text-[#8B2D2D]" : "text-cyan-300";
   const answerText = isWarmthMode ? "text-gray-700" : "text-cyan-100";
 
-  const Background = (
+  // Replace your current const Background definition with this:
+  const Background = useMemo(() => (
     <div className="absolute inset-0 z-0 pointer-events-none">
       {isWarmthMode ? (
         <>
@@ -101,7 +102,7 @@ export default function FaQs() {
         </>
       )}
     </div>
-  );
+  ), [isWarmthMode]); // This array is key: it only re-runs if isWarmthMode changes
 
   return (
     <div className="relative min-h-screen flex flex-col overflow-hidden">
