@@ -59,11 +59,7 @@ export default function Controls() {
   ];
 
   return (
-    <div className={`w-full max-w-screen-xl mx-auto mb-6 px-4 flex justify-center ${
-      isWarmthMode
-        ? "bg-[#fff7f7]"
-        : "bg-[#181b20]"
-    }`}>
+    <div className="w-full max-w-screen-xl mx-auto mb-6 px-4 flex justify-center">
       {/* Context wrapper for Controls for the Timeline Page
         * 
         * w-full: Component takes up the full width of the container

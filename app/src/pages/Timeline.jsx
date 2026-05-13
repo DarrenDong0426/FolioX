@@ -1,59 +1,81 @@
-// Imports
-import Header from "../components/Header";                               // Imports the Header component from the path ../components/Header.jsx
-import { EventProvider } from "../hooks/eventsContext";                  // Import EventProvider from the path ../hooks/eventsContext.jsx
-import Events from "../sections/Timeline/Events";                        // Import Events component from the path ../sections/Timeline/Events.jsx
-import { useTheme } from '../hooks/themeContext.jsx';                   // Import theme context
+import { motion } from "framer-motion"
+import Header from "../components/Header";
+import { EventProvider } from "../hooks/eventsContext";
+import Events from "../sections/Timeline/Events";
+import { useTheme } from '../hooks/themeContext.jsx';
 import Footer from "../components/Footer.jsx";
 
-/* *
- * Timeline page
- * 
- * Displays project/events in chronological order.
- * 
- */
 export default function Timeline(){
   const { isWarmthMode } = useTheme();
 
-  // Compute dynamic background
-  const bgGradient = isWarmthMode
-    ? "radial-gradient(ellipse 80% 60% at 20% 10%,rgba(255,226,237,0.7) 60%,#fff8f3 100%)"
-    : "radial-gradient(ellipse 80% 60% at 20% 10%,rgba(22,34,57,0.88) 60%,#1b2432 100%)";
+  const Background = (
+    <div className="absolute inset-0 z-0 pointer-events-none">
+      {isWarmthMode ? (
+        <>
+          <div className="absolute inset-0 bg-gradient-to-tr from-pink-300 via-purple-300 to-blue-300 animate-gradient bg-[length:400%_400%]" />
+          {Array.from({ length: 75 }).map((_, i) => (
+            <motion.div
+              key={`light-${i}`}
+              className="absolute rounded-full"
+              style={{
+                width: `${50 + Math.random() * 100}px`,
+                height: `${50 + Math.random() * 100}px`,
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+                backgroundColor: `hsl(${Math.random() * 360}, 70%, 60%)`,
+                opacity: 0.5 + Math.random() * 0.3,
+              }}
+              animate={{
+                x: [0, Math.random() * 200 - 100, 0],
+                y: [0, Math.random() * 100 - 50, 0],
+                scale: [1, 0.8 + Math.random() * 0.4, 1],
+              }}
+              transition={{
+                duration: 15 + Math.random() * 20,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+          ))}
+        </>
+      ) : (
+        <>
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0a0e27] via-[#1a1f4a] to-[#0a0e27]" />
+          {Array.from({ length: 2000 }).map((_, i) => (
+            <motion.div
+              key={`dark-${i}`}
+              className="absolute rounded-full bg-cyan-300"
+              style={{
+                width: `${1 + Math.random() * 3}px`,
+                height: `${1 + Math.random() * 3}px`,
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+                opacity: 0.3 + Math.random() * 0.7,
+                boxShadow: '0 0 4px rgba(125, 227, 252, 0.8)',
+              }}
+              animate={{
+                opacity: [0.3, 1, 0.3],
+                scale: [1, 1.3, 1],
+              }}
+              transition={{
+                duration: 2 + Math.random() * 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: Math.random() * 3,
+              }}
+            />
+          ))}
+        </>
+      )}
+    </div>
+  );
 
   return (
-    <div className="relative min-h-screen">
-      {/* Overlay background: covers the entire page regardless of content or z-index */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: "fixed",
-          zIndex: 0,
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "100vh",
-          pointerEvents: "none",
-          background: bgGradient,
-        }}
-      />
-      {/* Div: Content Wrapper over the entire home page
-        *
-        * min-h-screen sets the minimum height of the element to be 100% of the viewpoint height (the entire browser window screen)
-        * flex sets the children to be in a flexbox format
-        * flex-col sets the flex direction to be columns so children are placed vertically
-        * The background color is now force-overlaid underneath all content by an absolutely positioned/fixed div
-        *  
-      */}
+    <div className="relative min-h-screen overflow-hidden">
+      {Background}
       <div className="flex flex-col min-h-screen relative z-10 transition-colors duration-500">
         <Header/>
-        <main className='flex flex-col flex-1 min-h-0'> {/* Removed px-4 to remove left/right gap */}
-          {/* Main: Content Wrapper over all sections. Main is used to identify the "main" part of this page
-            *
-            * flex-1 fills in the flex direction (column here)
-            * overflow-y-auto shows scrollbar if children overflow. Otherwise, no scrollbar
-            * py-3 sets the vertical padding 
-            * min-h-0 ensures that the main can shrink below its content size when inside a flex container
-            *  
-            */}
+        <main className='flex flex-col flex-1 min-h-0'>
           <h1
             style={{ fontFamily: "'Orbitron', 'Arial', sans-serif" }}
             className={`
@@ -63,22 +85,7 @@ export default function Timeline(){
           >
             Timeline
           </h1>
-          {/* h1: Overall project heading of the page
-            *
-            * text-4xl sets the text size of the heading to extra large 4x
-            * font-bold sets the text emphasis to bold
-            * mb-8 adds a margin to the bottom of the component
-            * text-center puts the text in the center of the flex direction (horizontal here)
-            * transition-colors for smooth theme transitions
-            * tracking-wide for wider letters
-            * uppercase for all caps
-            * drop-shadow-sm for subtle shadow
-            * dynamic color per theme
-            *  
-            */}
-            
           <EventProvider>
-            {/* Wrap the Events component with EventProvider to provide context */}
             <Events/>
           </EventProvider>
           <Footer/>

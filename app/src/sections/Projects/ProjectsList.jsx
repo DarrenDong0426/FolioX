@@ -68,17 +68,27 @@ export default function ProjectsList() {
 };
 
 
-  if (loading) return <p className={`text-center ${isWarmthMode ? "text-gray-600" : "text-cyan-200"}`}>LOADING...</p>;
+  if (loading) return (
+    <div className="flex flex-col items-center justify-center py-20 gap-4">
+      <div
+        className={`w-12 h-12 rounded-full border-4 border-t-transparent animate-spin
+          ${isWarmthMode ? "border-[#E94E41]" : "border-cyan-400"}
+        `}
+      />
+      <p
+        className={`font-mono tracking-widest uppercase text-sm
+          ${isWarmthMode ? "text-[#8B2D2D]" : "text-cyan-200"}
+        `}
+      >
+        Loading...
+      </p>
+    </div>
+  );
+
   if (error) return <p className={`text-center ${isWarmthMode ? "text-red-600" : "text-[#F38BA3]"}`}>Error: {error.message}</p>;
 
   return (
-    <div className={`
-      min-h-screen w-screen transition-colors duration-500 pt-5 flex flex-col
-      ${isWarmthMode
-        ? "bg-[radial-gradient(ellipse_80%_60%_at_20%_10%,rgba(255,226,237,0.7)_60%,#fff8f3_100%)]"
-        : "bg-[radial-gradient(ellipse_80%_60%_at_20%_10%,rgba(32,46,65,0.96)_48%,rgba(16,28,44,0.93)_75%,rgba(9,16,29,0.97)_90%,#101727_100%)]"
-      }
-    `}>
+    <div className="w-full pt-5 flex flex-col">
       <div className="max-w-7xl w-full mx-auto px-4 pb-10">
         <Controls />
         <ul className='pt-4'>
