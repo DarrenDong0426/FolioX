@@ -1,16 +1,57 @@
+// Imports
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import Header from '../../components/Header';
 import { useTheme } from '../../hooks/themeContext';
 
+/**
+ * Login
+ *
+ * Admin login page using OTP (one-time password) flow.
+ *
+ * Pipeline:
+ *   1. User enters email → submits.
+ *   2. Frontend POSTs email to /api/admin/login.
+ *   3. Backend checks email against ADMIN_EMAIL env var:
+ *       - If match: generates 6-digit code, stores its hash with 10-min expiration,
+ *         emails the code to the admin.
+ *       - If no match: silently does nothing.
+ *      Either way, returns 200 (prevents enumeration attacks).
+ *   4. Frontend switches UI to OTP input field.
+ *   5. User checks email, types 6-digit code, submits.
+ *   6. Frontend POSTs { email, code } to /api/admin/verify.
+ *   7. Backend hashes the code, looks it up:
+ *       - If valid + not expired + not used: marks code as used,
+ *         creates a session row, sets an HTTP-only session cookie.
+ *       - If invalid/expired/used: returns 401.
+ *   8. On success, frontend redirects to /Admin, where AdminRoute
+ *      checks the session cookie via /api/admin/me and lets the user in.
+ */
 const Login = () => {
   const { isWarmthMode } = useTheme();
+
+  // Email entered in stage 1
   const [email, setEmail] = useState("");
+
+  // OTP entered in stage 2
+  const [code, setCode] = useState("");
+
+  // Two-stage form: "email" shows the email input, "code" shows the OTP input
+  const [stage, setStage] = useState("email");
+
+  // Async status for the current request: "idle" | "sending" | "verifying"
   const [status, setStatus] = useState("idle");
+
+  // Error message displayed below the form (cleared on each new submission)
   const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSubmit = (e) => {
+  /**
+   * Stage 1 → Stage 2 transition.
+   * Posts the email to /api/admin/login. Backend always returns 200, so we
+   * advance to the code-entry stage regardless of whether the email is valid.
+   */
+  const handleEmailSubmit = (e) => {
     e.preventDefault();
     setStatus("sending");
     setErrorMsg("");
@@ -23,19 +64,60 @@ const Login = () => {
     })
       .then(response => {
         if (!response.ok) throw new Error('Login request failed');
-        setStatus("sent");
+        setStage("code");
+        setStatus("idle");
       })
       .catch(err => {
         console.error('Login error:', err);
         setErrorMsg("Something went wrong. Please try again.");
-        setStatus("error");
+        setStatus("idle");
       });
   };
 
-  return (
-    <div className="relative min-h-screen flex flex-col overflow-hidden">
+  /**
+   * Stage 2 submit.
+   * Posts { email, code } to /api/admin/verify. On success (200), the backend
+   * has set a session cookie via Set-Cookie; we redirect to /Admin, which
+   * goes through AdminRoute → /api/admin/me → renders dashboard.
+   */
+  const handleCodeSubmit = (e) => {
+    e.preventDefault();
+    setStatus("verifying");
+    setErrorMsg("");
 
-      {/* BG (theme-aware) */}
+    fetch('/api/admin/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email, code }),
+    })
+      .then(async response => {
+        if (!response.ok) {
+          const data = await response.json().catch(() => ({}));
+          throw new Error(data.error || 'Invalid code');
+        }
+        // Full reload so AdminRoute re-runs its auth check with the fresh cookie
+        window.location.href = '/Admin';
+      })
+      .catch(err => {
+        setErrorMsg(err.message);
+        setStatus("idle");
+      });
+  };
+
+  /** Go back to email entry — clears the code and any error. */
+  const handleBackToEmail = () => {
+    setStage("email");
+    setCode("");
+    setErrorMsg("");
+  };
+
+  return (
+    <div className="relative min-h-screen flex flex-col text-gray-900 overflow-hidden">
+
+      {/* =========================
+          BG (theme-aware)
+      ========================== */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         {isWarmthMode ? (
           <>
@@ -100,33 +182,22 @@ const Login = () => {
 
       <main className="flex-1 relative z-10 flex items-center justify-center px-4">
         <motion.div
-          className={`w-full max-w-md p-8 rounded-2xl shadow-xl border transition-colors duration-500
-            ${isWarmthMode
-              ? "bg-white/30 border-[#e2eafc] text-[#264653]"
-              : "bg-[#1b2433]/30 border-cyan-700/50 text-cyan-100"
-            }`}
+          className="w-full max-w-md bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-xl"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
         >
-          <h1 className={`text-2xl font-semibold mb-2 ${isWarmthMode ? "text-[#E94E41]" : "text-cyan-300"}`}>
-            Admin Login
-          </h1>
-          <p className={`text-sm mb-6 ${isWarmthMode ? "text-[#39536B]" : "text-cyan-400"}`}>
-            Enter your email to receive a sign-in link.
+
+          <h1 className="text-2xl font-semibold mb-2">Admin Login</h1>
+          <p className="text-sm text-gray-600 mb-6">
+            {stage === "email"
+              ? "Enter your email to receive a 6-digit code."
+              : "Check your inbox for a 6-digit code."}
           </p>
 
-          {status === "sent" ? (
-            <div className={`text-sm ${isWarmthMode ? "text-[#264653]" : "text-cyan-100"}`}>
-              <p className="mb-2">Check your inbox.</p>
-              <p>If that email is authorized, a sign-in link is on its way.</p>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit}>
-              <label
-                className={`block text-sm font-medium mb-1 ${isWarmthMode ? "text-[#264653]" : "text-cyan-300"}`}
-                htmlFor="email"
-              >
+          {stage === "email" ? (
+            <form onSubmit={handleEmailSubmit}>
+              <label className="block text-sm font-medium mb-1" htmlFor="email">
                 Email
               </label>
               <input
@@ -136,40 +207,61 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={status === "sending"}
-                className={`w-full rounded-lg px-3 py-2 mb-4 focus:outline-none focus:ring-2 transition-colors duration-300
-                  ${isWarmthMode
-                    ? "bg-white/60 border border-[#e2eafc] text-[#264653] placeholder-gray-400 focus:ring-[#E94E41]"
-                    : "bg-[#1b2433]/50 border border-cyan-700/50 text-cyan-100 placeholder-cyan-700 focus:ring-cyan-500"
-                  }`}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4 bg-white/90 focus:outline-none focus:ring-2 focus:ring-purple-400"
                 placeholder="you@example.com"
               />
               <button
                 type="submit"
                 disabled={status === "sending"}
-                className={`w-full font-medium py-2 rounded-lg transition-opacity disabled:opacity-50
-                  ${isWarmthMode
-                    ? "bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 text-white hover:opacity-90"
-                    : "bg-cyan-700/60 hover:bg-cyan-600/70 text-cyan-100 border border-cyan-600"
-                  }`}
+                className="w-full bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 text-white font-medium py-2 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
               >
-                {status === "sending" ? "Sending..." : "Send link"}
+                {status === "sending" ? "Sending..." : "Send code"}
               </button>
-              {errorMsg && (
-                <p className={`text-sm mt-3 ${isWarmthMode ? "text-red-600" : "text-[#F38BA3]"}`}>
-                  {errorMsg}
-                </p>
-              )}
+            </form>
+          ) : (
+            <form onSubmit={handleCodeSubmit}>
+              <label className="block text-sm font-medium mb-1" htmlFor="code">
+                Code
+              </label>
+              <input
+                id="code"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]{6}"
+                maxLength={6}
+                required
+                value={code}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+                disabled={status === "verifying"}
+                autoFocus
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4 bg-white/90 focus:outline-none focus:ring-2 focus:ring-purple-400 text-center text-2xl tracking-widest font-mono"
+                placeholder="000000"
+              />
+              <button
+                type="submit"
+                disabled={status === "verifying" || code.length !== 6}
+                className="w-full bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 text-white font-medium py-2 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+              >
+                {status === "verifying" ? "Verifying..." : "Verify"}
+              </button>
+              <button
+                type="button"
+                onClick={handleBackToEmail}
+                className="w-full mt-3 text-xs text-gray-500 hover:underline"
+              >
+                ← Use a different email
+              </button>
             </form>
           )}
 
-          <div className="mt-6 text-xs">
-            <Link
-              to="/"
-              className={`hover:underline ${isWarmthMode ? "text-[#39536B] hover:text-[#E94E41]" : "text-cyan-500 hover:text-cyan-300"}`}
-            >
-              ← Back to site
-            </Link>
+          {errorMsg && (
+            <p className="text-sm text-red-600 mt-3">{errorMsg}</p>
+          )}
+
+          <div className="mt-6 text-xs text-gray-500">
+            <Link to="/" className="hover:underline">← Back to site</Link>
           </div>
+
         </motion.div>
       </main>
 

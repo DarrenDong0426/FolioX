@@ -13,7 +13,6 @@ import Changelog from './pages/Changelog';
 // Admin imports
 import Admin from './pages/Admin';                                          // Import custom "Admin" dashboard component from ./pages/Admin
 import Login from './sections/Admin/Login';                                 // Import "Login" component for admin magic-link login
-import Verify from './sections/Admin/Verify';                               // Import "Verify" component for magic-link token verification
 import Logout from './sections/Admin/Logout';                               // Import "Logout" component for admin logout
 import AdminRoute from './sections/Admin/AdminRoute';                       // Import "AdminRoute" auth wrapper that protects admin pages
 import AdminLayout from './sections/Admin/AdminLayout';                     // Import "AdminLayout" shell with topbar/sidebar for admin pages
@@ -51,7 +50,6 @@ export default function App() {
 
           {/* Admin auth routes — public, no auth wrapper since user is logging in */}
           <Route path="/Admin/Login" element={<Login />} />       {/* Maps the path "/Admin/Login" to render the Login component */}
-          <Route path="/Admin/Verify" element={<Verify />} />     {/* Maps the path "/Admin/Verify" to render the Verify component for magic-link token */}
           <Route path="/Admin/Logout" element={<Logout />} />     {/* Maps the path "/Admin/Logout" to render the Logout component */}
 
           {/* Admin protected routes — wrapped in AdminRoute (auth gate) and AdminLayout (shell) */}
