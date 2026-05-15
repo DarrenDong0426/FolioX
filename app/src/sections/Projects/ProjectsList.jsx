@@ -122,21 +122,15 @@ export default function ProjectsList() {
                   mb-4 transition-colors
                   ${isWarmthMode ? "text-gray-700" : "text-cyan-100"}
                 `}>
-                  {project.description}
+                  {project.desc}
                 </p>
                 <div className='flex flex-wrap gap-2'>
-                  {project.type.includes("Software") && <Tag label="Software" type="type" colorCodeFunc={colorCodeFunc} />}
-                  {project.type.includes("Hardware") && <Tag label="Hardware" type="type" colorCodeFunc={colorCodeFunc} />}
-                  {project.type.includes("AI/ML") && <Tag label="AI/ML" type="type" colorCodeFunc={colorCodeFunc} />}
-                  {project.language.includes("C++") && <Tag label="C++" type="language" colorCodeFunc={colorCodeFunc} />}
-                  {project.language.includes("Java") && <Tag label="Java" type="language" colorCodeFunc={colorCodeFunc} />}
-                  {project.language.includes("Python") && <Tag label="Python" type="language" colorCodeFunc={colorCodeFunc} />}
-                  {project.language.includes("Shell") && <Tag label="Shell" type="language" colorCodeFunc={colorCodeFunc} />}
-                  {project.language.includes("HTML") && <Tag label="HTML" type="language" colorCodeFunc={colorCodeFunc} />}
-                  {project.language.includes("CSS") && <Tag label="CSS" type="language" colorCodeFunc={colorCodeFunc} />}
-                  {project.language.includes("JavaScript") && <Tag label="JavaScript" type="language" colorCodeFunc={colorCodeFunc} />}
-                  {project.language.includes("C") && <Tag label="C" type="language" colorCodeFunc={colorCodeFunc} />}
-                  {project.language.includes("Dart") && <Tag label="Dart" type="language" colorCodeFunc={colorCodeFunc} />}
+                  {(project.type || []).map(tag => (
+                    <Tag key={`type-${tag}`} label={tag} type="type" colorCodeFunc={colorCodeFunc} />
+                  ))}
+                  {(project.language || []).map(tag => (
+                    <Tag key={`lang-${tag}`} label={tag} type="language" colorCodeFunc={colorCodeFunc} />
+                  ))}
                 </div>
               </div>
             </li>

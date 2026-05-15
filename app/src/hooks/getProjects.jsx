@@ -21,7 +21,7 @@ const getProjects = () => {
 
     useEffect(() => {                                                             // useEffect to call api projects
       const encodedFilters = filters.category.map(encodeURIComponent).join(",");  // encode items into URI (for cases such as C++ to C%2B%2B for parsing)       
-      fetch(`/api/projects?page=${currentPage}&query=${query}&dropDown=${dropDown}&filters=${encodedFilters}`)
+      fetch(`/api/projects?page=${currentPage}&query=${query}&dropDown=${dropDown}&filters=${encodedFilters}&perPage=5`)
         .then(response => {
           if (!response.ok) throw new Error('Network response was not ok');       // Throw error if response unsuccessful             
           return response.json();                                                 // Return json response on success
