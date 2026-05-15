@@ -6,7 +6,7 @@ import { useTheme } from '../../hooks/themeContext';
 
 const Login = () => {
   const { isWarmthMode } = useTheme();
-  const navigate = useNavigate(); // Fixed typo
+  const navigate = useNavigate();
 
   // State Management
   const [email, setEmail] = useState("");
@@ -14,20 +14,22 @@ const Login = () => {
   const [stage, setStage] = useState("email");
   const [status, setStatus] = useState("idle");
   const [errorMsg, setErrorMsg] = useState("");
-  const [checkingAuth, setCheckingAuth] = useState(true); // Added missing state
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
+  // On mount: check if already authed. If yes, redirect to /Admin instantly.
   useEffect(() => {
     fetch('/api/admin/me', { credentials: 'include' })
-      .then(res => {
-        if (res.ok) {
-          // Use navigate with replace: true to "delete" login from browser history
-          navigate('/Admin', { replace: true }); 
+      .then(response => {
+        if (response.ok) {
+          navigate('/Admin', { replace: true });   // instant in-app redirect
         } else {
-          setCheckingAuth(false);
+          setCheckingAuth(false);                  // not authed, show login form
         }
       })
-      .catch(() => setCheckingAuth(false));
-  }, [navigate]); // Add navigate to dependency array
+      .catch(() => {
+        setCheckingAuth(false);                    // network error, show login form
+      });
+  }, [navigate]);
 
   const Background = useMemo(() => {
     return (
@@ -104,7 +106,13 @@ const Login = () => {
       credentials: 'include',
       body: JSON.stringify({ email }),
     })
-      .then(response => {
+      .then(async response => {
+        if (response.status === 429) {
+          const data = await response.json().catch(() => ({}));
+          setErrorMsg(`Too many requests. Try again in a few minutes.`);
+          setStatus("idle");
+          return;
+        }
         if (!response.ok) throw new Error('Login request failed');
         setStage("code");
         setStatus("idle");
@@ -132,7 +140,7 @@ const Login = () => {
           const data = await response.json().catch(() => ({}));
           throw new Error(data.error || 'Invalid code');
         }
-        window.location.href = '/Admin';
+        navigate('/Admin', { replace: true });   // instant in-app redirect
       })
       .catch(err => {
         setErrorMsg(err.message);
@@ -146,11 +154,29 @@ const Login = () => {
     setErrorMsg("");
   };
 
-  // THIS IS THE KEY: If we're still checking auth, show NOTHING.
-  // This prevents the "flicker" of the login form.
+  // Blank screen while auth check runs — prevents form flicker before redirect
   if (checkingAuth) {
-    return null; 
-  }
+  return (
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {Background}
+      <div
+        className={`relative z-10 w-12 h-12 rounded-full border-4 border-t-transparent animate-spin
+          ${isWarmthMode ? "border-[#E94E41]" : "border-cyan-400"}
+        `}
+      />
+      <style jsx>{`
+        @keyframes gradientShift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        .animate-gradient {
+          animation: gradientShift 40s ease infinite;
+        }
+      `}</style>
+    </div>
+  );
+}
 
   return (
     <div className="relative min-h-screen flex flex-col text-gray-900 overflow-hidden">

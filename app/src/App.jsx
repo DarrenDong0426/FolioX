@@ -50,7 +50,6 @@ export default function App() {
 
           {/* Admin auth routes — public, no auth wrapper since user is logging in */}
           <Route path="/Admin/Login" element={<Login />} />       {/* Maps the path "/Admin/Login" to render the Login component */}
-          <Route path="/Admin/Logout" element={<Logout />} />     {/* Maps the path "/Admin/Logout" to render the Logout component */}
 
           {/* Admin protected routes — wrapped in AdminRoute (auth gate) and AdminLayout (shell) */}
           <Route element={<AdminRoute />}>
@@ -68,6 +67,14 @@ export default function App() {
               <Route path="/Admin/Events" element={<AdminEvents />} />
               <Route path="/Admin/Events/New" element={<NewEvent />} />
               <Route path="/Admin/Events/:id/Edit" element={<EditEvent />} />
+
+              {/* <Route path="/Admin/Changelog" element={<AdminChangelog />} />
+              <Route path="/Admin/Changelog/New" element={<NewChangelog />} />
+              <Route path="/Admin/Changelog/:id/Edit" element={<EditChangelog />} />
+
+              <Route path="/Admin/FAQs" element={<AdminFAQs />} />
+              <Route path="/Admin/FAQs/New" element={<NewFAQ />} />
+              <Route path="/Admin/FAQs/:id/Edit" element={<EditFAQ />} /> */}
             </Route>
           </Route>
         </Routes>
