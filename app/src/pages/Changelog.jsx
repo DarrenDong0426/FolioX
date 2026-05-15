@@ -43,7 +43,7 @@ export default function Changelog() {
         ) : (
           <>
             <div className="absolute inset-0 bg-gradient-to-br from-[#0a0e27] via-[#1a1f4a] to-[#0a0e27]" />
-            {Array.from({ length: 2000 }).map((_, i) => (
+            {Array.from({ length: 100 }).map((_, i) => (
               <motion.div
                 key={`dark-${i}`}
                 className="absolute rounded-full bg-cyan-300"
