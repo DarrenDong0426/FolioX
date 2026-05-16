@@ -62,13 +62,11 @@ def get_projects():
     # we check overlap using Postgres's ?| operator (jsonb) or via a
     # cast-to-text LIKE fallback since the column type is JSON not JSONB.
     if filter_tags:
-        # Build OR clauses: column::text ILIKE '%"tag"%' for each tag
-        # Wrapping the tag in quotes ensures we match JSON string values exactly
         tag_clauses = []
         for i, tag in enumerate(filter_tags):
             key = f"tag_{i}"
-            tag_clauses.append(f"(language::text ILIKE :{key} OR type::text ILIKE :{key})")
-            params[key] = f'%"{tag}"%'
+            tag_clauses.append(f"(:{key} = ANY(language) OR :{key} = ANY(type))")
+            params[key] = tag
         where_clauses.append("(" + " OR ".join(tag_clauses) + ")")
 
     where_sql = " WHERE " + " AND ".join(where_clauses) if where_clauses else ""

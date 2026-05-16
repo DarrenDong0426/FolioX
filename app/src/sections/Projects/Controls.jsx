@@ -1,14 +1,12 @@
 // Imports
+import { useState, useEffect } from 'react';
 import Dropdown from '../../components/Dropdown';
 import Filter from '../../components/Filter';
 import SearchBar from '../../components/SearchBar';
 import { useProjects } from '../../hooks/projectListContext';
 import { useTheme } from '../../hooks/themeContext.jsx';
+import { useTagColor } from '../../components/TagColor.jsx';
 
-/* Defines the Controls section component
- *
- * Calls the search bar, dropdown, and filter components
- */
 export default function Controls() {
   const { 
     query, setQuery, setCurrentPage, 
@@ -19,52 +17,44 @@ export default function Controls() {
 
   const { isWarmthMode } = useTheme();
 
-  // Unified theme-aware color function for tags/filters
-  function colorCodeFunc(type, label) {
-    switch ((type || label)?.toLowerCase()) {
-      case "academics": 
-        return { bg: isWarmthMode ? "#FFE6CC" : "#0f1120", text: isWarmthMode ? "#3B185F" : "#0ff" };
-      case "professional": 
-        return { bg: isWarmthMode ? "#CCF9F0" : "#10141c", text: isWarmthMode ? "#166534" : "#0f0" };
-      case "personal": 
-        return { bg: isWarmthMode ? "#FFE0EB" : "#1a0d1f", text: isWarmthMode ? "#BE185D" : "#f0f" };
-      case "projects": 
-        return { bg: isWarmthMode ? "#FFF9CC" : "#1c1a10", text: isWarmthMode ? "#78350F" : "#ff0" };
-      case "research": 
-        return { bg: isWarmthMode ? "#EAE8FF" : "#100f1e", text: isWarmthMode ? "#6B21A8" : "#a0f" };
-      case "type": 
-        return { bg: isWarmthMode ? "#CCF9F0" : "#10141c", text: isWarmthMode ? "#166534" : "#0f0" };
-      case "language": 
-        return { bg: isWarmthMode ? "#FFE6CC" : "#1c1a10", text: isWarmthMode ? "#78350F" : "#ff0" };
-      default: 
-        return { bg: isWarmthMode ? "#F3F4F6" : "#101010", text: isWarmthMode ? "#1F2937" : "#fff" };
-    }
-  }
+  // Track unique tags across all projects for the filter dropdown
+  const [allTags, setAllTags] = useState({ types: [], languages: [] });
 
-  // Filter sections
+  useEffect(() => {
+    // Fetch all projects (no pagination) just to extract tags
+    fetch('/api/projects?page=1&query=&dropDown=Most%20Recent&filters=')
+      .then(res => res.json())
+      .then(data => {
+        // For tag extraction we want ALL projects, not just one page.
+        // The simplest workaround is a separate "all tags" endpoint, but
+        // a cheap fix is to use a large page size. Easier path: collect tags
+        // from whatever's loaded, which works fine at small scale.
+        const typeSet = new Set();
+        const langSet = new Set();
+        (data.projects || []).forEach(p => {
+          (p.type || []).forEach(t => typeSet.add(t));
+          (p.language || []).forEach(l => langSet.add(l));
+        });
+        setAllTags({
+          types: Array.from(typeSet).sort(),
+          languages: Array.from(langSet).sort(),
+        });
+      })
+      .catch(err => console.error('Failed to load filter tags:', err));
+  }, []);
+
+  const colorCodeFunc = useTagColor();
+
+  // Build filter sections from discovered tags
   const filterSections = [
     {
       title: "Project Category",
-      options: [
-        { label: "AI/ML", type: "type" },
-        { label: "Hardware", type: "type" },
-        { label: "Software", type: "type" }
-      ],
+      options: allTags.types.map(t => ({ label: t, type: "type" })),
     },
     {
       title: "Languages",
-      options: [
-        { label: "C", type: "language" },
-        { label: "C++", type: "language" },
-        { label: "CSS", type: "language" },
-        { label: "Dart", type: "language" },
-        { label: "HTML", type: "language" },
-        { label: "Java", type: "language" },
-        { label: "JavaScript", type: "language" },
-        { label: "Python", type: "language" },
-        { label: "Shell", type: "language" }
-      ]
-    }
+      options: allTags.languages.map(l => ({ label: l, type: "language" })),
+    },
   ];
 
   return (

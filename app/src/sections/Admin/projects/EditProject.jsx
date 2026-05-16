@@ -166,7 +166,7 @@ export default function EditProject() {
           <label className="block text-sm font-medium mb-1">Description</label>
           <textarea
             rows={4}
-            maxLength={500}
+            maxLength={5000}
             value={form.desc}
             onChange={(e) => setForm({ ...form, desc: e.target.value })}
             className={inputClass}
