@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import urllib.parse
 from api.endpoints.auth import require_admin
 import re
+import json
 
 load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -29,6 +30,37 @@ timeline_bp = Blueprint("timeline", __name__, url_prefix="/api")
 # =========================
 # GET /api/events — public list (year-filtered for timeline)
 # =========================
+@timeline_bp.route("/events/<int:event_id>", methods=["GET"], strict_slashes=False)
+def get_event(event_id):
+    try:
+        with engine.connect() as conn:
+            row = conn.execute(
+                text("""
+                    SELECT id, title, description AS desc, start, "end", tags, images, content_blocks
+                    FROM events
+                    WHERE id = :id
+                """),
+                {"id": event_id}
+            ).fetchone()
+
+        if not row:
+            return jsonify({"error": "Event not found"}), 404
+
+        return jsonify({
+            "id": row.id,
+            "title": row.title,
+            "desc": row.desc,
+            "tags": row.tags,
+            "start": row.start.isoformat() if row.start else None,
+            "end": row.end.isoformat() if row.end else None,
+            "images": row.images or [],
+            "content_blocks": row.content_blocks or [],
+        }), 200
+
+    except Exception as e:
+        print(f"Get event error: {e}")
+        return jsonify({"error": str(e)}), 500
+    
 @timeline_bp.route("/events", methods=["GET"], strict_slashes=False)
 def get_events():
     year = request.args.get("year", type=int)
@@ -56,7 +88,7 @@ def get_events():
         where_sql = "WHERE " + " AND ".join(where_clauses)
 
     sql = text(f"""
-        SELECT id, title, description AS desc, start, "end", tags, images
+        SELECT id, title, description AS desc, start, "end", tags, images, content_blocks
         FROM events
         {where_sql}
         ORDER BY start ASC;
@@ -72,6 +104,8 @@ def get_events():
                 e["start"] = e["start"].isoformat()
             if hasattr(e["end"], "isoformat"):
                 e["end"] = e["end"].isoformat()
+            if e.get("content_blocks") is None:
+                e["content_blocks"] = []
 
         return jsonify({"events": events}), 200
 
@@ -148,6 +182,7 @@ def create_event():
     start = data.get("start")
     end = data.get("end")
     images = data.get("images") or []
+    content_blocks = data.get("content_blocks") or []
 
     if not title or not tags or not start or not end:
         return jsonify({"error": "Missing required fields"}), 400
@@ -156,13 +191,14 @@ def create_event():
         with engine.begin() as conn:
             result = conn.execute(
                 text("""
-                    INSERT INTO events (title, description, tags, start, "end", images)
-                    VALUES (:title, :desc, :tags, :start, :end, :images)
+                    INSERT INTO events (title, description, tags, start, "end", images, content_blocks)
+                    VALUES (:title, :desc, :tags, :start, :end, :images, :content_blocks)
                     RETURNING id
                 """),
                 {
                     "title": title, "desc": desc, "tags": tags,
                     "start": start, "end": end, "images": images,
+                    content_blocks: json.dumps(content_blocks)
                 }
             )
             new_id = result.scalar()
@@ -191,6 +227,7 @@ def update_event(event_id):
     start = data.get("start")
     end = data.get("end")
     images = data.get("images") or []
+    content_blocks = data.get("content_blocks") or []
 
     if not title or not tags or not start or not end:
         return jsonify({"error": "Missing required fields"}), 400
@@ -205,12 +242,13 @@ def update_event(event_id):
                         tags = :tags,
                         start = :start,
                         "end" = :end,
-                        images = :images
+                        images = :images, 
+                        content_blocks = :content_blocks
                     WHERE id = :id
                 """),
                 {
                     "id": event_id, "title": title, "desc": desc, "tags": tags,
-                    "start": start, "end": end, "images": images,
+                    "start": start, "end": end, "images": images, "content_blocks": json.dumps(content_blocks)
                 }
             )
 

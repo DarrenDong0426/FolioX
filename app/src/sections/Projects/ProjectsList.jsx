@@ -5,6 +5,7 @@ import Controls from './Controls';
 import { useProjects } from '../../hooks/projectListContext';
 import { useTheme } from '../../hooks/themeContext.jsx';
 import { useTagColor } from '../../components/TagColor.jsx';
+import { Link } from 'react-router-dom';
 
 /* Defines the ProjectsList section component
  *
@@ -57,13 +58,16 @@ export default function ProjectsList() {
               <div className='flex items-center gap-2 mb-2'>
                 {project.lock && <span title="Private">🔒</span>}
                 {project.wip && <span title="Work in progress">🚧</span>}
-                <h3 className={`
-                  text-2xl font-bold transition-colors duration-200
-                  ${isWarmthMode ? "text-[#264653] hover:text-[#E94E41]" : "text-cyan-200 hover:text-cyan-400"}
-                  hover:underline hover:underline-offset-2
-                `}>
+                <Link
+                  to={`/Projects/${project.id}`}
+                  className={`
+                    text-2xl font-bold transition-colors duration-200
+                    ${isWarmthMode ? "text-[#264653] hover:text-[#E94E41]" : "text-cyan-200 hover:text-cyan-400"}
+                    hover:underline hover:underline-offset-2
+                  `}
+                >
                   {project.name}
-                </h3>
+                </Link>
                 <p className={`
                   ml-auto text-sm
                   ${isWarmthMode ? "text-gray-500" : "text-cyan-400"}

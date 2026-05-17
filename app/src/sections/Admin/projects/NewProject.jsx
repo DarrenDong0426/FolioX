@@ -31,6 +31,7 @@ export default function NewProject() {
     type: [],
     lock: false,
     wip: false,
+    content_blocks: [], 
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);

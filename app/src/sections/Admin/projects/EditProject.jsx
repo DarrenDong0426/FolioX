@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTheme } from '../../../hooks/themeContext';
 import TagSelector from './TagSelector';
-
+import BlockEditor from '../../../components/BlockEditor';
+import BlockRenderer from '../../../components/BlockRenderer';
 const LANGUAGE_BASE_PRESETS = ['C', 'C++', 'Java', 'Python', 'JavaScript', 'HTML', 'CSS', 'Dart', 'Shell'];
 const TYPE_BASE_PRESETS = ['AI/ML', 'Hardware', 'Software'];
 
@@ -28,6 +29,7 @@ export default function EditProject() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [allProjects, setAllProjects] = useState([]);
+  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     fetch('/api/projects')
@@ -48,6 +50,7 @@ export default function EditProject() {
           type: Array.isArray(project.type) ? project.type : [],
           lock: !!project.lock,
           wip: !!project.wip,
+          content_blocks: Array.isArray(project.content_blocks) ? project.content_blocks : [],  // NEW
         });
       })
       .catch(err => setError(err.message));
@@ -221,6 +224,36 @@ export default function EditProject() {
             />
             Work in progress
           </label>
+          
+        </div>
+        <div>
+          <div className="flex justify-between items-center mb-2">
+            <label className="block text-sm font-medium">Page Content</label>
+            <button
+              type="button"
+              onClick={() => setShowPreview(!showPreview)}
+              className={`px-3 py-1 rounded text-xs font-medium ${
+                isWarmthMode
+                  ? 'bg-pink-100 text-pink-600 hover:bg-pink-200'
+                  : 'bg-cyan-900/40 text-cyan-300 hover:bg-cyan-900/60'
+              }`}
+            >
+              {showPreview ? '✎ Edit' : '👁 Preview'}
+            </button>
+          </div>
+
+          {showPreview ? (
+            <div className={`p-4 rounded-lg border ${
+              isWarmthMode ? 'bg-white border-pink-200' : 'bg-[#0a0e27]/60 border-cyan-700'
+            }`}>
+              <BlockRenderer blocks={form.content_blocks} />
+            </div>
+          ) : (
+            <BlockEditor
+              blocks={form.content_blocks}
+              onChange={(newBlocks) => setForm({ ...form, content_blocks: newBlocks })}
+            />
+          )}
         </div>
 
         {error && <p className="text-red-500 text-sm">{error}</p>}

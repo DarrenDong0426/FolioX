@@ -9,6 +9,7 @@ import Documents from './pages/Documents';        // Import custom "Documents" c
 import Timeline from './pages/Timeline';          // Import custom "Timeline" component from ./pages/Timeline
 import FaQs from './pages/FaQs';
 import Changelog from './pages/Changelog';
+import ProjectDetail from './pages/ProjectDetail';
 
 // Admin imports
 import Admin from './pages/Admin';                                          // Import custom "Admin" dashboard component from ./pages/Admin
@@ -28,6 +29,10 @@ import EditEvent from './sections/Admin/events/EditEvent';
 import AdminChangelog from './sections/Admin/changelog/Changelog';
 import NewChangelog from './sections/Admin/changelog/NewChangelog';
 import EditChangelog from './sections/Admin/changelog/EditChangelog';
+import AdminFAQs from './sections/Admin/faqs/FAQs';
+import NewFAQ from './sections/Admin/faqs/NewFAQ';
+import EditFAQ from './sections/Admin/faqs/EditFAQ';
+
 
 /* Defines the App component
  *
@@ -50,7 +55,8 @@ export default function App() {
           <Route path="/Timeline" element={<Timeline/>}/>       {/* Maps the path "/Timeline" to render the Timeline component */}
           <Route path="/FaQs" element={<FaQs/>}/>       {/* Maps the path "/Timeline" to render the Timeline component */}
           <Route path="/Changelog" element={<Changelog/>}/>       {/* Maps the path "/Timeline" to render the Timeline component */}
-
+          <Route path="/Projects/:id" element={<ProjectDetail />} />
+          
           {/* Admin auth routes — public, no auth wrapper since user is logging in */}
           <Route path="/Admin/Login" element={<Login />} />       {/* Maps the path "/Admin/Login" to render the Login component */}
 
@@ -75,9 +81,9 @@ export default function App() {
               <Route path="/Admin/Changelog/New" element={<NewChangelog />} />
               <Route path="/Admin/Changelog/:id/Edit" element={<EditChangelog />} />
 
-              {/* <Route path="/Admin/FAQs" element={<AdminFAQs />} />
+              <Route path="/Admin/FAQs" element={<AdminFAQs />} />
               <Route path="/Admin/FAQs/New" element={<NewFAQ />} />
-              <Route path="/Admin/FAQs/:id/Edit" element={<EditFAQ />} />  */}
+              <Route path="/Admin/FAQs/:id/Edit" element={<EditFAQ />} /> 
             </Route>
           </Route>
         </Routes>

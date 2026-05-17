@@ -3,6 +3,7 @@ from sqlalchemy import create_engine, text
 import os
 from dotenv import load_dotenv
 from api.endpoints.auth import require_admin
+import json
 
 load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -21,6 +22,39 @@ projects_bp = Blueprint("projects", __name__, url_prefix="/api")
 # =========================
 # GET /api/projects — public list
 # =========================
+@projects_bp.route("/projects/<int:project_id>", methods=["GET"], strict_slashes=False)
+def get_project(project_id):
+    try:
+        with engine.connect() as conn:
+            row = conn.execute(
+                text("""
+                    SELECT id, name, description, lock, wip, month_year, language, type, content_blocks
+                    FROM projects
+                    WHERE id = :id
+                """),
+                {"id": project_id}
+            ).fetchone()
+
+        if not row:
+            return jsonify({"error": "Project not found"}), 404
+
+        return jsonify({
+            "id": row.id,
+            "name": row.name,
+            "desc": row.description,
+            "lock": row.lock,
+            "wip": row.wip,
+            "month_year": row.month_year.strftime("%B %Y") if row.month_year else None,
+            "month_year_raw": row.month_year.isoformat() if row.month_year else None,
+            "language": row.language,
+            "type": row.type,
+            "content_blocks": row.content_blocks or [],
+        }), 200
+
+    except Exception as e:
+        print(f"Get project error: {e}")
+        return jsonify({"error": str(e)}), 500
+    
 @projects_bp.route("/projects", methods=["GET"], strict_slashes=False)
 def get_projects():
     """
@@ -84,7 +118,7 @@ def get_projects():
             # Then: the actual paginated rows
             offset = (page - 1) * page_size
             data_sql = text(f"""
-                SELECT id, name, description, lock, wip, month_year, language, type
+                SELECT id, name, description, lock, wip, month_year, language, type, content_blocks
                 FROM projects
                 {where_sql}
                 ORDER BY {order_by}
@@ -107,6 +141,7 @@ def get_projects():
                 "month_year_raw": r.month_year.isoformat() if r.month_year else None,
                 "language": r.language,
                 "type": r.type,
+                "content_blocks": r.content_blocks or [],
             })
 
         return jsonify({"projects": projects, "totalItems": total_items}), 200
@@ -137,13 +172,14 @@ def create_project():
 
     lock = bool(data.get("lock", False))
     wip = bool(data.get("wip", False))
+    content_blocks = data.get("content_blocks") or []
 
     try:
         with engine.begin() as conn:
             result = conn.execute(
                 text("""
-                    INSERT INTO projects (name, description, lock, wip, month_year, language, type)
-                    VALUES (:name, :desc, :lock, :wip, :month_year, :language, :type)
+                    INSERT INTO projects (name, description, lock, wip, month_year, language, type, content_blocks)
+                    VALUES (:name, :desc, :lock, :wip, :month_year, :language, :type, :content_blocks)
                     RETURNING id
                 """),
                 {
@@ -154,6 +190,7 @@ def create_project():
                     "month_year": month_year,
                     "language": language,
                     "type": type_,
+                    "content_blocks": json.dumps(content_blocks),
                 }
             )
             new_id = result.scalar()
@@ -187,6 +224,7 @@ def update_project(project_id):
 
     lock = bool(data.get("lock", False))
     wip = bool(data.get("wip", False))
+    content_blocks = data.get("content_blocks") or []
 
     try:
         with engine.begin() as conn:
@@ -199,7 +237,8 @@ def update_project(project_id):
                         wip = :wip,
                         month_year = :month_year,
                         language = :language,
-                        type = :type
+                        type = :type, 
+                        content_blocks = :content_blocks
                     WHERE id = :id
                 """),
                 {
@@ -211,6 +250,7 @@ def update_project(project_id):
                     "month_year": month_year,
                     "language": language,
                     "type": type_,
+                    "content_blocks": json.dumps(content_blocks),
                 }
             )
 
