@@ -25,6 +25,9 @@ import EditDocument from './sections/Admin/documents/EditDocument';
 import AdminEvents from './sections/Admin/events/Events';
 import NewEvent from './sections/Admin/events/NewEvent';
 import EditEvent from './sections/Admin/events/EditEvent';
+import AdminChangelog from './sections/Admin/changelog/Changelog';
+import NewChangelog from './sections/Admin/changelog/NewChangelog';
+import EditChangelog from './sections/Admin/changelog/EditChangelog';
 
 /* Defines the App component
  *
@@ -68,13 +71,13 @@ export default function App() {
               <Route path="/Admin/Events/New" element={<NewEvent />} />
               <Route path="/Admin/Events/:id/Edit" element={<EditEvent />} />
 
-              {/* <Route path="/Admin/Changelog" element={<AdminChangelog />} />
+              <Route path="/Admin/Changelog" element={<AdminChangelog />} />
               <Route path="/Admin/Changelog/New" element={<NewChangelog />} />
               <Route path="/Admin/Changelog/:id/Edit" element={<EditChangelog />} />
 
-              <Route path="/Admin/FAQs" element={<AdminFAQs />} />
+              {/* <Route path="/Admin/FAQs" element={<AdminFAQs />} />
               <Route path="/Admin/FAQs/New" element={<NewFAQ />} />
-              <Route path="/Admin/FAQs/:id/Edit" element={<EditFAQ />} /> */}
+              <Route path="/Admin/FAQs/:id/Edit" element={<EditFAQ />} />  */}
             </Route>
           </Route>
         </Routes>

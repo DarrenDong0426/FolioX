@@ -3,20 +3,20 @@ import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../../../hooks/themeContext';
 
-export default function AdminEvents() {
+export default function AdminChangelog() {
   const { isWarmthMode } = useTheme();
   const navigate = useNavigate();
 
-  const [events, setEvents] = useState([]);
+  const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
-    fetch('/api/events?all=true')
+    fetch('/api/changelog')
       .then(res => res.json())
       .then(data => {
-        setEvents(data.events || []);
+        setEntries(data.changelog || []);
         setLoading(false);
       })
       .catch(err => {
@@ -25,16 +25,16 @@ export default function AdminEvents() {
       });
   }, []);
 
-  const handleDelete = async (id, title) => {
-    if (!window.confirm(`Delete "${title}"? This will also delete all associated images.`)) return;
+  const handleDelete = async (id, version) => {
+    if (!window.confirm(`Delete version ${version}?`)) return;
     setDeletingId(id);
     try {
-      const res = await fetch(`/api/admin/events/${id}`, {
+      const res = await fetch(`/api/admin/changelog/${id}`, {
         method: 'DELETE',
         credentials: 'include',
       });
       if (!res.ok) throw new Error('Delete failed');
-      setEvents(events.filter(e => e.id !== id));
+      setEntries(entries.filter(e => e.id !== id));
     } catch (err) {
       alert(`Failed to delete: ${err.message}`);
     } finally {
@@ -63,7 +63,7 @@ export default function AdminEvents() {
         <div className={`w-12 h-12 rounded-full border-4 border-t-transparent animate-spin
           ${isWarmthMode ? "border-[#E94E41]" : "border-cyan-400"}`} />
         <p className={`font-mono tracking-widest uppercase text-sm
-          ${isWarmthMode ? "text-[#8B2D2D]" : "text-cyan-200"}`}>Loading events...</p>
+          ${isWarmthMode ? "text-[#8B2D2D]" : "text-cyan-200"}`}>Loading...</p>
       </div>
     );
   }
@@ -81,53 +81,49 @@ export default function AdminEvents() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className={`max-w-6xl mx-auto p-6 rounded-2xl backdrop-blur-md border-2 shadow-2xl ${cardClass}`}
+      className={`max-w-5xl mx-auto p-6 rounded-2xl backdrop-blur-md border-2 shadow-2xl ${cardClass}`}
     >
       <div className="flex justify-between items-center mb-6">
         <h1 className={`text-3xl font-bold ${isWarmthMode ? 'text-pink-700' : 'text-cyan-300'}`}>
-          Events ({events.length})
+          Changelog ({entries.length})
         </h1>
         <Link
-          to="/Admin/Events/New"
+          to="/Admin/Changelog/New"
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${addButtonClass}`}
         >
-          + New event
+          + New entry
         </Link>
       </div>
 
-      {events.length === 0 ? (
-        <p className="text-center py-10 opacity-70">No events yet. Click "+ New event" to create one.</p>
+      {entries.length === 0 ? (
+        <p className="text-center py-10 opacity-70">No entries yet. Click "+ New entry" to add one.</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className={tableHeaderClass}>
-                <th className="py-3 px-2 text-center">Title</th>
-                <th className="py-3 px-2 text-center">Tag</th>
-                <th className="py-3 px-2 text-center">Date Range</th>
-                <th className="py-3 px-2 text-center">Images</th>
+                <th className="py-3 px-2 text-center">Order</th>
+                <th className="py-3 px-2 text-center">Version</th>
+                <th className="py-3 px-2 text-center">Description</th>
                 <th className="py-3 px-2 text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {events.map(e => (
+              {entries.map(e => (
                 <tr key={e.id} className={`border-b ${
                   isWarmthMode ? 'border-pink-100' : 'border-cyan-900/30'
                 } ${rowHoverClass} transition-colors`}>
-                  <td className="py-3 px-2 font-medium text-center">{e.title}</td>
-                  <td className="py-3 px-2 opacity-80 text-center">{e.tags}</td>
-                  <td className="py-3 px-2 opacity-80 text-center">{e.start} → {e.end}</td>
-                  <td className="py-3 px-2 opacity-80 text-center">
-                    {Array.isArray(e.images) ? e.images.length : 0}
-                  </td>
+                  <td className="py-3 px-2 text-center opacity-60">{e.sort_order}</td>
+                  <td className="py-3 px-2 font-mono font-medium text-center">{e.version}</td>
+                  <td className="py-3 px-2 opacity-80 text-center">{e.description}</td>
                   <td className="py-3 px-2 text-center">
                     <div className="flex justify-center gap-1">
                       <button
-                        onClick={() => navigate(`/Admin/Events/${e.id}/Edit`)}
+                        onClick={() => navigate(`/Admin/Changelog/${e.id}/Edit`)}
                         className={`px-3 py-1 rounded text-xs font-medium ${editButtonClass}`}
                       >Edit</button>
                       <button
-                        onClick={() => handleDelete(e.id, e.title)}
+                        onClick={() => handleDelete(e.id, e.version)}
                         disabled={deletingId === e.id}
                         className={`px-3 py-1 rounded text-xs font-medium disabled:opacity-50 ${deleteButtonClass}`}
                       >

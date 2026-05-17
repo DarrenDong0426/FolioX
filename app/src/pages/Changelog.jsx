@@ -1,5 +1,4 @@
-// Imports
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import Header from "../components/Header";
 import Footer from "../components/Footer.jsx";
@@ -7,8 +6,19 @@ import { useTheme } from "../hooks/themeContext.jsx";
 
 export default function Changelog() {
   const { isWarmthMode } = useTheme();
+  const [entries, setEntries] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Memoize the background to prevent recalculating random positions on every render
+  useEffect(() => {
+    fetch('/api/changelog')
+      .then(res => res.json())
+      .then(data => {
+        setEntries(data.changelog || []);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
   const Background = useMemo(() => {
     return (
       <div className="absolute inset-0 z-0 pointer-events-none">
@@ -32,11 +42,7 @@ export default function Changelog() {
                   y: [0, Math.random() * 100 - 50, 0],
                   scale: [1, 0.8 + Math.random() * 0.4, 1],
                 }}
-                transition={{
-                  duration: 15 + Math.random() * 20,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
+                transition={{ duration: 15 + Math.random() * 20, repeat: Infinity, ease: "easeInOut" }}
               />
             ))}
           </>
@@ -55,16 +61,8 @@ export default function Changelog() {
                   opacity: 0.3 + Math.random() * 0.7,
                   boxShadow: '0 0 4px rgba(125, 227, 252, 0.8)',
                 }}
-                animate={{
-                  opacity: [0.3, 1, 0.3],
-                  scale: [1, 1.3, 1],
-                }}
-                transition={{
-                  duration: 2 + Math.random() * 4,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: Math.random() * 3,
-                }}
+                animate={{ opacity: [0.3, 1, 0.3], scale: [1, 1.3, 1] }}
+                transition={{ duration: 2 + Math.random() * 4, repeat: Infinity, ease: "easeInOut", delay: Math.random() * 3 }}
               />
             ))}
           </>
@@ -81,29 +79,30 @@ export default function Changelog() {
   return (
     <div className="relative min-h-screen flex flex-col overflow-hidden">
       {Background}
-      
       <Header />
-      
+
       <div className="flex-1 flex flex-col items-center p-6 relative z-10">
         <h1 className={`text-4xl font-bold mb-2 text-center ${headingText}`}>
           Changelog
         </h1>
         <p className={`text-center text-sm mb-8 ${subText}`}>
-          Last Updated: October 2025
+          A running list of updates to the site.
         </p>
 
         <div className={`w-full max-w-3xl p-6 rounded-xl shadow-lg border-2 backdrop-blur-md ${cardBg}`}>
-          <ul className="space-y-3">
-            <li className={`text-sm ${itemText}`}>
-              • Version 1.0.0 – Initial release of the portfolio.
-            </li>
-            <li className={`text-sm ${itemText}`}>
-              • Version 1.1.0 – Contact Form on Main Page Implemented.
-            </li>
-            <li className={`text-sm ${itemText}`}>
-              • Version 1.1.1 – Fixed bug with Timeline events not showing correctly on Safari Browser.
-            </li>
-          </ul>
+          {loading ? (
+            <p className={`text-center ${itemText}`}>Loading...</p>
+          ) : entries.length === 0 ? (
+            <p className={`text-center ${itemText} opacity-70`}>No entries yet.</p>
+          ) : (
+            <ul className="space-y-3">
+              {entries.map(entry => (
+                <li key={entry.id} className={`text-sm ${itemText}`}>
+                  • Version {entry.version} – {entry.description}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
 
