@@ -50,6 +50,7 @@ export default function EditProject() {
           type: Array.isArray(project.type) ? project.type : [],
           lock: !!project.lock,
           wip: !!project.wip,
+          featured: !!project.featured, 
           content_blocks: Array.isArray(project.content_blocks) ? project.content_blocks : [],  // NEW
         });
       })
@@ -223,6 +224,14 @@ export default function EditProject() {
               onChange={(e) => setForm({ ...form, wip: e.target.checked })}
             />
             Work in progress
+          </label>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={form.featured}
+              onChange={(e) => setForm({ ...form, featured: e.target.checked })}
+            />
+            ⭐ Featured (homepage carousel)
           </label>
           
         </div>

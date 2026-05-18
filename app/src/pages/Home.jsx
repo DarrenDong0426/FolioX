@@ -8,6 +8,7 @@ import Timeline from "../sections/Home/Timeline";
 import Information from "../sections/Home/Information";
 import Footer from "../components/Footer";
 import { useTheme } from "../hooks/themeContext";
+import FeaturedCarousel from "../sections/Home/FeaturedCarousel";
 
 const sectionVariant = {
   hidden: { opacity: 0, y: 30 },
@@ -22,6 +23,7 @@ export default function Home() {
   const { isWarmthMode } = useTheme();
   const sections = [
     { Component: Intro, key: "Intro" },
+    { Component: FeaturedCarousel, key: "FeaturedCarousel" }, 
     { Component: Projects, key: "Projects" },
     { Component: Documents, key: "Documents" },
     { Component: Timeline, key: "Timeline" },
@@ -102,10 +104,13 @@ export default function Home() {
 
       <main className="flex-1 relative z-10">
         {sections.map(({ Component, key }, idx) => (
-          <motion.section
-            key={key}
-            className={`min-h-screen flex items-center justify-center ${idx === sections.length - 1 ? "mb-0" : ""}`}
-            initial="hidden"
+        <motion.section
+          key={key}
+          className={`
+            ${key === "Intro" || key === "FeaturedCarousel" ? "" : "min-h-screen"}
+            flex items-center justify-center
+            ${idx === sections.length - 1 ? "mb-0" : ""}
+          `}initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.3 }}
             variants={sectionVariant}

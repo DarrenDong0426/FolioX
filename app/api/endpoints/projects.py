@@ -28,10 +28,10 @@ def get_project(project_id):
         with engine.connect() as conn:
             row = conn.execute(
                 text("""
-                    SELECT id, name, description, lock, wip, month_year, language, type, content_blocks
+                    SELECT id, name, description, lock, wip, month_year, language, type, content_blocks, featured
                     FROM projects
                     WHERE id = :id
-                """),
+                """), 
                 {"id": project_id}
             ).fetchone()
 
@@ -49,6 +49,7 @@ def get_project(project_id):
             "language": row.language,
             "type": row.type,
             "content_blocks": row.content_blocks or [],
+            "featured": row.featured,
         }), 200
 
     except Exception as e:
@@ -118,7 +119,7 @@ def get_projects():
             # Then: the actual paginated rows
             offset = (page - 1) * page_size
             data_sql = text(f"""
-                SELECT id, name, description, lock, wip, month_year, language, type, content_blocks
+                SELECT id, name, description, lock, wip, month_year, language, type, content_blocks, featured
                 FROM projects
                 {where_sql}
                 ORDER BY {order_by}
@@ -142,6 +143,7 @@ def get_projects():
                 "language": r.language,
                 "type": r.type,
                 "content_blocks": r.content_blocks or [],
+                "featured": r.featured,
             })
 
         return jsonify({"projects": projects, "totalItems": total_items}), 200
@@ -166,6 +168,7 @@ def create_project():
     month_year = data.get("month_year")
     language = data.get("language") or []
     type_ = data.get("type") or []
+    featured = bool(data.get("featured", False))
 
     if not name or not month_year or not language or not type_:
         return jsonify({"error": "Missing required fields"}), 400
@@ -178,19 +181,15 @@ def create_project():
         with engine.begin() as conn:
             result = conn.execute(
                 text("""
-                    INSERT INTO projects (name, description, lock, wip, month_year, language, type, content_blocks)
-                    VALUES (:name, :desc, :lock, :wip, :month_year, :language, :type, :content_blocks)
+                    INSERT INTO projects (name, description, lock, wip, month_year, language, type, content_blocks, featured)
+                    VALUES (:name, :desc, :lock, :wip, :month_year, :language, :type, :content_blocks, :featured)
                     RETURNING id
                 """),
                 {
-                    "name": name,
-                    "desc": desc,
-                    "lock": lock,
-                    "wip": wip,
-                    "month_year": month_year,
-                    "language": language,
-                    "type": type_,
+                    "name": name, "desc": desc, "lock": lock, "wip": wip,
+                    "month_year": month_year, "language": language, "type": type_,
                     "content_blocks": json.dumps(content_blocks),
+                    "featured": featured,
                 }
             )
             new_id = result.scalar()
@@ -218,6 +217,7 @@ def update_project(project_id):
     month_year = data.get("month_year")
     language = data.get("language") or []
     type_ = data.get("type") or []
+    featured = bool(data.get("featured", False))
 
     if not name or not month_year or not language or not type_:
         return jsonify({"error": "Missing required fields"}), 400
@@ -237,20 +237,16 @@ def update_project(project_id):
                         wip = :wip,
                         month_year = :month_year,
                         language = :language,
-                        type = :type, 
-                        content_blocks = :content_blocks
+                        type = :type,
+                        content_blocks = :content_blocks,
+                        featured = :featured
                     WHERE id = :id
                 """),
                 {
-                    "id": project_id,
-                    "name": name,
-                    "desc": desc,
-                    "lock": lock,
-                    "wip": wip,
-                    "month_year": month_year,
-                    "language": language,
-                    "type": type_,
+                    "id": project_id, "name": name, "desc": desc, "lock": lock, "wip": wip,
+                    "month_year": month_year, "language": language, "type": type_,
                     "content_blocks": json.dumps(content_blocks),
+                    "featured": featured,
                 }
             )
 
@@ -335,4 +331,37 @@ def delete_tag():
 
     except Exception as e:
         print(f"Delete tag error: {e}")
+        return jsonify({"error": str(e)}), 500
+    
+@projects_bp.route("/projects/featured", methods=["GET"], strict_slashes=False)
+def get_featured_projects():
+    try:
+        sql = text("""
+            SELECT id, name, description, lock, wip, month_year, language, type, content_blocks
+            FROM projects
+            WHERE featured = TRUE
+            ORDER BY month_year DESC
+        """)
+
+        with engine.connect() as conn:
+            rows = conn.execute(sql).fetchall()
+
+        projects = []
+        for r in rows:
+            projects.append({
+                "id": r.id,
+                "name": r.name,
+                "desc": r.description,
+                "lock": r.lock,
+                "wip": r.wip,
+                "month_year": r.month_year.strftime("%B %Y") if r.month_year else None,
+                "language": r.language,
+                "type": r.type,
+                "content_blocks": r.content_blocks or [],
+            })
+
+        return jsonify({"projects": projects}), 200
+
+    except Exception as e:
+        print(f"Get featured projects error: {e}")
         return jsonify({"error": str(e)}), 500

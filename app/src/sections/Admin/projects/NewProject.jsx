@@ -31,6 +31,7 @@ export default function NewProject() {
     type: [],
     lock: false,
     wip: false,
+    featured: false,
     content_blocks: [], 
   });
   const [saving, setSaving] = useState(false);
@@ -190,6 +191,14 @@ export default function NewProject() {
               onChange={(e) => setForm({ ...form, wip: e.target.checked })}
             />
             Work in progress
+          </label>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={form.featured}
+              onChange={(e) => setForm({ ...form, featured: e.target.checked })}
+            />
+            ⭐ Featured (homepage carousel)
           </label>
         </div>
 
