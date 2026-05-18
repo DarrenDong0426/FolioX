@@ -17,14 +17,18 @@ const sectionVariant = {
 
 function IntroCombined() {
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center gap-2 md:gap-6 py-4">
-      {/* Intro takes up only as much space as it needs */}
-      <Intro />
+    <div className="w-full h-full flex flex-col items-center justify-center gap-2 md:gap-4 py-4">
       
-      {/* Carousel wrapper is given flexibility to shrink/grow properly */}
-      <div className="w-full max-w-6xl flex-1 min-h-0 flex flex-col items-center justify-center">
+      {/* Intro: only takes what it needs */}
+      <div className="shrink-0 w-full">
+        <Intro />
+      </div>
+
+      {/* Carousel: gets all remaining space */}
+      <div className="w-full flex-1 min-h-0 flex flex-col items-center justify-center">
         <FeaturedCarousel />
       </div>
+
     </div>
   );
 }
@@ -103,7 +107,7 @@ export default function Home() {
         ) : (
           <>
             <div className="absolute inset-0 bg-gradient-to-br from-[#0a0e27] via-[#1a1f4a] to-[#0a0e27]" />
-            {Array.from({ length: 1000 }).map((_, i) => ( // Dropped from 2000 to improve rendering overhead
+            {Array.from({ length: 75 }).map((_, i) => ( // Dropped from 2000 to improve rendering overhead
               <motion.div
                 key={`dark-${i}`}
                 className="absolute rounded-full bg-cyan-300"
