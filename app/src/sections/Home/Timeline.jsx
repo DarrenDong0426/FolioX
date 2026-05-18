@@ -1,109 +1,164 @@
-// Imports
+import React, { useEffect, useState } from "react";
 import timeline from "../../assets/images/timeline.png";
 import { Link } from "react-router-dom";
 import { useTheme } from "../../hooks/themeContext.jsx";
-import { motion } from "framer-motion"; // ✅ Import Framer Motion
+import { motion } from "framer-motion";
 
-// Animation variants
 const leftSlide = {
   hidden: { opacity: 0, x: -80 },
-  visible: {
-    opacity: 1,
-    x: 0,
-    transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] },
-  },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] } },
 };
 
 const rightSlide = {
   hidden: { opacity: 0, x: 80 },
-  visible: {
-    opacity: 1,
-    x: 0,
-    transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] },
-  },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] } },
 };
 
 export default function Timeline() {
   const { isWarmthMode } = useTheme();
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/events?all=true')
+      .then(res => res.json())
+      .then(data => setEvents(data.events || []))
+      .catch(() => {});
+  }, []);
+
+  const stats = React.useMemo(() => {
+    const total = events.length;
+    const tagCounts = {};
+    let earliestYear = null;
+    let latestYear = null;
+
+    for (const e of events) {
+      if (e.tags) {
+        tagCounts[e.tags] = (tagCounts[e.tags] || 0) + 1;
+      }
+      if (e.start) {
+        const year = parseInt(e.start.slice(0, 4), 10);
+        if (!earliestYear || year < earliestYear) earliestYear = year;
+        if (!latestYear || year > latestYear) latestYear = year;
+      }
+    }
+
+    const topTags = Object.entries(tagCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3);
+
+    const yearSpan = earliestYear && latestYear
+      ? (earliestYear === latestYear ? `${earliestYear}` : `${earliestYear} – ${latestYear}`)
+      : null;
+
+    return { total, topTags, yearSpan };
+  }, [events]);
+
+  const headingClass = isWarmthMode ? "text-[#E94E41]" : "text-cyan-400";
+  const bodyText = isWarmthMode ? "text-[#264653]" : "text-gray-200";
+  const labelClass = isWarmthMode ? "text-gray-600" : "text-cyan-400";
+  const valueClass = isWarmthMode ? "text-[#264653]" : "text-cyan-200";
 
   return (
-    <div
-      className={`
-        min-h-screen w-screen flex items-center justify-center px-4 py-6
-        transition-colors duration-500
-        ${isWarmthMode
-          ? "bg-[radial-gradient(ellipse_80%_60%_at_20%_10%,rgba(255,226,237,0.8)_60%,rgba(247,243,234,1)_100%)]"
-          : "bg-[radial-gradient(ellipse_80%_60%_at_20%_10%,rgba(17,26,34,0.8)_60%,rgba(18,32,47,1)_100%)]"
-        }
-      `}
-    >
+    <div className="w-full h-full flex items-center justify-center px-4 py-6 transition-colors duration-500">
       <div
         className={`
-          flex flex-col md:flex-row max-w-6xl w-full gap-10 rounded-3xl shadow-xl border-2 p-6 my-6 z-10
+          flex flex-col max-w-5xl w-full gap-6 rounded-3xl shadow-xl border-2 px-6 py-6 my-6 z-10
           ${isWarmthMode
             ? "bg-[#FFF8F3]/90 border-[#E94E41]"
             : "bg-[#151C26]/90 border-cyan-700"
           }
         `}
       >
-        {/* Left Text Section */}
-        <motion.div
-          className="flex flex-col justify-center flex-[2]"
-          variants={leftSlide}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: false, amount: 0.3 }}
-        >
-          <h1
-            className={`
-              text-3xl lg:text-4xl font-bold mb-4 text-center tracking-wide
-              ${isWarmthMode ? "text-[#E94E41]" : "text-cyan-400"}
-            `}
+        {/* Top half: intro + image */}
+        <div className="flex flex-col md:flex-row gap-12 items-center">
+          <motion.div
+            className="flex flex-col justify-center flex-[2]"
+            variants={leftSlide}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.3 }}
           >
-            View Timeline
-          </h1>
-          <p className={`mb-4 ${isWarmthMode ? "text-[#264653]" : "text-gray-200"}`}>
-            This timeline feature provides users with a comprehensive, chronological overview of significant achievements and events, organized by year. The timeline displays a wide range of milestones, including academic accomplishments such as major projects, admissions, and degree completions; professional development experiences, such as research appointments, internships, and conference participation; as well as notable personal events, including travel and other meaningful activities. Each event is represented as a distinct point on the timeline for its respective year.
-          </p>
-          <p className={`mb-4 ${isWarmthMode ? "text-[#39536B]" : "text-gray-400"}`}>
-            When users hover over an event point, it expands into a detailed information box that summarizes the event, allowing for quick insights at a glance. For further exploration, clicking on an event directs users to a dedicated page containing comprehensive details, supporting resources, and related content.
-          </p>
-          <p className={`mb-4 ${isWarmthMode ? "text-[#39536B]" : "text-gray-400"}`}>
-            The feature also includes robust filtering options, allowing users to tailor their view based on event categories such as Academic, Professional Development, or Personal. Users can select one or multiple categories simultaneously, enabling a customized and focused timeline experience. Navigational controls support both sequential and direct access to timeline entries, with buttons to move to the previous or next year, as well as to jump directly to the present or the last year in the timeline. Additionally, a scrollbar provides efficient access to any specific year within the timeline.
-          </p>
-          <p className="mb-4">
-            <Link
-              to="/Timeline"
-              className={`
-                font-bold underline underline-offset-2 transition-colors duration-200
-                ${isWarmthMode
-                  ? "text-blue-600 hover:text-[#E94E41]"
-                  : "text-cyan-300 hover:text-cyan-100"}
-              `}
-            >
+            <h1 className={`text-3xl lg:text-4xl font-bold mb-4 tracking-wide ${headingClass}`}>
               View Timeline
-            </Link>
-          </p>
-        </motion.div>
+            </h1>
+            <p className={`mb-4 ${bodyText}`}>
+              A chronological view of academic milestones, professional experiences, and personal events. Hover for a quick summary, click to dive deeper, and filter by category to focus on what matters.
+            </p>
+            <p className="mb-2">
+              <Link
+                to="/Timeline"
+                className={`
+                  font-bold underline underline-offset-2 transition-colors duration-200
+                  ${isWarmthMode
+                    ? "text-blue-600 hover:text-[#E94E41]"
+                    : "text-cyan-300 hover:text-cyan-100"}
+                `}
+              >
+                Explore Timeline →
+              </Link>
+            </p>
+          </motion.div>
 
-        {/* Right Image Section */}
+          <motion.div
+            className="flex w-full md:w-auto flex-[1] items-center justify-center"
+            variants={rightSlide}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.3 }}
+          >
+            <img
+              src={timeline}
+              alt="Timeline"
+              className={`
+                w-[200px] md:w-[240px] rounded-xl shadow-lg ring-2 bg-white/70
+                ${isWarmthMode ? "ring-[#e2eafc]" : "ring-cyan-900"}
+              `}
+            />
+          </motion.div>
+        </div>
+
+        {/* Divider */}
+        <hr className={`my-2 ${isWarmthMode ? "border-pink-200" : "border-cyan-900"}`} />
+
+        {/* Bottom half: stats */}
         <motion.div
-          className="flex w-full md:w-auto flex-[1] items-center justify-center"
-          variants={rightSlide}
-          initial="hidden"
-          whileInView="visible"
+          className="grid grid-cols-2 md:grid-cols-3 gap-4"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false, amount: 0.3 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          <img
-            src={timeline}
-            alt="Timeline"
-            className={`
-              max-w-xs sm:max-w-sm md:max-w-md
-              rounded-xl shadow-lg ring-2
-              ${isWarmthMode ? "ring-[#e2eafc]" : "ring-cyan-900"}
-              bg-white/70
-            `}
-          />
+          <div className="text-center">
+            <div className={`text-4xl md:text-5xl font-bold mb-1 ${valueClass}`}>
+              {stats.total}
+            </div>
+            <div className={`text-xs uppercase tracking-widest ${labelClass}`}>
+              Events
+            </div>
+          </div>
+
+          {stats.yearSpan && (
+            <div className="text-center">
+              <div className={`text-2xl md:text-3xl font-bold mb-1 ${valueClass}`}>
+                {stats.yearSpan}
+              </div>
+              <div className={`text-xs uppercase tracking-widest ${labelClass}`}>
+                Years Spanned
+              </div>
+            </div>
+          )}
+
+          <div className="text-center">
+            <div className={`text-sm md:text-base font-semibold mb-2 ${valueClass}`}>
+              {stats.topTags.length === 0
+                ? '—'
+                : stats.topTags.map(([name]) => name).join(' · ')
+              }
+            </div>
+            <div className={`text-xs uppercase tracking-widest ${labelClass}`}>
+              Top Categories
+            </div>
+          </div>
         </motion.div>
       </div>
     </div>
