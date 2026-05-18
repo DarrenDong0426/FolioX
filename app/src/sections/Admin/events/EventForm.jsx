@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTheme } from '../../../hooks/themeContext';
+import BlockEditor from '../../../components/BlockEditor';
+import BlockRenderer from '../../../components/BlockRenderer';
 
 const TAG_OPTIONS = ['Personal', 'Professional', 'Projects', 'Research'];
 
@@ -9,6 +11,15 @@ export default function EventForm({ initialForm, onSubmit, submitLabel, onCancel
   const [form, setForm] = useState(initialForm);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
+  const [projects, setProjects] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/projects')
+      .then(res => res.json())
+      .then(data => setProjects(data.projects || []))
+      .catch(() => {});
+  }, []);
 
   const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files || []);
@@ -38,7 +49,7 @@ export default function EventForm({ initialForm, onSubmit, submitLabel, onCancel
       setUploadError(err.message);
     } finally {
       setUploading(false);
-      e.target.value = '';   // reset so the same file can be picked again
+      e.target.value = '';
     }
   };
 
@@ -70,6 +81,29 @@ export default function EventForm({ initialForm, onSubmit, submitLabel, onCancel
           onChange={(e) => setForm({ ...form, title: e.target.value })}
           className={inputClass}
         />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Linked Project (optional)</label>
+        <select
+          value={form.project_id || ''}
+          onChange={(e) => setForm({
+            ...form,
+            project_id: e.target.value ? parseInt(e.target.value, 10) : null
+          })}
+          className={inputClass}
+        >
+          <option value="">— None (standalone event) —</option>
+          {projects.map(p => (
+            <option key={p.id} value={p.id}>{p.name}</option>
+          ))}
+        </select>
+        <p className="text-xs opacity-60 mt-1">
+          {form.project_id
+            ? "Clicking this event on the timeline will open the linked project's page."
+            : "Clicking this event on the timeline will open its own detail page."
+          }
+        </p>
       </div>
 
       <div>
@@ -146,8 +180,12 @@ export default function EventForm({ initialForm, onSubmit, submitLabel, onCancel
             ))}
           </div>
         )}
+      </div>
 
-        <input
+      {/* Page Content — only shown when not linked to a project */}
+      {!form.project_id ? (
+        <div>
+          <input
           type="file"
           accept="image/*"
           multiple
@@ -157,7 +195,41 @@ export default function EventForm({ initialForm, onSubmit, submitLabel, onCancel
         />
         {uploading && <p className="text-xs opacity-70 mt-1">Uploading...</p>}
         {uploadError && <p className="text-red-500 text-xs mt-1">{uploadError}</p>}
-      </div>
+          <div className="flex justify-between items-center mb-2">
+            <label className="block text-sm font-medium">Page Content</label>
+            <button
+              type="button"
+              onClick={() => setShowPreview(!showPreview)}
+              className={`px-3 py-1 rounded text-xs font-medium ${
+                isWarmthMode
+                  ? 'bg-pink-100 text-pink-600 hover:bg-pink-200'
+                  : 'bg-cyan-900/40 text-cyan-300 hover:bg-cyan-900/60'
+              }`}
+            >
+              {showPreview ? '✎ Edit' : '👁 Preview'}
+            </button>
+          </div>
+
+          {showPreview ? (
+            <div className={`p-4 rounded-lg border ${
+              isWarmthMode ? 'bg-white border-pink-200' : 'bg-[#0a0e27]/60 border-cyan-700'
+            }`}>
+              <BlockRenderer blocks={form.content_blocks || []} />
+            </div>
+          ) : (
+            <BlockEditor
+              blocks={form.content_blocks || []}
+              onChange={(newBlocks) => setForm({ ...form, content_blocks: newBlocks })}
+            />
+          )}
+        </div>
+      ) : (
+        <div className={`p-4 rounded-lg border italic text-sm opacity-70 ${
+          isWarmthMode ? 'bg-pink-50 border-pink-200 text-gray-600' : 'bg-cyan-900/20 border-cyan-700 text-cyan-300'
+        }`}>
+          Page content is managed on the linked project. Set "Linked Project" to None to edit event content separately.
+        </div>
+      )}
 
       {error && <p className="text-red-500 text-sm">{error}</p>}
 

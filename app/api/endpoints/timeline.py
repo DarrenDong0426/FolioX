@@ -36,7 +36,7 @@ def get_event(event_id):
         with engine.connect() as conn:
             row = conn.execute(
                 text("""
-                    SELECT id, title, description AS desc, start, "end", tags, images, content_blocks
+                    SELECT id, title, description AS desc, start, "end", tags, images, content_blocks, project_id
                     FROM events
                     WHERE id = :id
                 """),
@@ -55,11 +55,13 @@ def get_event(event_id):
             "end": row.end.isoformat() if row.end else None,
             "images": row.images or [],
             "content_blocks": row.content_blocks or [],
+            "project_id": row.project_id,
         }), 200
 
     except Exception as e:
         print(f"Get event error: {e}")
         return jsonify({"error": str(e)}), 500
+
     
 @timeline_bp.route("/events", methods=["GET"], strict_slashes=False)
 def get_events():
@@ -88,7 +90,7 @@ def get_events():
         where_sql = "WHERE " + " AND ".join(where_clauses)
 
     sql = text(f"""
-        SELECT id, title, description AS desc, start, "end", tags, images, content_blocks
+        SELECT id, title, description AS desc, start, "end", tags, images, content_blocks, project_id
         FROM events
         {where_sql}
         ORDER BY start ASC;
@@ -175,7 +177,6 @@ def create_event():
         return auth_error
 
     data = request.get_json() or {}
-
     title = (data.get("title") or "").strip()
     desc = (data.get("desc") or "").strip()
     tags = (data.get("tags") or "").strip()
@@ -183,6 +184,7 @@ def create_event():
     end = data.get("end")
     images = data.get("images") or []
     content_blocks = data.get("content_blocks") or []
+    project_id = data.get("project_id") or None   # NEW
 
     if not title or not tags or not start or not end:
         return jsonify({"error": "Missing required fields"}), 400
@@ -191,20 +193,20 @@ def create_event():
         with engine.begin() as conn:
             result = conn.execute(
                 text("""
-                    INSERT INTO events (title, description, tags, start, "end", images, content_blocks)
-                    VALUES (:title, :desc, :tags, :start, :end, :images, :content_blocks)
+                    INSERT INTO events (title, description, tags, start, "end", images, content_blocks, project_id)
+                    VALUES (:title, :desc, :tags, :start, :end, :images, :content_blocks, :project_id)
                     RETURNING id
                 """),
                 {
                     "title": title, "desc": desc, "tags": tags,
                     "start": start, "end": end, "images": images,
-                    content_blocks: json.dumps(content_blocks)
+                    "content_blocks": json.dumps(content_blocks),
+                    "project_id": project_id,
                 }
             )
             new_id = result.scalar()
 
         return jsonify({"id": new_id, "status": "created"}), 201
-
     except Exception as e:
         print(f"Create event error: {e}")
         return jsonify({"error": str(e)}), 500
@@ -228,6 +230,7 @@ def update_event(event_id):
     end = data.get("end")
     images = data.get("images") or []
     content_blocks = data.get("content_blocks") or []
+    project_id = data.get("project_id") or None
 
     if not title or not tags or not start or not end:
         return jsonify({"error": "Missing required fields"}), 400
@@ -242,13 +245,16 @@ def update_event(event_id):
                         tags = :tags,
                         start = :start,
                         "end" = :end,
-                        images = :images, 
-                        content_blocks = :content_blocks
+                        images = :images,
+                        content_blocks = :content_blocks,
+                        project_id = :project_id
                     WHERE id = :id
                 """),
                 {
                     "id": event_id, "title": title, "desc": desc, "tags": tags,
-                    "start": start, "end": end, "images": images, "content_blocks": json.dumps(content_blocks)
+                    "start": start, "end": end, "images": images,
+                    "content_blocks": json.dumps(content_blocks),
+                    "project_id": project_id,
                 }
             )
 

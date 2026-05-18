@@ -14,14 +14,12 @@ export default function EditEvent() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch('/api/events?all=true')
-      .then(res => res.json())
-      .then(data => {
-        const event = (data.events || []).find(e => String(e.id) === id);
-        if (!event) {
-          setError('Event not found');
-          return;
-        }
+    fetch(`/api/events/${id}`)
+      .then(res => {
+        if (!res.ok) throw new Error('Event not found');
+        return res.json();
+      })
+      .then(event => {
         setInitialForm({
           title: event.title || '',
           desc: event.desc || '',
@@ -29,6 +27,8 @@ export default function EditEvent() {
           start: event.start || '',
           end: event.end || '',
           images: Array.isArray(event.images) ? event.images : [],
+          content_blocks: Array.isArray(event.content_blocks) ? event.content_blocks : [],
+          project_id: event.project_id || null,
         });
       })
       .catch(err => setError(err.message));

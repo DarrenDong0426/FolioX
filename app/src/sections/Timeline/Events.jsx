@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useEvents } from "../../hooks/eventsContext";                      
 import Controls from "./Controls";                                          
 import Card from "../../components/Card";                                   
-import { useTheme } from "../../hooks/themeContext";                        
+import { useTheme } from "../../hooks/themeContext";      
+import { Link } from 'react-router-dom';                  
 
 export default function Events() {
   const { events, loading, error, year } = useEvents();
@@ -150,17 +151,19 @@ export default function Events() {
   onMouseEnter={() => setHoveredEventId(event.id)}
   onMouseLeave={() => setHoveredEventId(null)}
 >
-            <div
-              className="w-40 text-center text-sm font-semibold rounded transition-colors duration-300"
+            <Link
+              to={event.project_id ? `/Projects/${event.project_id}` : `/Events/${event.id}`}
+              className="w-40 text-center text-sm font-semibold rounded transition-all duration-300 hover:opacity-80"
               style={{
                 backgroundColor: color.bg,
                 color: color.text,
                 border: `2px solid ${isWarmthMode ? "#E94E41" : "#0ff"}`,
                 padding: "0.5rem",
+                display: "block",
               }}
             >
               {event.title}
-            </div>
+            </Link>
 
             <div className="flex-1 relative h-8 ml-2 rounded">
               <div

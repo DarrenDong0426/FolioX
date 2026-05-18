@@ -12,7 +12,14 @@ export default function NewEvent() {
   const [error, setError] = useState(null);
 
   const initialForm = {
-    title: '', desc: '', tags: '', start: '', end: '', images: [],
+    title: '',
+    desc: '',
+    tags: '',
+    start: '',
+    end: '',
+    images: [],
+    content_blocks: [],
+    project_id: null,
   };
 
   const handleSubmit = async (form) => {

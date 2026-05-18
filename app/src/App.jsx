@@ -10,6 +10,7 @@ import Timeline from './pages/Timeline';          // Import custom "Timeline" co
 import FaQs from './pages/FaQs';
 import Changelog from './pages/Changelog';
 import ProjectDetail from './pages/ProjectDetail';
+import EventDetail from './pages/EventDetail';
 
 // Admin imports
 import Admin from './pages/Admin';                                          // Import custom "Admin" dashboard component from ./pages/Admin
@@ -56,6 +57,7 @@ export default function App() {
           <Route path="/FaQs" element={<FaQs/>}/>       {/* Maps the path "/Timeline" to render the Timeline component */}
           <Route path="/Changelog" element={<Changelog/>}/>       {/* Maps the path "/Timeline" to render the Timeline component */}
           <Route path="/Projects/:id" element={<ProjectDetail />} />
+          <Route path="/Events/:id" element={<EventDetail />} />
           
           {/* Admin auth routes — public, no auth wrapper since user is logging in */}
           <Route path="/Admin/Login" element={<Login />} />       {/* Maps the path "/Admin/Login" to render the Login component */}
