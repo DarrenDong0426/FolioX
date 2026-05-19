@@ -17,18 +17,13 @@ const sectionVariant = {
 
 function IntroCombined() {
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center gap-2 md:gap-4 py-4">
-      
-      {/* Intro: only takes what it needs */}
-      <div className="shrink-0 w-full">
+    <div className="w-full h-full flex flex-col items-center justify-center gap-1 py-2 min-h-0">
+      <div className="shrink-0 w-full flex items-center justify-center">
         <Intro />
       </div>
-
-      {/* Carousel: gets all remaining space */}
       <div className="w-full flex-1 min-h-0 flex flex-col items-center justify-center">
         <FeaturedCarousel />
       </div>
-
     </div>
   );
 }
@@ -149,7 +144,7 @@ export default function Home() {
               viewport={{ once: true, amount: 0.3 }}
               variants={sectionVariant}
             >
-              <div className="flex-1 min-h-0 w-full flex items-center justify-center p-4">
+              <div className="flex-1 min-h-0 w-full flex items-center justify-center p-2 overflow-hidden">
                 <Component />
               </div>
               {isLast && <Footer />}

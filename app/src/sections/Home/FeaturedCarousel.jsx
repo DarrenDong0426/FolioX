@@ -103,14 +103,14 @@ export default function FeaturedCarousel() {
     <div className="w-full max-w-5xl mx-auto px-4 md:px-6 flex flex-col h-full min-h-0 justify-center">
 
       {/* Header */}
-      <div className="shrink-0 mb-2 md:mb-4">
-        <h2 className={`text-2xl md:text-3xl font-bold text-center mb-1 ${isWarmthMode ? "text-[#E94E41]" : "text-cyan-300"}`}>
-          Featured Work
+      <div className="shrink-0 mb-1">
+        <h2 className={`text-lg md:text-2xl font-bold text-center ${isWarmthMode ? "text-[#E94E41]" : "text-cyan-300"}`}>
+            Featured Work
         </h2>
-        <p className={`text-center text-xs md:text-sm ${isWarmthMode ? "text-gray-600" : "text-cyan-400"}`}>
-          A rotating look at projects worth highlighting.
+        <p className={`text-center text-xs ${isWarmthMode ? "text-gray-600" : "text-cyan-400"}`}>
+            A rotating look at projects worth highlighting.
         </p>
-      </div>
+    </div>
 
       {loading && <LoadingSpinner isWarmthMode={isWarmthMode} />}
 

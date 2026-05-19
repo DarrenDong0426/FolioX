@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTheme } from '../hooks/themeContext';
 
+
 /**
  * Renders an array of content blocks.
  *
