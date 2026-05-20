@@ -2,13 +2,37 @@ import React from "react";
 import { useTheme } from "../hooks/themeContext";
 
 /**
+ * Strip common inline markdown for display in the TOC.
+ * The full markdown is still rendered in the heading itself.
+ */
+function stripMarkdown(text) {
+  if (!text) return "";
+  return text
+    .replace(/\*\*(.*?)\*\*/g, "$1") // **bold**
+    .replace(/\*(.*?)\*/g, "$1") // *italic*
+    .replace(/__(.*?)__/g, "$1") // __bold__
+    .replace(/_(.*?)_/g, "$1") // _italic_
+    .replace(/\[(.*?)\]\(.*?\)/g, "$1") // [link](url)
+    .replace(/`(.*?)`/g, "$1") // `code`
+    .trim();
+}
+
+/**
+ * Slugify text into a stable URL fragment.
+ * Strips markdown first so "How **minimax** works" and "How minimax works" produce the same slug.
+ */
+export function slugifyHeading(text) {
+  return stripMarkdown(text)
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]/g, "");
+}
+
+/**
  * TableOfContents
  *
  * Props:
  *   blocks — the same content_blocks array passed to BlockRenderer
- *
- * Renders a linked list of all heading blocks.
- * Headings in BlockRenderer must have matching id attributes (slugified text).
  */
 export default function TableOfContents({ blocks }) {
   const { isWarmthMode } = useTheme();
@@ -16,12 +40,6 @@ export default function TableOfContents({ blocks }) {
   const headings = (blocks || []).filter((b) => b.type === "heading" && b.text);
 
   if (headings.length === 0) return null;
-
-  const slugify = (text) =>
-    text
-      .toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/[^\w-]/g, "");
 
   const indentMap = {
     1: "pl-0",
@@ -53,18 +71,34 @@ export default function TableOfContents({ blocks }) {
       aria-label="Table of contents"
     >
       <p
-        className={`text-xs uppercase tracking-widest font-bold mb-3 ${isWarmthMode ? "text-[#E94E41]" : "text-cyan-400"}`}
+        className={`text-xs uppercase tracking-widest font-bold mb-3 ${
+          isWarmthMode ? "text-[#E94E41]" : "text-cyan-400"
+        }`}
       >
         Contents
       </p>
       <ol className="space-y-1.5">
         {headings.map((block, idx) => {
-          const slug = slugify(block.text);
+          const slug = slugifyHeading(block.text);
+          const displayText = stripMarkdown(block.text);
           const level = block.level || 2;
+
           return (
             <li key={idx} className={indentMap[level] || "pl-0"}>
               <a
                 href={`#${slug}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  const target = document.getElementById(slug);
+                  if (target) {
+                    target.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    });
+                    // Update URL hash without triggering a jump
+                    history.replaceState(null, "", `#${slug}`);
+                  }
+                }}
                 className={`
                   ${sizeMap[level] || "text-sm"}
                   transition-colors duration-150 hover:underline underline-offset-2
@@ -75,7 +109,7 @@ export default function TableOfContents({ blocks }) {
                   }
                 `}
               >
-                {block.text}
+                {displayText}
               </a>
             </li>
           );

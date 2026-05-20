@@ -1,9 +1,54 @@
 import React, { useState } from "react";
 import { useTheme } from "../hooks/themeContext";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
+/**
+ * BlockEditor
+ *
+ * Props:
+ *   blocks    — current array of block objects
+ *   onChange  — fn(newBlocks: array) to update parent state
+ *
+ * Manages: add, edit, drag-to-reorder, delete blocks.
+ */
 export default function BlockEditor({ blocks, onChange }) {
   const { isWarmthMode } = useTheme();
-  const [addingBlockType, setAddingBlockType] = useState(null);
+
+  // ---- DnD setup ----
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = blocks.findIndex((_, i) => `block-${i}` === active.id);
+    const newIndex = blocks.findIndex((_, i) => `block-${i}` === over.id);
+    onChange(arrayMove(blocks, oldIndex, newIndex));
+  };
+
+  // ---- Block manipulation helpers ----
 
   const updateBlock = (index, newBlock) => {
     const updated = [...blocks];
@@ -16,19 +61,12 @@ export default function BlockEditor({ blocks, onChange }) {
     onChange(blocks.filter((_, i) => i !== index));
   };
 
-  const moveBlock = (index, direction) => {
-    const newIndex = index + direction;
-    if (newIndex < 0 || newIndex >= blocks.length) return;
-    const updated = [...blocks];
-    [updated[index], updated[newIndex]] = [updated[newIndex], updated[index]];
-    onChange(updated);
-  };
-
   const addBlock = (type) => {
     const newBlock = createBlankBlock(type);
     onChange([...blocks, newBlock]);
-    setAddingBlockType(null);
   };
+
+  // ---- Theme styles ----
 
   const blockCardClass = isWarmthMode
     ? "bg-white border-pink-200"
@@ -50,49 +88,59 @@ export default function BlockEditor({ blocks, onChange }) {
       : "text-cyan-300 hover:bg-cyan-900/40"
   }`;
 
+  // ---- Render each block's edit form based on type ----
+
   const renderBlockEditor = (block, index) => {
     switch (block.type) {
       case "heading":
         return (
-          <div className="flex gap-2">
-            <select
-              value={block.level || 2}
-              onChange={(e) =>
-                updateBlock(index, {
-                  ...block,
-                  level: parseInt(e.target.value, 10),
-                })
-              }
-              className={`${inputClass} !w-24 shrink-0`}
-            >
-              <option value={1}>H1</option>
-              <option value={2}>H2</option>
-              <option value={3}>H3</option>
-              <option value={4}>H4</option>
-            </select>
-            <input
-              type="text"
-              value={block.text || ""}
-              onChange={(e) =>
-                updateBlock(index, { ...block, text: e.target.value })
-              }
-              placeholder="Heading text..."
-              className={`${inputClass} !w-auto flex-1 min-w-0`}
-            />
+          <div className="space-y-2">
+            <div className="grid grid-cols-[auto_1fr] gap-2">
+              <select
+                value={block.level || 2}
+                onChange={(e) =>
+                  updateBlock(index, {
+                    ...block,
+                    level: parseInt(e.target.value, 10),
+                  })
+                }
+                className={`${inputClass} w-24`}
+              >
+                <option value={1}>H1</option>
+                <option value={2}>H2</option>
+                <option value={3}>H3</option>
+                <option value={4}>H4</option>
+              </select>
+              <input
+                type="text"
+                value={block.text || ""}
+                onChange={(e) =>
+                  updateBlock(index, { ...block, text: e.target.value })
+                }
+                placeholder="Heading text..."
+                className={inputClass}
+              />
+            </div>
           </div>
         );
 
       case "paragraph":
         return (
-          <textarea
-            rows={4}
-            value={block.text || ""}
-            onChange={(e) =>
-              updateBlock(index, { ...block, text: e.target.value })
-            }
-            placeholder="Paragraph text..."
-            className={inputClass}
-          />
+          <div className="space-y-1">
+            <textarea
+              rows={4}
+              value={block.text || ""}
+              onChange={(e) =>
+                updateBlock(index, { ...block, text: e.target.value })
+              }
+              placeholder="Paragraph text — markdown supported (**bold**, *italic*, - bullets, [links](url))"
+              className={inputClass}
+            />
+            <p className="text-xs opacity-60">
+              Supports markdown: <strong>**bold**</strong>, <em>*italic*</em>,
+              lists with - or 1., links with [text](url)
+            </p>
+          </div>
         );
 
       case "image":
@@ -110,9 +158,12 @@ export default function BlockEditor({ blocks, onChange }) {
           const match = url.match(
             /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/,
           );
-          if (match) return `https://www.youtube.com/embed/${match[1]}`;
+          if (match) {
+            return `https://www.youtube.com/embed/${match[1]}`;
+          }
           return url;
         };
+
         return (
           <div className="space-y-2">
             <input
@@ -225,53 +276,48 @@ export default function BlockEditor({ blocks, onChange }) {
             isWarmthMode ? "text-gray-600" : "text-cyan-200"
           }`}
         >
-          No content blocks yet. Click "+ Add block" below to start.
+          No content blocks yet. Click a button below to start.
         </p>
       )}
 
-      {blocks.map((block, idx) => (
-        <div key={idx} className={`p-3 rounded-lg border ${blockCardClass}`}>
-          <div className="flex items-center justify-between mb-2">
-            <span
-              className={`text-xs uppercase font-bold tracking-wider ${
-                isWarmthMode ? "text-pink-600" : "text-cyan-400"
-              }`}
-            >
-              {block.type}
-            </span>
-            <div className="flex gap-1">
-              <button
-                type="button"
-                onClick={() => moveBlock(idx, -1)}
-                disabled={idx === 0}
-                className={`${iconButtonClass} disabled:opacity-30`}
-                aria-label="Move up"
-              >
-                ↑
-              </button>
-              <button
-                type="button"
-                onClick={() => moveBlock(idx, 1)}
-                disabled={idx === blocks.length - 1}
-                className={`${iconButtonClass} disabled:opacity-30`}
-                aria-label="Move down"
-              >
-                ↓
-              </button>
-              <button
-                type="button"
-                onClick={() => removeBlock(idx)}
-                className={`${iconButtonClass} text-red-500 hover:bg-red-100`}
-                aria-label="Delete block"
-              >
-                ✕
-              </button>
-            </div>
-          </div>
-          {renderBlockEditor(block, idx)}
-        </div>
-      ))}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={blocks.map((_, i) => `block-${i}`)}
+          strategy={verticalListSortingStrategy}
+        >
+          {blocks.map((block, idx) => (
+            <SortableBlock key={`block-${idx}`} id={`block-${idx}`}>
+              <div className={`p-3 rounded-lg border ${blockCardClass}`}>
+                <div className="flex items-center justify-between mb-2">
+                  <span
+                    className={`text-xs uppercase font-bold tracking-wider ${
+                      isWarmthMode ? "text-pink-600" : "text-cyan-400"
+                    }`}
+                  >
+                    {block.type}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => removeBlock(idx)}
+                    className={`${iconButtonClass} text-red-500 hover:bg-red-100`}
+                    aria-label="Delete block"
+                  >
+                    ✕
+                  </button>
+                </div>
 
+                {renderBlockEditor(block, idx)}
+              </div>
+            </SortableBlock>
+          ))}
+        </SortableContext>
+      </DndContext>
+
+      {/* Add block controls */}
       <div className="flex flex-wrap gap-2 pt-2">
         <button
           type="button"
@@ -320,24 +366,45 @@ export default function BlockEditor({ blocks, onChange }) {
   );
 }
 
-function createBlankBlock(type) {
-  switch (type) {
-    case "heading":
-      return { type: "heading", text: "", level: 2 };
-    case "paragraph":
-      return { type: "paragraph", text: "" };
-    case "image":
-      return { type: "image", url: "", caption: "" };
-    case "video":
-      return { type: "video", url: "" };
-    case "code":
-      return { type: "code", language: "javascript", code: "" };
-    case "demo":
-      return { type: "demo", html: "", css: "", js: "" };
-    default:
-      return { type };
-  }
+// ---- Sortable wrapper ----
+
+function SortableBlock({ id, children }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 10 : "auto",
+  };
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <div className="flex gap-2 items-start">
+        <button
+          type="button"
+          {...attributes}
+          {...listeners}
+          className="mt-3 cursor-grab active:cursor-grabbing px-2 py-1 rounded hover:bg-black/10 text-sm opacity-50 hover:opacity-100 select-none"
+          aria-label="Drag to reorder"
+          title="Drag to reorder"
+        >
+          ⋮⋮
+        </button>
+        <div className="flex-1 min-w-0">{children}</div>
+      </div>
+    </div>
+  );
 }
+
+// ---- Image block sub-editor ----
 
 function ImageBlockEditor({ block, onUpdate, inputClass }) {
   const [uploading, setUploading] = useState(false);
@@ -348,6 +415,7 @@ function ImageBlockEditor({ block, onUpdate, inputClass }) {
     if (!file) return;
     setUploading(true);
     setUploadError(null);
+
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -412,4 +480,25 @@ function ImageBlockEditor({ block, onUpdate, inputClass }) {
       </div>
     </div>
   );
+}
+
+// ---- Helpers ----
+
+function createBlankBlock(type) {
+  switch (type) {
+    case "heading":
+      return { type: "heading", text: "", level: 2 };
+    case "paragraph":
+      return { type: "paragraph", text: "" };
+    case "image":
+      return { type: "image", url: "", caption: "", size: "full" };
+    case "video":
+      return { type: "video", url: "" };
+    case "code":
+      return { type: "code", language: "javascript", code: "" };
+    case "demo":
+      return { type: "demo", html: "", css: "", js: "" };
+    default:
+      return { type };
+  }
 }

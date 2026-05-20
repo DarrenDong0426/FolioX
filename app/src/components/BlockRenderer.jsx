@@ -1,13 +1,11 @@
-import React from 'react';
-import { useTheme } from '../hooks/themeContext';
-
+import React from "react";
+import { useTheme } from "../hooks/themeContext";
+import ReactMarkdown from "react-markdown";
+import remarkBreaks from "remark-breaks";
+import { slugifyHeading } from "./TableOfContents";
 
 /**
  * Renders an array of content blocks.
- *
- * Block format:
- *   { type: 'heading', text: '...', level: 2 }
- *   { type: 'paragraph', text: '...' }
  *
  * Used by both:
  *   - Public detail pages (Projects/:id, Events/:id)
@@ -18,72 +16,153 @@ export default function BlockRenderer({ blocks }) {
 
   if (!blocks || blocks.length === 0) {
     return (
-      <p className={`text-center italic opacity-60 py-8 ${
-        isWarmthMode ? 'text-gray-600' : 'text-cyan-200'
-      }`}>
+      <p
+        className={`text-center italic opacity-60 py-8 ${
+          isWarmthMode ? "text-gray-600" : "text-cyan-200"
+        }`}
+      >
         No content yet.
       </p>
     );
   }
 
-  const textColor = isWarmthMode ? 'text-gray-800' : 'text-cyan-100';
-  const headingColor = isWarmthMode ? 'text-[#8B2D2D]' : 'text-cyan-300';
+  const textColor = isWarmthMode ? "text-gray-800" : "text-cyan-100";
 
   return (
     <div className="prose max-w-none space-y-4">
       {blocks.map((block, idx) => {
         switch (block.type) {
-          case 'heading': {
+          case "heading": {
             const level = block.level || 2;
-            const Tag = `h${Math.min(Math.max(level, 1), 6)}`;
-            const sizeClass = {
-              1: 'text-4xl',
-              2: 'text-3xl',
-              3: 'text-2xl',
-              4: 'text-xl',
-              5: 'text-lg',
-              6: 'text-base',
-            }[level] || 'text-2xl';
+            const sizeClass =
+              {
+                1: "text-4xl md:text-5xl font-bold",
+                2: "text-3xl md:text-4xl font-bold",
+                3: "text-2xl md:text-3xl font-bold",
+                4: "text-xl md:text-2xl font-bold",
+              }[level] || "text-2xl font-bold";
+
+            const slug = slugifyHeading(block.text || "");
+
             return (
-              <Tag
+              <div
                 key={idx}
-                className={`${sizeClass} font-bold mt-6 mb-2 ${headingColor}`}
+                id={slug}
+                className={`mt-6 mb-3 scroll-mt-24 ${sizeClass} ${textColor}`}
               >
-                {block.text}
-              </Tag>
+                <ReactMarkdown
+                  remarkPlugins={[remarkBreaks]}
+                  components={{
+                    p: ({ node, ...props }) => {
+                      const HeadingTag = `h${level}`;
+                      return <HeadingTag {...props} />;
+                    },
+                    a: ({ node, ...props }) => (
+                      <a
+                        className="underline hover:opacity-80"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        {...props}
+                      />
+                    ),
+                    strong: ({ node, ...props }) => (
+                      <strong className="font-extrabold" {...props} />
+                    ),
+                    em: ({ node, ...props }) => (
+                      <em className="italic" {...props} />
+                    ),
+                    code: ({ node, ...props }) => (
+                      <code
+                        className="bg-black/10 px-1.5 py-0.5 rounded text-[0.85em] font-mono"
+                        {...props}
+                      />
+                    ),
+                  }}
+                >
+                  {block.text}
+                </ReactMarkdown>
+              </div>
             );
           }
 
-          case 'paragraph':
+          case "paragraph":
             return (
-              <p key={idx} className={`leading-relaxed ${textColor}`}>
-                {block.text}
-              </p>
+              <div key={idx} className={`my-3 markdown-body ${textColor}`}>
+                <ReactMarkdown
+                  remarkPlugins={[remarkBreaks]}
+                  components={{
+                    p: ({ node, ...props }) => (
+                      <p className="mb-3" {...props} />
+                    ),
+                    ul: ({ node, ...props }) => (
+                      <ul
+                        className="list-disc list-inside ml-4 mb-3 space-y-1"
+                        {...props}
+                      />
+                    ),
+                    ol: ({ node, ...props }) => (
+                      <ol
+                        className="list-decimal list-inside ml-4 mb-3 space-y-1"
+                        {...props}
+                      />
+                    ),
+                    li: ({ node, ...props }) => (
+                      <li className="ml-2" {...props} />
+                    ),
+                    a: ({ node, ...props }) => (
+                      <a
+                        className="underline hover:opacity-80"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        {...props}
+                      />
+                    ),
+                    strong: ({ node, ...props }) => (
+                      <strong className="font-bold" {...props} />
+                    ),
+                    em: ({ node, ...props }) => (
+                      <em className="italic" {...props} />
+                    ),
+                    code: ({ node, ...props }) => (
+                      <code
+                        className="bg-black/10 px-1 py-0.5 rounded text-sm font-mono"
+                        {...props}
+                      />
+                    ),
+                  }}
+                >
+                  {block.text}
+                </ReactMarkdown>
+              </div>
             );
-          case 'image': {
-              const sizeMap = {
-                small: 'max-w-xs',     // ~300px
-                medium: 'max-w-md',    // ~500px
-                large: 'max-w-2xl',    // ~700px
-                full: 'w-full',
-              };
-              const sizeClass = sizeMap[block.size] || 'w-full';
-              return (
-                <figure key={idx} className="my-4 flex flex-col items-center">
-                  <img
-                    src={block.url}
-                    alt={block.caption || ''}
-                    className={`${sizeClass} rounded-lg shadow`}
-                  />
-                  {block.caption && (
-                    <figcaption className={`text-sm mt-2 text-center italic opacity-70 ${textColor}`}>
-                      {block.caption}
-                    </figcaption>
-                  )}
-                </figure>
-              );
-            }
-          case 'video':
+
+          case "image": {
+            const sizeMap = {
+              small: "max-w-xs",
+              medium: "max-w-md",
+              large: "max-w-2xl",
+              full: "w-full",
+            };
+            const sizeClass = sizeMap[block.size] || "w-full";
+            return (
+              <figure key={idx} className="my-4 flex flex-col items-center">
+                <img
+                  src={block.url}
+                  alt={block.caption || ""}
+                  className={`${sizeClass} rounded-lg shadow`}
+                />
+                {block.caption && (
+                  <figcaption
+                    className={`text-sm mt-2 text-center italic opacity-70 ${textColor}`}
+                  >
+                    {block.caption}
+                  </figcaption>
+                )}
+              </figure>
+            );
+          }
+
+          case "video":
             return (
               <div key={idx} className="my-4 aspect-video">
                 <iframe
@@ -97,31 +176,38 @@ export default function BlockRenderer({ blocks }) {
               </div>
             );
 
-          case 'code':
+          case "code":
             return (
               <div key={idx} className="my-4">
                 {block.language && (
-                  <div className={`text-xs font-mono uppercase tracking-wider px-3 py-1 rounded-t ${
-                    isWarmthMode ? 'bg-pink-100 text-pink-700' : 'bg-cyan-900/40 text-cyan-300'
-                  }`}>
+                  <div
+                    className={`text-xs font-mono uppercase tracking-wider px-3 py-1 rounded-t ${
+                      isWarmthMode
+                        ? "bg-pink-100 text-pink-700"
+                        : "bg-cyan-900/40 text-cyan-300"
+                    }`}
+                  >
                     {block.language}
                   </div>
                 )}
-                <pre className={`p-4 overflow-x-auto text-sm font-mono ${
-                  block.language ? 'rounded-b' : 'rounded'
-                } ${
-                  isWarmthMode ? 'bg-gray-100 text-gray-800' : 'bg-[#0a0e27] text-cyan-100'
-                }`}>
+                <pre
+                  className={`p-4 overflow-x-auto text-sm font-mono ${
+                    block.language ? "rounded-b" : "rounded"
+                  } ${
+                    isWarmthMode
+                      ? "bg-gray-100 text-gray-800"
+                      : "bg-[#0a0e27] text-cyan-100"
+                  }`}
+                >
                   <code>{block.code}</code>
                 </pre>
               </div>
             );
 
-          case 'demo':
+          case "demo":
             return <DemoBlock key={idx} block={block} />;
 
           default:
-            // Unknown block type — render nothing (or a debug warning in dev)
             console.warn(`Unknown block type: ${block.type}`);
             return null;
         }
@@ -133,7 +219,6 @@ export default function BlockRenderer({ blocks }) {
 function DemoBlock({ block }) {
   const { isWarmthMode } = useTheme();
 
-  // Compose the full HTML document the iframe will run
   const srcDoc = `
 <!DOCTYPE html>
 <html>
@@ -141,14 +226,14 @@ function DemoBlock({ block }) {
 <meta charset="utf-8">
 <style>
   body { margin: 0; padding: 1rem; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
-  ${block.css || ''}
+  ${block.css || ""}
 </style>
 </head>
 <body>
-  ${block.html || ''}
+  ${block.html || ""}
   <script>
     try {
-      ${block.js || ''}
+      ${block.js || ""}
     } catch (err) {
       document.body.innerHTML = '<pre style="color: red; padding: 1rem;">' + err.toString() + '</pre>';
     }
@@ -158,19 +243,25 @@ function DemoBlock({ block }) {
   `.trim();
 
   return (
-    <div className={`my-4 rounded-lg overflow-hidden border-2 ${
-      isWarmthMode ? 'border-pink-300' : 'border-cyan-700'
-    }`}>
-      <div className={`text-xs px-3 py-1 font-mono uppercase tracking-wider ${
-        isWarmthMode ? 'bg-pink-100 text-pink-700' : 'bg-cyan-900/40 text-cyan-300'
-      }`}>
+    <div
+      className={`my-4 rounded-lg overflow-hidden border-2 ${
+        isWarmthMode ? "border-pink-300" : "border-cyan-700"
+      }`}
+    >
+      <div
+        className={`text-xs px-3 py-1 font-mono uppercase tracking-wider ${
+          isWarmthMode
+            ? "bg-pink-100 text-pink-700"
+            : "bg-cyan-900/40 text-cyan-300"
+        }`}
+      >
         Interactive demo
       </div>
       <iframe
         srcDoc={srcDoc}
         sandbox="allow-scripts"
         className="w-full"
-        style={{ minHeight: '400px', border: 'none', background: 'white' }}
+        style={{ minHeight: "400px", border: "none", background: "white" }}
         title="Interactive demo"
       />
     </div>
