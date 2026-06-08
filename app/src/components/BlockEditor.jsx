@@ -259,6 +259,14 @@ export default function BlockEditor({ blocks, onChange }) {
           </div>
         );
 
+      case "pdf":
+        return (
+          <PdfBlockEditor
+            block={block}
+            onUpdate={(b) => updateBlock(index, b)}
+            inputClass={inputClass}
+          />
+        );
       default:
         return (
           <p className="text-sm opacity-60 italic">
@@ -360,6 +368,13 @@ export default function BlockEditor({ blocks, onChange }) {
           className={`px-3 py-1.5 rounded-lg text-sm font-medium ${addButtonClass}`}
         >
           + Demo
+        </button>
+        <button
+          type="button"
+          onClick={() => addBlock("pdf")}
+          className={`px-3 py-1.5 rounded-lg text-sm font-medium ${addButtonClass}`}
+        >
+          + PDF
         </button>
       </div>
     </div>
@@ -482,6 +497,75 @@ function ImageBlockEditor({ block, onUpdate, inputClass }) {
   );
 }
 
+function PdfBlockEditor({ block, onUpdate, inputClass }) {
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState(null);
+
+  const handleUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploading(true);
+    setUploadError(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/admin/content/upload-pdf", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Upload failed");
+      }
+      const { url } = await res.json();
+      onUpdate({ ...block, url });
+    } catch (err) {
+      setUploadError(err.message);
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      {block.url && (
+        <p className="text-xs opacity-70 break-all">Current: {block.url}</p>
+      )}
+      <input
+        type="file"
+        accept="application/pdf"
+        onChange={handleUpload}
+        disabled={uploading}
+        className={inputClass}
+      />
+      {uploading && <p className="text-xs opacity-70">Uploading...</p>}
+      {uploadError && <p className="text-red-500 text-xs">{uploadError}</p>}
+      <input
+        type="text"
+        value={block.caption || ""}
+        onChange={(e) => onUpdate({ ...block, caption: e.target.value })}
+        placeholder="Caption (optional)"
+        className={inputClass}
+      />
+      <div>
+        <label className="block text-xs font-bold uppercase tracking-wider mb-1 opacity-70">
+          Height (px)
+        </label>
+        <input
+          type="number"
+          value={block.height || 600}
+          onChange={(e) =>
+            onUpdate({ ...block, height: parseInt(e.target.value, 10) || 600 })
+          }
+          className={inputClass}
+        />
+      </div>
+    </div>
+  );
+}
+
 // ---- Helpers ----
 
 function createBlankBlock(type) {
@@ -498,6 +582,8 @@ function createBlankBlock(type) {
       return { type: "code", language: "javascript", code: "" };
     case "demo":
       return { type: "demo", html: "", css: "", js: "" };
+    case "pdf":
+      return { type: "pdf", url: "", caption: "", height: 600 };
     default:
       return { type };
   }

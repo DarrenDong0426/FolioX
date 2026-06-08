@@ -207,6 +207,32 @@ export default function BlockRenderer({ blocks }) {
           case "demo":
             return <DemoBlock key={idx} block={block} />;
 
+          case "pdf":
+            return (
+              <figure key={idx} className="my-4">
+                <iframe
+                  src={block.url}
+                  title={block.caption || `PDF ${idx}`}
+                  className="w-full rounded-lg shadow border border-gray-300"
+                  style={{ height: `${block.height || 600}px` }}
+                />
+                <div className="text-center mt-2 text-sm opacity-70">
+                  <a
+                    href={block.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline"
+                  >
+                    Open PDF in new tab
+                  </a>
+                  {block.caption && (
+                    <span className={`italic ${textColor} block mt-1`}>
+                      {block.caption}
+                    </span>
+                  )}
+                </div>
+              </figure>
+            );
           default:
             console.warn(`Unknown block type: ${block.type}`);
             return null;
