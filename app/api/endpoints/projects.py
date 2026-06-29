@@ -20,7 +20,71 @@ projects_bp = Blueprint("projects", __name__, url_prefix="/api")
 
 
 # =========================
-# GET /api/projects — public list
+# Helpers — mirror project metadata into events table
+# =========================
+def _upsert_mirror_event(conn, project_id, name, desc, month_year):
+    """
+    Ensures there is an event row mirroring this project's metadata.
+    Idempotent — call on create OR update.
+    Event uses single date (start == end == month_year) and "Projects" tag.
+    Clicking the event redirects to the project page (handled in EventDetail.jsx).
+    """
+    existing = conn.execute(
+        text("SELECT id FROM events WHERE project_id = :pid"),
+        {"pid": project_id}
+    ).fetchone()
+
+    if existing:
+        # Update the existing mirror event
+        conn.execute(
+            text("""
+                UPDATE events
+                SET title = :title,
+                    description = :desc,
+                    start = :start,
+                    "end" = :end,
+                    tags = :tags
+                WHERE project_id = :pid
+            """),
+            {
+                "pid": project_id,
+                "title": name,
+                "desc": desc,
+                "start": month_year,
+                "end": month_year,
+                "tags": "Projects",
+            }
+        )
+    else:
+        # Create a new mirror event
+        conn.execute(
+            text("""
+                INSERT INTO events (title, description, tags, start, "end", images, content_blocks, project_id)
+                VALUES (:title, :desc, :tags, :start, :end, :images, :content_blocks, :pid)
+            """),
+            {
+                "title": name,
+                "desc": desc,
+                "tags": "Projects",
+                "start": month_year,
+                "end": month_year,
+                "images": [],
+                "content_blocks": json.dumps([]),
+                "pid": project_id,
+            }
+        )
+
+
+def _delete_mirror_event(conn, project_id):
+    """Removes the linked event when a project is deleted."""
+    conn.execute(
+        text("DELETE FROM events WHERE project_id = :pid"),
+        {"pid": project_id}
+    )
+
+
+# =========================
+# GET /api/projects/<id> — public detail
 # =========================
 @projects_bp.route("/projects/<int:project_id>", methods=["GET"], strict_slashes=False)
 def get_project(project_id):
@@ -92,10 +156,6 @@ def get_projects():
         where_clauses.append("name ILIKE :search")
         params["search"] = f"%{query_str}%"
 
-    # For tag filtering: project matches if ANY of its language or type
-    # values appear in the filter list. The JSON columns are arrays, so
-    # we check overlap using Postgres's ?| operator (jsonb) or via a
-    # cast-to-text LIKE fallback since the column type is JSON not JSONB.
     if filter_tags:
         tag_clauses = []
         for i, tag in enumerate(filter_tags):
@@ -108,7 +168,6 @@ def get_projects():
 
     try:
         with engine.connect() as conn:
-            # First: total count for pagination
             count_sql = text(f"SELECT COUNT(*) AS c FROM projects{where_sql}")
             total_items = conn.execute(count_sql, params).scalar() or 0
             if request.args.get("perPage") is None:
@@ -116,7 +175,6 @@ def get_projects():
             else: 
                 page_size = int(request.args.get("perPage")) 
 
-            # Then: the actual paginated rows
             offset = (page - 1) * page_size
             data_sql = text(f"""
                 SELECT id, name, description, lock, wip, month_year, language, type, content_blocks, featured
@@ -154,6 +212,7 @@ def get_projects():
 
 # =========================
 # POST /api/admin/projects — create
+# Also creates a mirrored event so the project shows up on the timeline.
 # =========================
 @projects_bp.route("/admin/projects", methods=["POST"], strict_slashes=False)
 def create_project():
@@ -194,6 +253,10 @@ def create_project():
             )
             new_id = result.scalar()
 
+            # Auto-create mirror event so this shows up on the timeline.
+            # Clicking the event redirects to the project page (EventDetail.jsx).
+            _upsert_mirror_event(conn, new_id, name, desc, month_year)
+
         return jsonify({"id": new_id, "status": "created"}), 201
 
     except Exception as e:
@@ -203,6 +266,7 @@ def create_project():
 
 # =========================
 # PUT /api/admin/projects/<id> — update
+# Also updates the mirrored event to keep title/desc/date in sync.
 # =========================
 @projects_bp.route("/admin/projects/<int:project_id>", methods=["PUT"], strict_slashes=False)
 def update_project(project_id):
@@ -253,6 +317,10 @@ def update_project(project_id):
             if result.rowcount == 0:
                 return jsonify({"error": "Project not found"}), 404
 
+            # Keep the mirrored event in sync. Upsert handles the case where
+            # a project was created before this hook existed and has no event yet.
+            _upsert_mirror_event(conn, project_id, name, desc, month_year)
+
         return jsonify({"status": "updated"}), 200
 
     except Exception as e:
@@ -262,6 +330,7 @@ def update_project(project_id):
 
 # =========================
 # DELETE /api/admin/projects/<id>
+# Also deletes the linked event so it doesn't lead to a dead redirect.
 # =========================
 @projects_bp.route("/admin/projects/<int:project_id>", methods=["DELETE"], strict_slashes=False)
 def delete_project(project_id):
@@ -271,6 +340,10 @@ def delete_project(project_id):
 
     try:
         with engine.begin() as conn:
+            # Delete the mirrored event first so there is no orphan referring
+            # to a project that no longer exists.
+            _delete_mirror_event(conn, project_id)
+
             result = conn.execute(
                 text("DELETE FROM projects WHERE id = :id"),
                 {"id": project_id}

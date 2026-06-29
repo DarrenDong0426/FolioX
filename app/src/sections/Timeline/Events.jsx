@@ -1,9 +1,23 @@
-import { useState } from "react";                                          
-import { useEvents } from "../../hooks/eventsContext";                      
-import Controls from "./Controls";                                          
-import Card from "../../components/Card";                                   
-import { useTheme } from "../../hooks/themeContext";      
-import { Link } from 'react-router-dom';                  
+import { useState } from "react";
+import { useEvents } from "../../hooks/eventsContext";
+import Controls from "./Controls";
+import Card from "../../components/Card";
+import { useTheme } from "../../hooks/themeContext";
+import { Link } from "react-router-dom";
+
+// Pull every image URL out of an event's content_blocks. Both standalone
+// image blocks and gallery blocks contribute.
+function collectImageUrls(blocks) {
+  if (!Array.isArray(blocks)) return [];
+  const urls = [];
+  for (const b of blocks) {
+    if (b.type === "image" && b.url) urls.push(b.url);
+    else if (b.type === "gallery" && Array.isArray(b.images)) {
+      for (const img of b.images) if (img.url) urls.push(img.url);
+    }
+  }
+  return urls;
+}
 
 export default function Events() {
   const { events, loading, error, year } = useEvents();
@@ -13,7 +27,10 @@ export default function Events() {
   const dec = new Date(year, 11, 31).getTime();
 
   const timeToPercent = (time) => ((time - jan) / (dec - jan)) * 100;
-  const monthLabels = Array.from({ length: 12 }, (_, i) => new Date(year, i, 1));
+  const monthLabels = Array.from(
+    { length: 12 },
+    (_, i) => new Date(year, i, 1),
+  );
   const formatDate = (date) => {
     return date.toLocaleString("en-US", { month: "short", year: "numeric" });
   };
@@ -21,57 +38,59 @@ export default function Events() {
   function colorCodeFunc(type) {
     switch (type.toLowerCase()) {
       case "professional":
-        return { 
+        return {
           bg: isWarmthMode ? "#E6F9F0" : "#0b1e13",
-          text: isWarmthMode ? "#16A34A" : "#0f0", 
-          bar: isWarmthMode ? "#16A34A" : "#0f0" 
-        };  
+          text: isWarmthMode ? "#16A34A" : "#0f0",
+          bar: isWarmthMode ? "#16A34A" : "#0f0",
+        };
       case "personal":
-        return { 
+        return {
           bg: isWarmthMode ? "#E8F0FF" : "#0a1a2f",
-          text: isWarmthMode ? "#1F51FF" : "#04D9FF", 
-          bar: isWarmthMode ? "#1F51FF" : "#04D9FF" 
-        };   
+          text: isWarmthMode ? "#1F51FF" : "#04D9FF",
+          bar: isWarmthMode ? "#1F51FF" : "#04D9FF",
+        };
       case "projects":
-        return { 
+        return {
           bg: isWarmthMode ? "#FFFBE6" : "#332600",
-          text: isWarmthMode ? "#D97706" : "#FF5F1F", 
-          bar: isWarmthMode ? "#D97706" : "#FF5F1F" 
-        };  
+          text: isWarmthMode ? "#D97706" : "#FF5F1F",
+          bar: isWarmthMode ? "#D97706" : "#FF5F1F",
+        };
       case "research":
-        return { 
+        return {
           bg: isWarmthMode ? "#F3E8FF" : "#1a0f2e",
-          text: isWarmthMode ? "#7C3AED" : "#a0f", 
-          bar: isWarmthMode ? "#7C3AED" : "#a0f" 
-        };  
+          text: isWarmthMode ? "#7C3AED" : "#a0f",
+          bar: isWarmthMode ? "#7C3AED" : "#a0f",
+        };
       default:
-        return { 
+        return {
           bg: isWarmthMode ? "#F3F4F6" : "#121212",
-          text: isWarmthMode ? "#1F2937" : "#fff", 
-          bar: isWarmthMode ? "#9CA3AF" : "#fff" 
-        };   
+          text: isWarmthMode ? "#1F2937" : "#fff",
+          bar: isWarmthMode ? "#9CA3AF" : "#fff",
+        };
     }
   }
 
   const [hoveredEventId, setHoveredEventId] = useState(null);
 
-  if (loading) return (
-    <div className="flex flex-col items-center justify-center py-20 gap-4">
-      <div
-        className={`w-12 h-12 rounded-full border-4 border-t-transparent animate-spin
+  if (loading)
+    return (
+      <div className="flex flex-col items-center justify-center py-20 gap-4">
+        <div
+          className={`w-12 h-12 rounded-full border-4 border-t-transparent animate-spin
           ${isWarmthMode ? "border-[#E94E41]" : "border-cyan-400"}
         `}
-      />
-      <p
-        className={`font-mono tracking-widest uppercase text-sm
+        />
+        <p
+          className={`font-mono tracking-widest uppercase text-sm
           ${isWarmthMode ? "text-[#8B2D2D]" : "text-cyan-200"}
         `}
-      >
-        Loading...
-      </p>
-    </div>
-  );
-  if (error) return <p className='text-center text-red-600'>Error: {error.message}</p>
+        >
+          Loading...
+        </p>
+      </div>
+    );
+  if (error)
+    return <p className="text-center text-red-600">Error: {error.message}</p>;
 
   return (
     <div className="flex flex-col flex-1 min-h-0 py-2">
@@ -81,7 +100,9 @@ export default function Events() {
           isWarmthMode ? "border-[#E94E41]" : "border-cyan-500"
         }`}
       >
-        <div className={`w-40 flex items-center justify-center text-sm font-semibold ${isWarmthMode ? "text-[#8B2D2D]" : "text-cyan-400"}`}>
+        <div
+          className={`w-40 flex items-center justify-center text-sm font-semibold ${isWarmthMode ? "text-[#8B2D2D]" : "text-cyan-400"}`}
+        >
           Events
         </div>
         <div className="flex-1 relative h-12">
@@ -129,8 +150,8 @@ export default function Events() {
         const [y2, m2, d2] = (event.end || event.start).split("-").map(Number);
         const eventEnd = new Date(y2, m2 - 1);
 
-        const janOfYear = new Date(year, 0, 1).getTime();   
-        const decOfYear = new Date(year, 11, 31).getTime(); 
+        const janOfYear = new Date(year, 0, 1).getTime();
+        const decOfYear = new Date(year, 11, 31).getTime();
 
         const clippedStart = Math.max(eventStart.getTime(), janOfYear);
         const clippedEnd = Math.min(eventEnd.getTime(), decOfYear);
@@ -143,16 +164,20 @@ export default function Events() {
         const color = colorCodeFunc(event.tags);
 
         return (
-<div
-  key={event.id || idx}
-  className={`flex items-center transition-colors duration-300 rounded-2xl p-3 mb-3 border shadow-md
+          <div
+            key={event.id || idx}
+            className={`flex items-center transition-colors duration-300 rounded-2xl p-3 mb-3 border shadow-md
     ${isWarmthMode ? "bg-white/20 border-[#e2eafc]" : "bg-[#1b2433]/30 border-cyan-700/50"}
   `}
-  onMouseEnter={() => setHoveredEventId(event.id)}
-  onMouseLeave={() => setHoveredEventId(null)}
->
+            onMouseEnter={() => setHoveredEventId(event.id)}
+            onMouseLeave={() => setHoveredEventId(null)}
+          >
             <Link
-              to={event.project_id ? `/Projects/${event.project_id}` : `/Events/${event.id}`}
+              to={
+                event.project_id
+                  ? `/Projects/${event.project_id}`
+                  : `/Events/${event.id}`
+              }
               className="w-40 text-center text-sm font-semibold rounded transition-all duration-300 hover:opacity-80"
               style={{
                 backgroundColor: color.bg,
@@ -198,7 +223,7 @@ export default function Events() {
                     desc={event.desc}
                     tags={event.tags}
                     date={event.start}
-                    images={event.images}
+                    images={collectImageUrls(event.content_blocks)}
                   />
                 </div>
               )}

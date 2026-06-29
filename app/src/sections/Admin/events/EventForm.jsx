@@ -1,11 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { useTheme } from '../../../hooks/themeContext';
-import BlockEditor from '../../../components/BlockEditor';
-import BlockRenderer from '../../../components/BlockRenderer';
+import React, { useState, useEffect } from "react";
+import { useTheme } from "../../../hooks/themeContext";
+import BlockEditor from "../../../components/BlockEditor";
+import BlockRenderer from "../../../components/BlockRenderer";
 
-const TAG_OPTIONS = ['Personal', 'Professional', 'Projects', 'Research'];
+const TAG_OPTIONS = ["Personal", "Professional", "Projects", "Research"];
 
-export default function EventForm({ initialForm, onSubmit, submitLabel, onCancel, error, saving }) {
+export default function EventForm({
+  initialForm,
+  onSubmit,
+  submitLabel,
+  onCancel,
+  error,
+  saving,
+}) {
   const { isWarmthMode } = useTheme();
 
   const [form, setForm] = useState(initialForm);
@@ -15,9 +22,9 @@ export default function EventForm({ initialForm, onSubmit, submitLabel, onCancel
   const [projects, setProjects] = useState([]);
 
   useEffect(() => {
-    fetch('/api/projects')
-      .then(res => res.json())
-      .then(data => setProjects(data.projects || []))
+    fetch("/api/projects")
+      .then((res) => res.json())
+      .then((data) => setProjects(data.projects || []))
       .catch(() => {});
   }, []);
 
@@ -31,30 +38,33 @@ export default function EventForm({ initialForm, onSubmit, submitLabel, onCancel
       const newUrls = [];
       for (const file of files) {
         const formData = new FormData();
-        formData.append('file', file);
-        const res = await fetch('/api/admin/events/upload-image', {
-          method: 'POST',
-          credentials: 'include',
+        formData.append("file", file);
+        const res = await fetch("/api/admin/events/upload-image", {
+          method: "POST",
+          credentials: "include",
           body: formData,
         });
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
-          throw new Error(data.error || 'Upload failed');
+          throw new Error(data.error || "Upload failed");
         }
         const { url } = await res.json();
         newUrls.push(url);
       }
-      setForm(prev => ({ ...prev, images: [...(prev.images || []), ...newUrls] }));
+      setForm((prev) => ({
+        ...prev,
+        images: [...(prev.images || []), ...newUrls],
+      }));
     } catch (err) {
       setUploadError(err.message);
     } finally {
       setUploading(false);
-      e.target.value = '';
+      e.target.value = "";
     }
   };
 
   const removeImage = (index) => {
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index),
     }));
@@ -66,7 +76,9 @@ export default function EventForm({ initialForm, onSubmit, submitLabel, onCancel
   };
 
   const inputClass = `w-full border rounded-lg px-3 py-2 bg-white/90 text-gray-800 focus:outline-none focus:ring-2 ${
-    isWarmthMode ? 'border-gray-300 focus:ring-purple-400' : 'border-cyan-700 focus:ring-cyan-400'
+    isWarmthMode
+      ? "border-gray-300 focus:ring-purple-400"
+      : "border-cyan-700 focus:ring-cyan-400"
   }`;
 
   return (
@@ -76,7 +88,9 @@ export default function EventForm({ initialForm, onSubmit, submitLabel, onCancel
           Title <span className="text-red-500">*</span>
         </label>
         <input
-          type="text" required maxLength={100}
+          type="text"
+          required
+          maxLength={100}
           value={form.title}
           onChange={(e) => setForm({ ...form, title: e.target.value })}
           className={inputClass}
@@ -84,32 +98,38 @@ export default function EventForm({ initialForm, onSubmit, submitLabel, onCancel
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Linked Project (optional)</label>
+        <label className="block text-sm font-medium mb-1">
+          Linked Project (optional)
+        </label>
         <select
-          value={form.project_id || ''}
-          onChange={(e) => setForm({
-            ...form,
-            project_id: e.target.value ? parseInt(e.target.value, 10) : null
-          })}
+          value={form.project_id || ""}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              project_id: e.target.value ? parseInt(e.target.value, 10) : null,
+            })
+          }
           className={inputClass}
         >
           <option value="">— None (standalone event) —</option>
-          {projects.map(p => (
-            <option key={p.id} value={p.id}>{p.name}</option>
+          {projects.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.name}
+            </option>
           ))}
         </select>
         <p className="text-xs opacity-60 mt-1">
           {form.project_id
             ? "Clicking this event on the timeline will open the linked project's page."
-            : "Clicking this event on the timeline will open its own detail page."
-          }
+            : "Clicking this event on the timeline will open its own detail page."}
         </p>
       </div>
 
       <div>
         <label className="block text-sm font-medium mb-1">Description</label>
         <textarea
-          rows={3} maxLength={500}
+          rows={3}
+          maxLength={500}
           value={form.desc}
           onChange={(e) => setForm({ ...form, desc: e.target.value })}
           className={inputClass}
@@ -126,8 +146,14 @@ export default function EventForm({ initialForm, onSubmit, submitLabel, onCancel
           onChange={(e) => setForm({ ...form, tags: e.target.value })}
           className={inputClass}
         >
-          <option value="" disabled>Select a tag...</option>
-          {TAG_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
+          <option value="" disabled>
+            Select a tag...
+          </option>
+          {TAG_OPTIONS.map((t) => (
+            <option key={t} value={t}>
+              {t}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -137,7 +163,8 @@ export default function EventForm({ initialForm, onSubmit, submitLabel, onCancel
             Start Date <span className="text-red-500">*</span>
           </label>
           <input
-            type="date" required
+            type="date"
+            required
             value={form.start}
             onChange={(e) => setForm({ ...form, start: e.target.value })}
             className={inputClass}
@@ -148,7 +175,8 @@ export default function EventForm({ initialForm, onSubmit, submitLabel, onCancel
             End Date <span className="text-red-500">*</span>
           </label>
           <input
-            type="date" required
+            type="date"
+            required
             value={form.end}
             onChange={(e) => setForm({ ...form, end: e.target.value })}
             className={inputClass}
@@ -156,45 +184,9 @@ export default function EventForm({ initialForm, onSubmit, submitLabel, onCancel
         </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">Images</label>
-
-        {form.images && form.images.length > 0 && (
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mb-2">
-            {form.images.map((url, idx) => (
-              <div key={url} className="relative group">
-                <img
-                  src={url}
-                  alt={`Event image ${idx + 1}`}
-                  className="w-full h-24 object-cover rounded border"
-                />
-                <button
-                  type="button"
-                  onClick={() => removeImage(idx)}
-                  className="absolute top-1 right-1 bg-red-500 text-white w-6 h-6 rounded-full text-xs hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
-                  aria-label="Remove image"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
       {/* Page Content — only shown when not linked to a project */}
       {!form.project_id ? (
         <div>
-          <input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={handleImageUpload}
-          disabled={uploading}
-          className={inputClass}
-        />
-        {uploading && <p className="text-xs opacity-70 mt-1">Uploading...</p>}
-        {uploadError && <p className="text-red-500 text-xs mt-1">{uploadError}</p>}
           <div className="flex justify-between items-center mb-2">
             <label className="block text-sm font-medium">Page Content</label>
             <button
@@ -202,32 +194,43 @@ export default function EventForm({ initialForm, onSubmit, submitLabel, onCancel
               onClick={() => setShowPreview(!showPreview)}
               className={`px-3 py-1 rounded text-xs font-medium ${
                 isWarmthMode
-                  ? 'bg-pink-100 text-pink-600 hover:bg-pink-200'
-                  : 'bg-cyan-900/40 text-cyan-300 hover:bg-cyan-900/60'
+                  ? "bg-pink-100 text-pink-600 hover:bg-pink-200"
+                  : "bg-cyan-900/40 text-cyan-300 hover:bg-cyan-900/60"
               }`}
             >
-              {showPreview ? '✎ Edit' : '👁 Preview'}
+              {showPreview ? "✎ Edit" : "👁 Preview"}
             </button>
           </div>
 
           {showPreview ? (
-            <div className={`p-4 rounded-lg border ${
-              isWarmthMode ? 'bg-white border-pink-200' : 'bg-[#0a0e27]/60 border-cyan-700'
-            }`}>
+            <div
+              className={`p-4 rounded-lg border ${
+                isWarmthMode
+                  ? "bg-white border-pink-200"
+                  : "bg-[#0a0e27]/60 border-cyan-700"
+              }`}
+            >
               <BlockRenderer blocks={form.content_blocks || []} />
             </div>
           ) : (
             <BlockEditor
               blocks={form.content_blocks || []}
-              onChange={(newBlocks) => setForm({ ...form, content_blocks: newBlocks })}
+              onChange={(newBlocks) =>
+                setForm({ ...form, content_blocks: newBlocks })
+              }
             />
           )}
         </div>
       ) : (
-        <div className={`p-4 rounded-lg border italic text-sm opacity-70 ${
-          isWarmthMode ? 'bg-pink-50 border-pink-200 text-gray-600' : 'bg-cyan-900/20 border-cyan-700 text-cyan-300'
-        }`}>
-          Page content is managed on the linked project. Set "Linked Project" to None to edit event content separately.
+        <div
+          className={`p-4 rounded-lg border italic text-sm opacity-70 ${
+            isWarmthMode
+              ? "bg-pink-50 border-pink-200 text-gray-600"
+              : "bg-cyan-900/20 border-cyan-700 text-cyan-300"
+          }`}
+        >
+          Page content is managed on the linked project. Set "Linked Project" to
+          None to edit event content separately.
         </div>
       )}
 
@@ -239,17 +242,19 @@ export default function EventForm({ initialForm, onSubmit, submitLabel, onCancel
           disabled={saving || uploading}
           className={`px-5 py-2 rounded-lg font-medium text-white disabled:opacity-50 ${
             isWarmthMode
-              ? 'bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400'
-              : 'bg-gradient-to-r from-cyan-500 to-blue-500'
+              ? "bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400"
+              : "bg-gradient-to-r from-cyan-500 to-blue-500"
           }`}
         >
-          {saving ? 'Saving...' : submitLabel}
+          {saving ? "Saving..." : submitLabel}
         </button>
         <button
           type="button"
           onClick={onCancel}
           className={`px-5 py-2 rounded-lg font-medium ${
-            isWarmthMode ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' : 'bg-cyan-900/40 text-cyan-300 hover:bg-cyan-900/60'
+            isWarmthMode
+              ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              : "bg-cyan-900/40 text-cyan-300 hover:bg-cyan-900/60"
           }`}
         >
           Cancel

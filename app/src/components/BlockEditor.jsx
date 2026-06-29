@@ -14,8 +14,20 @@ import {
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
+  horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+
+const BLOCK_TYPES = [
+  "heading",
+  "paragraph",
+  "image",
+  "gallery",
+  "video",
+  "code",
+  "demo",
+  "pdf",
+];
 
 /**
  * BlockEditor
@@ -25,6 +37,7 @@ import { CSS } from "@dnd-kit/utilities";
  *   onChange  — fn(newBlocks: array) to update parent state
  *
  * Manages: add, edit, drag-to-reorder, delete blocks.
+ * Includes hover-revealed insert zones between blocks for precise insertion.
  */
 export default function BlockEditor({ blocks, onChange }) {
   const { isWarmthMode } = useTheme();
@@ -64,6 +77,15 @@ export default function BlockEditor({ blocks, onChange }) {
   const addBlock = (type) => {
     const newBlock = createBlankBlock(type);
     onChange([...blocks, newBlock]);
+  };
+
+  // Insert a new block at a specific index (used by insert zones).
+  // insertAt(0) = before all blocks. insertAt(blocks.length) = after all blocks.
+  const insertAt = (index, type) => {
+    const newBlock = createBlankBlock(type);
+    const updated = [...blocks];
+    updated.splice(index, 0, newBlock);
+    onChange(updated);
   };
 
   // ---- Theme styles ----
@@ -149,6 +171,16 @@ export default function BlockEditor({ blocks, onChange }) {
             block={block}
             onUpdate={(b) => updateBlock(index, b)}
             inputClass={inputClass}
+          />
+        );
+
+      case "gallery":
+        return (
+          <GalleryBlockEditor
+            block={block}
+            onUpdate={(b) => updateBlock(index, b)}
+            inputClass={inputClass}
+            isWarmthMode={isWarmthMode}
           />
         );
 
@@ -277,7 +309,7 @@ export default function BlockEditor({ blocks, onChange }) {
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-1">
       {blocks.length === 0 && (
         <p
           className={`text-sm opacity-60 italic ${
@@ -297,86 +329,155 @@ export default function BlockEditor({ blocks, onChange }) {
           items={blocks.map((_, i) => `block-${i}`)}
           strategy={verticalListSortingStrategy}
         >
-          {blocks.map((block, idx) => (
-            <SortableBlock key={`block-${idx}`} id={`block-${idx}`}>
-              <div className={`p-3 rounded-lg border ${blockCardClass}`}>
-                <div className="flex items-center justify-between mb-2">
-                  <span
-                    className={`text-xs uppercase font-bold tracking-wider ${
-                      isWarmthMode ? "text-pink-600" : "text-cyan-400"
-                    }`}
-                  >
-                    {block.type}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => removeBlock(idx)}
-                    className={`${iconButtonClass} text-red-500 hover:bg-red-100`}
-                    aria-label="Delete block"
-                  >
-                    ✕
-                  </button>
-                </div>
+          {/* Insert zone at the very top (only shown if there are blocks) */}
+          {blocks.length > 0 && (
+            <InsertZone
+              onInsert={(type) => insertAt(0, type)}
+              isWarmthMode={isWarmthMode}
+            />
+          )}
 
-                {renderBlockEditor(block, idx)}
-              </div>
-            </SortableBlock>
+          {blocks.map((block, idx) => (
+            <React.Fragment key={`block-frag-${idx}`}>
+              <SortableBlock id={`block-${idx}`}>
+                <div className={`p-3 rounded-lg border ${blockCardClass}`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span
+                      className={`text-xs uppercase font-bold tracking-wider ${
+                        isWarmthMode ? "text-pink-600" : "text-cyan-400"
+                      }`}
+                    >
+                      {block.type}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeBlock(idx)}
+                      className={`${iconButtonClass} text-red-500 hover:bg-red-100`}
+                      aria-label="Delete block"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  {renderBlockEditor(block, idx)}
+                </div>
+              </SortableBlock>
+
+              {/* Insert zone after this block */}
+              <InsertZone
+                onInsert={(type) => insertAt(idx + 1, type)}
+                isWarmthMode={isWarmthMode}
+              />
+            </React.Fragment>
           ))}
         </SortableContext>
       </DndContext>
 
-      {/* Add block controls */}
-      <div className="flex flex-wrap gap-2 pt-2">
-        <button
-          type="button"
-          onClick={() => addBlock("heading")}
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium ${addButtonClass}`}
-        >
-          + Heading
-        </button>
-        <button
-          type="button"
-          onClick={() => addBlock("paragraph")}
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium ${addButtonClass}`}
-        >
-          + Paragraph
-        </button>
-        <button
-          type="button"
-          onClick={() => addBlock("image")}
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium ${addButtonClass}`}
-        >
-          + Image
-        </button>
-        <button
-          type="button"
-          onClick={() => addBlock("video")}
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium ${addButtonClass}`}
-        >
-          + Video
-        </button>
-        <button
-          type="button"
-          onClick={() => addBlock("code")}
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium ${addButtonClass}`}
-        >
-          + Code
-        </button>
-        <button
-          type="button"
-          onClick={() => addBlock("demo")}
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium ${addButtonClass}`}
-        >
-          + Demo
-        </button>
-        <button
-          type="button"
-          onClick={() => addBlock("pdf")}
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium ${addButtonClass}`}
-        >
-          + PDF
-        </button>
+      {/* Add block controls (bottom — kept for convenience and discoverability) */}
+      <div className="flex flex-wrap gap-2 pt-3">
+        {BLOCK_TYPES.map((type) => (
+          <button
+            key={type}
+            type="button"
+            onClick={() => addBlock(type)}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium ${addButtonClass}`}
+          >
+            + {type.charAt(0).toUpperCase() + type.slice(1)}
+          </button>
+        ))}
       </div>
+    </div>
+  );
+}
+
+// ---- Insert zone (hover-revealed insertion point between blocks) ----
+
+function InsertZone({ onInsert, isWarmthMode }) {
+  const [hovered, setHovered] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  // The zone is mostly invisible until hovered, then shows a + button.
+  // Clicking the + opens an inline menu of block types.
+  const handleSelect = (type) => {
+    onInsert(type);
+    setMenuOpen(false);
+    setHovered(false);
+  };
+
+  const lineColor = isWarmthMode ? "bg-pink-300" : "bg-cyan-500";
+  const buttonColor = isWarmthMode
+    ? "bg-pink-400 text-white hover:bg-pink-500"
+    : "bg-cyan-500 text-white hover:bg-cyan-400";
+
+  // When the menu is open, force the zone to stay expanded.
+  const active = hovered || menuOpen;
+
+  return (
+    <div
+      className="relative w-full transition-all duration-150"
+      style={{
+        height: active ? "auto" : "8px",
+        minHeight: active ? "32px" : "8px",
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {!active && (
+        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-px opacity-0 hover:opacity-100" />
+      )}
+
+      {active && !menuOpen && (
+        <div className="flex items-center gap-2 py-1">
+          <div className={`flex-1 h-px ${lineColor} opacity-40`} />
+          <button
+            type="button"
+            onClick={() => setMenuOpen(true)}
+            className={`${buttonColor} rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shadow`}
+            aria-label="Insert block here"
+            title="Insert block here"
+          >
+            +
+          </button>
+          <div className={`flex-1 h-px ${lineColor} opacity-40`} />
+        </div>
+      )}
+
+      {menuOpen && (
+        <div
+          className={`flex flex-wrap gap-1 py-2 px-2 rounded-lg border ${
+            isWarmthMode
+              ? "bg-pink-50 border-pink-300"
+              : "bg-[#0a0e27]/80 border-cyan-700"
+          }`}
+        >
+          {BLOCK_TYPES.map((type) => (
+            <button
+              key={type}
+              type="button"
+              onClick={() => handleSelect(type)}
+              className={`px-2 py-1 rounded text-xs font-medium ${
+                isWarmthMode
+                  ? "bg-white border border-pink-200 text-gray-700 hover:bg-pink-100"
+                  : "bg-[#0a0e27] border border-cyan-700 text-cyan-200 hover:bg-cyan-900/40"
+              }`}
+            >
+              + {type.charAt(0).toUpperCase() + type.slice(1)}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() => setMenuOpen(false)}
+            className={`px-2 py-1 rounded text-xs ${
+              isWarmthMode
+                ? "text-gray-500 hover:bg-pink-100"
+                : "text-cyan-300 hover:bg-cyan-900/40"
+            }`}
+            aria-label="Cancel"
+          >
+            ✕
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -497,6 +598,210 @@ function ImageBlockEditor({ block, onUpdate, inputClass }) {
   );
 }
 
+// ---- Gallery block sub-editor ----
+
+function GalleryBlockEditor({ block, onUpdate, inputClass, isWarmthMode }) {
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState(null);
+  const [progress, setProgress] = useState({ done: 0, total: 0 });
+
+  const images = block.images || [];
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 5 },
+    }),
+  );
+
+  const uploadOne = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch("/api/admin/content/upload-image", {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || "Upload failed");
+    }
+    const { url } = await res.json();
+    return url;
+  };
+
+  const handleUpload = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    setUploading(true);
+    setUploadError(null);
+    setProgress({ done: 0, total: files.length });
+
+    const newImages = [...images];
+    for (let i = 0; i < files.length; i++) {
+      try {
+        const url = await uploadOne(files[i]);
+        newImages.push({ url, caption: "" });
+        setProgress({ done: i + 1, total: files.length });
+        onUpdate({ ...block, images: [...newImages] });
+      } catch (err) {
+        setUploadError(`${files[i].name}: ${err.message}`);
+      }
+    }
+
+    setUploading(false);
+    setProgress({ done: 0, total: 0 });
+    e.target.value = "";
+  };
+
+  const removeImage = (idx) => {
+    onUpdate({ ...block, images: images.filter((_, i) => i !== idx) });
+  };
+
+  const updateCaption = (idx, caption) => {
+    const updated = images.map((img, i) =>
+      i === idx ? { ...img, caption } : img,
+    );
+    onUpdate({ ...block, images: updated });
+  };
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = images.findIndex((_, i) => `img-${i}` === active.id);
+    const newIndex = images.findIndex((_, i) => `img-${i}` === over.id);
+    onUpdate({ ...block, images: arrayMove(images, oldIndex, newIndex) });
+  };
+
+  return (
+    <div className="space-y-3">
+      <p className="text-xs opacity-60">
+        Upload multiple images at once. Click an image to set a caption. Drag to
+        reorder.
+      </p>
+
+      <input
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={handleUpload}
+        disabled={uploading}
+        className={inputClass}
+      />
+      {uploading && (
+        <p className="text-xs opacity-70">
+          Uploading {progress.done} / {progress.total}...
+        </p>
+      )}
+      {uploadError && <p className="text-red-500 text-xs">{uploadError}</p>}
+
+      {images.length > 0 && (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={images.map((_, i) => `img-${i}`)}
+            strategy={horizontalListSortingStrategy}
+          >
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+              {images.map((img, idx) => (
+                <SortableThumbnail
+                  key={`img-${idx}`}
+                  id={`img-${idx}`}
+                  img={img}
+                  idx={idx}
+                  onRemove={() => removeImage(idx)}
+                  onCaptionChange={(c) => updateCaption(idx, c)}
+                  isWarmthMode={isWarmthMode}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
+      )}
+
+      <p className="text-xs opacity-60">
+        {images.length} image{images.length === 1 ? "" : "s"} in this gallery
+      </p>
+    </div>
+  );
+}
+
+function SortableThumbnail({
+  id,
+  img,
+  idx,
+  onRemove,
+  onCaptionChange,
+  isWarmthMode,
+}) {
+  const [editingCaption, setEditingCaption] = useState(false);
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`relative aspect-square rounded overflow-hidden border ${
+        isWarmthMode ? "border-pink-200" : "border-cyan-700"
+      }`}
+    >
+      <img
+        src={img.url}
+        alt={img.caption || `Image ${idx + 1}`}
+        className="w-full h-full object-cover"
+        {...attributes}
+        {...listeners}
+        style={{ cursor: "grab" }}
+      />
+      <button
+        type="button"
+        onClick={onRemove}
+        className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-500"
+        aria-label="Remove image"
+      >
+        ✕
+      </button>
+      <button
+        type="button"
+        onClick={() => setEditingCaption((v) => !v)}
+        className="absolute bottom-1 right-1 bg-black/60 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-cyan-500"
+        aria-label="Edit caption"
+        title={img.caption || "Add caption"}
+      >
+        ✎
+      </button>
+      {editingCaption && (
+        <div className="absolute inset-x-0 bottom-0 bg-black/80 p-1">
+          <input
+            type="text"
+            value={img.caption || ""}
+            onChange={(e) => onCaptionChange(e.target.value)}
+            onBlur={() => setEditingCaption(false)}
+            placeholder="Caption..."
+            autoFocus
+            className="w-full text-xs px-1 py-0.5 rounded bg-white text-gray-800"
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
 function PdfBlockEditor({ block, onUpdate, inputClass }) {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
@@ -576,6 +881,8 @@ function createBlankBlock(type) {
       return { type: "paragraph", text: "" };
     case "image":
       return { type: "image", url: "", caption: "", size: "full" };
+    case "gallery":
+      return { type: "gallery", images: [] };
     case "video":
       return { type: "video", url: "" };
     case "code":

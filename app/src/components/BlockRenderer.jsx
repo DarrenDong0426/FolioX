@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useTheme } from "../hooks/themeContext";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
@@ -10,6 +11,9 @@ import { slugifyHeading } from "./TableOfContents";
  * Used by both:
  *   - Public detail pages (Projects/:id, Events/:id)
  *   - Admin preview mode
+ *
+ * Consecutive image blocks are auto-grouped into a gallery grid.
+ * Explicit gallery blocks (type: 'gallery') also render the same way.
  */
 export default function BlockRenderer({ blocks }) {
   const { isWarmthMode } = useTheme();
@@ -28,9 +32,35 @@ export default function BlockRenderer({ blocks }) {
 
   const textColor = isWarmthMode ? "text-gray-800" : "text-cyan-100";
 
+  // Group consecutive image blocks into virtual gallery blocks.
+  const groupedBlocks = [];
+  let i = 0;
+  while (i < blocks.length) {
+    const block = blocks[i];
+    if (block.type === "image") {
+      const run = [];
+      while (i < blocks.length && blocks[i].type === "image") {
+        run.push(blocks[i]);
+        i++;
+      }
+      if (run.length === 1) {
+        groupedBlocks.push(run[0]);
+      } else {
+        groupedBlocks.push({
+          type: "gallery",
+          images: run.map((b) => ({ url: b.url, caption: b.caption || "" })),
+          _autoGrouped: true,
+        });
+      }
+    } else {
+      groupedBlocks.push(block);
+      i++;
+    }
+  }
+
   return (
     <div className="prose max-w-none space-y-4">
-      {blocks.map((block, idx) => {
+      {groupedBlocks.map((block, idx) => {
         switch (block.type) {
           case "heading": {
             const level = block.level || 2;
@@ -162,6 +192,15 @@ export default function BlockRenderer({ blocks }) {
             );
           }
 
+          case "gallery":
+            return (
+              <GalleryBlock
+                key={idx}
+                images={block.images || []}
+                textColor={textColor}
+              />
+            );
+
           case "video":
             return (
               <div key={idx} className="my-4 aspect-video">
@@ -238,6 +277,157 @@ export default function BlockRenderer({ blocks }) {
             return null;
         }
       })}
+    </div>
+  );
+}
+
+// ---- Gallery block + lightbox ----
+
+function GalleryBlock({ images, textColor }) {
+  const [lightboxIdx, setLightboxIdx] = useState(null);
+
+  const open = (idx) => setLightboxIdx(idx);
+  const close = useCallback(() => setLightboxIdx(null), []);
+  const prev = useCallback(
+    () =>
+      setLightboxIdx((i) =>
+        i === null ? null : (i - 1 + images.length) % images.length,
+      ),
+    [images.length],
+  );
+  const next = useCallback(
+    () => setLightboxIdx((i) => (i === null ? null : (i + 1) % images.length)),
+    [images.length],
+  );
+
+  // Keyboard nav while lightbox is open
+  useEffect(() => {
+    if (lightboxIdx === null) return;
+    const handler = (e) => {
+      if (e.key === "Escape") close();
+      else if (e.key === "ArrowLeft") prev();
+      else if (e.key === "ArrowRight") next();
+    };
+    window.addEventListener("keydown", handler);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", handler);
+      document.body.style.overflow = "";
+    };
+  }, [lightboxIdx, close, prev, next]);
+
+  if (!images || images.length === 0) return null;
+
+  // Lightbox is rendered via portal to document.body so that `position: fixed`
+  // works correctly. Ancestors with CSS `transform` (framer-motion, etc.)
+  // would otherwise break fixed positioning, anchoring the overlay to the
+  // transformed parent instead of the viewport.
+  const lightbox =
+    lightboxIdx !== null
+      ? createPortal(
+          <div
+            className="fixed inset-0 bg-black/90 flex items-center justify-center"
+            style={{ zIndex: 9999 }}
+            onClick={close}
+          >
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                close();
+              }}
+              className="absolute top-4 right-4 text-white text-3xl hover:opacity-80"
+              style={{ zIndex: 10000 }}
+              aria-label="Close"
+            >
+              ✕
+            </button>
+
+            {images.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    prev();
+                  }}
+                  className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 text-white text-4xl hover:opacity-80 px-3 py-2 rounded-full bg-black/40"
+                  style={{ zIndex: 10000 }}
+                  aria-label="Previous image"
+                >
+                  ‹
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    next();
+                  }}
+                  className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 text-white text-4xl hover:opacity-80 px-3 py-2 rounded-full bg-black/40"
+                  style={{ zIndex: 10000 }}
+                  aria-label="Next image"
+                >
+                  ›
+                </button>
+              </>
+            )}
+
+            <div
+              className="flex flex-col items-center justify-center"
+              onClick={(e) => e.stopPropagation()}
+              style={{ maxWidth: "90vw", maxHeight: "90vh" }}
+            >
+              <img
+                src={images[lightboxIdx].url}
+                alt={images[lightboxIdx].caption || `Image ${lightboxIdx + 1}`}
+                className="rounded"
+                style={{
+                  maxWidth: "90vw",
+                  maxHeight: "85vh",
+                  width: "auto",
+                  height: "auto",
+                  objectFit: "contain",
+                  display: "block",
+                }}
+              />
+              {images[lightboxIdx].caption && (
+                <p className="text-white text-sm mt-3 text-center italic opacity-80 max-w-2xl">
+                  {images[lightboxIdx].caption}
+                </p>
+              )}
+              {images.length > 1 && (
+                <p className="text-white/60 text-xs mt-2">
+                  {lightboxIdx + 1} / {images.length}
+                </p>
+              )}
+            </div>
+          </div>,
+          document.body,
+        )
+      : null;
+
+  return (
+    <div className="my-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+        {images.map((img, i) => (
+          <button
+            key={i}
+            type="button"
+            onClick={() => open(i)}
+            className="relative aspect-square overflow-hidden rounded-lg shadow group focus:outline-none focus:ring-2 focus:ring-cyan-400"
+            aria-label={`Open image ${i + 1}`}
+          >
+            <img
+              src={img.url}
+              alt={img.caption || `Image ${i + 1}`}
+              className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
+              loading="lazy"
+            />
+          </button>
+        ))}
+      </div>
+
+      {lightbox}
     </div>
   );
 }
