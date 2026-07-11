@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useEvents } from "../../hooks/eventsContext";
 import Controls from "./Controls";
 import Card from "../../components/Card";
@@ -19,18 +20,40 @@ function collectImageUrls(blocks) {
   return urls;
 }
 
+function useIsMobile(breakpoint = 640) {
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth < breakpoint : false,
+  );
+
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < breakpoint);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, [breakpoint]);
+
+  return isMobile;
+}
+
+// Format a "YYYY-MM" or "YYYY-MM-DD" date string into "MMM YY".
+function formatShortMonth(date) {
+  return date.toLocaleString("en-US", { month: "short", year: "2-digit" });
+}
+
 export default function Events() {
   const { events, loading, error, year } = useEvents();
   const { isWarmthMode } = useTheme();
+  const isMobile = useIsMobile();
 
   const jan = new Date(year, 0, 1).getTime();
   const dec = new Date(year, 11, 31).getTime();
 
   const timeToPercent = (time) => ((time - jan) / (dec - jan)) * 100;
+
   const monthLabels = Array.from(
     { length: 12 },
     (_, i) => new Date(year, i, 1),
-  );
+  ).filter((_, i) => (isMobile ? i % 3 === 0 : true));
+
   const formatDate = (date) => {
     return date.toLocaleString("en-US", { month: "short", year: "numeric" });
   };
@@ -70,7 +93,31 @@ export default function Events() {
     }
   }
 
+  // Desktop uses hover. Mobile uses a click-triggered modal.
   const [hoveredEventId, setHoveredEventId] = useState(null);
+  const [modalEvent, setModalEvent] = useState(null);
+
+  // Lock body scroll while modal is open
+  useEffect(() => {
+    if (modalEvent) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [modalEvent]);
+
+  // Close modal on Escape
+  useEffect(() => {
+    if (!modalEvent) return;
+    const handler = (e) => {
+      if (e.key === "Escape") setModalEvent(null);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [modalEvent]);
 
   if (loading)
     return (
@@ -92,6 +139,8 @@ export default function Events() {
   if (error)
     return <p className="text-center text-red-600">Error: {error.message}</p>;
 
+  const titleColClass = "w-24 sm:w-40 flex-shrink-0";
+
   return (
     <div className="flex flex-col flex-1 min-h-0 py-2">
       <Controls />
@@ -101,7 +150,7 @@ export default function Events() {
         }`}
       >
         <div
-          className={`w-40 flex items-center justify-center text-sm font-semibold ${isWarmthMode ? "text-[#8B2D2D]" : "text-cyan-400"}`}
+          className={`${titleColClass} flex items-center justify-center text-xs sm:text-sm font-semibold ${isWarmthMode ? "text-[#8B2D2D]" : "text-cyan-400"}`}
         >
           Events
         </div>
@@ -129,7 +178,7 @@ export default function Events() {
                 ></div>
 
                 <span
-                  className="mt-1 px-2 py-0.5 rounded-full font-medium shadow-sm"
+                  className="mt-1 px-1.5 sm:px-2 py-0.5 rounded-full font-medium shadow-sm text-[10px] sm:text-xs whitespace-nowrap"
                   style={{
                     backgroundColor: monthColor.bg,
                     color: monthColor.text,
@@ -164,73 +213,235 @@ export default function Events() {
         const color = colorCodeFunc(event.tags);
 
         return (
-          <div
+          <EventRow
             key={event.id || idx}
-            className={`flex items-center transition-colors duration-300 rounded-2xl p-3 mb-3 border shadow-md
-    ${isWarmthMode ? "bg-white/20 border-[#e2eafc]" : "bg-[#1b2433]/30 border-cyan-700/50"}
-  `}
-            onMouseEnter={() => setHoveredEventId(event.id)}
-            onMouseLeave={() => setHoveredEventId(null)}
-          >
-            <Link
-              to={
-                event.project_id
-                  ? `/Projects/${event.project_id}`
-                  : `/Events/${event.id}`
-              }
-              className="w-40 text-center text-sm font-semibold rounded transition-all duration-300 hover:opacity-80"
-              style={{
-                backgroundColor: color.bg,
-                color: color.text,
-                border: `2px solid ${isWarmthMode ? "#E94E41" : "#0ff"}`,
-                padding: "0.5rem",
-                display: "block",
-              }}
-            >
-              {event.title}
-            </Link>
-
-            <div className="flex-1 relative h-8 ml-2 rounded">
-              <div
-                className="absolute h-6 rounded shadow"
-                style={{
-                  left: `${startPercent}%`,
-                  width: `${widthPercent}%`,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  backgroundColor: color.bar,
-                }}
-              />
-
-              <div
-                className="absolute h-full flex items-center text-xs font-medium"
-                style={{
-                  left: `${endPercent - startPercent === 0 ? startPercent + 2 : endPercent}%`,
-                  transform: "translateX(4px)",
-                  color: isWarmthMode ? "#4B5563" : "#0ff",
-                }}
-              >
-                {formatDate(eventStart)} - {formatDate(eventEnd)}
-              </div>
-
-              {hoveredEventId === event.id && (
-                <div
-                  className="absolute bottom-full mb-2 z-50"
-                  style={{ left: `${startPercent}%` }}
-                >
-                  <Card
-                    title={event.title}
-                    desc={event.desc}
-                    tags={event.tags}
-                    date={event.start}
-                    images={collectImageUrls(event.content_blocks)}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
+            event={event}
+            eventStart={eventStart}
+            eventEnd={eventEnd}
+            startPercent={startPercent}
+            endPercent={endPercent}
+            widthPercent={widthPercent}
+            color={color}
+            isWarmthMode={isWarmthMode}
+            isMobile={isMobile}
+            titleColClass={titleColClass}
+            formatDate={formatDate}
+            hoveredEventId={hoveredEventId}
+            setHoveredEventId={setHoveredEventId}
+            openModal={setModalEvent}
+          />
         );
       })}
+
+      {/* Mobile modal — portal-rendered over the viewport */}
+      {modalEvent &&
+        createPortal(
+          <div
+            className="fixed inset-0 bg-black/70 flex items-center justify-center p-4"
+            style={{ zIndex: 9999 }}
+            onClick={() => setModalEvent(null)}
+          >
+            <div
+              className="relative max-w-sm w-full max-h-[85vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                onClick={() => setModalEvent(null)}
+                className="absolute top-2 right-2 bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center text-lg shadow-lg hover:bg-gray-100"
+                style={{ zIndex: 10000 }}
+                aria-label="Close"
+              >
+                ✕
+              </button>
+              <Card
+                title={modalEvent.title}
+                desc={modalEvent.desc}
+                tags={modalEvent.tags}
+                date={modalEvent.start}
+                images={collectImageUrls(modalEvent.content_blocks)}
+              />
+              <div className="mt-3 flex justify-center">
+                <Link
+                  to={
+                    modalEvent.project_id
+                      ? `/Projects/${modalEvent.project_id}`
+                      : `/Events/${modalEvent.id}`
+                  }
+                  className={`
+                    inline-block px-4 py-2 rounded-lg font-semibold shadow
+                    ${
+                      isWarmthMode
+                        ? "bg-[#E94E41] text-white hover:opacity-90"
+                        : "bg-cyan-500 text-white hover:opacity-90"
+                    }
+                  `}
+                  onClick={() => setModalEvent(null)}
+                >
+                  View Details →
+                </Link>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
+    </div>
+  );
+}
+
+/**
+ * A single event row on the timeline.
+ * Desktop: hover shows a positioned card above/below the row.
+ * Mobile: tap opens a full modal via the parent's openModal callback.
+ */
+function EventRow({
+  event,
+  eventStart,
+  eventEnd,
+  startPercent,
+  endPercent,
+  widthPercent,
+  color,
+  isWarmthMode,
+  isMobile,
+  titleColClass,
+  formatDate,
+  hoveredEventId,
+  setHoveredEventId,
+  openModal,
+}) {
+  const rowRef = useRef(null);
+  const [cardBelow, setCardBelow] = useState(false);
+
+  const isHovered = hoveredEventId === event.id;
+
+  useEffect(() => {
+    if (!isHovered || !rowRef.current) return;
+    const rect = rowRef.current.getBoundingClientRect();
+    const CARD_HEIGHT_ESTIMATE = 260;
+    setCardBelow(rect.top < CARD_HEIGHT_ESTIMATE);
+  }, [isHovered]);
+
+  const startShort = formatShortMonth(eventStart);
+  const endShort = formatShortMonth(eventEnd);
+  const dateLabel =
+    startShort === endShort ? startShort : `${startShort} – ${endShort}`;
+
+  // On mobile, tapping the row anywhere (title button OR bar) opens the modal.
+  const handleMobileClick = (e) => {
+    if (isMobile) {
+      e.preventDefault();
+      openModal(event);
+    }
+  };
+
+  // Bars in the right half of the timeline show their date label to the left
+  // of the bar so it doesn't run off-screen.
+  const labelOnLeft = startPercent > 50;
+
+  return (
+    <div
+      ref={rowRef}
+      className={`flex items-center transition-colors duration-300 rounded-2xl p-2 sm:p-3 mb-3 border shadow-md
+    ${isWarmthMode ? "bg-white/20 border-[#e2eafc]" : "bg-[#1b2433]/30 border-cyan-700/50"}
+    ${isMobile ? "cursor-pointer" : ""}
+  `}
+      onMouseEnter={() => !isMobile && setHoveredEventId(event.id)}
+      onMouseLeave={() => !isMobile && setHoveredEventId(null)}
+      onClick={handleMobileClick}
+    >
+      <Link
+        to={
+          event.project_id
+            ? `/Projects/${event.project_id}`
+            : `/Events/${event.id}`
+        }
+        onClick={handleMobileClick}
+        className={`${titleColClass} text-center text-[11px] leading-tight sm:text-sm font-semibold rounded transition-all duration-300 hover:opacity-80`}
+        style={{
+          backgroundColor: color.bg,
+          color: color.text,
+          border: `2px solid ${isWarmthMode ? "#E94E41" : "#0ff"}`,
+          padding: "0.4rem 0.3rem",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "2.5rem",
+          wordBreak: "break-word",
+          overflowWrap: "anywhere",
+        }}
+      >
+        <span className="block w-full">{event.title}</span>
+      </Link>
+
+      <div className="flex-1 relative h-8 ml-2 rounded min-w-0">
+        <div
+          className="absolute h-6 rounded shadow"
+          style={{
+            left: `${startPercent}%`,
+            width: `${widthPercent}%`,
+            top: "50%",
+            transform: "translateY(-50%)",
+            backgroundColor: color.bar,
+          }}
+        />
+
+        {/* Full date range next to bar on tablet+ (desktop) */}
+        <div
+          className="absolute h-full items-center text-xs font-medium hidden sm:flex"
+          style={{
+            left: `${endPercent - startPercent === 0 ? startPercent + 2 : endPercent}%`,
+            transform: "translateX(4px)",
+            color: isWarmthMode ? "#4B5563" : "#0ff",
+          }}
+        >
+          {formatDate(eventStart)} - {formatDate(eventEnd)}
+        </div>
+
+        {/* Mobile date label — flips to the left if the bar is in the right half of the timeline */}
+        {isMobile &&
+          (labelOnLeft ? (
+            <div
+              className="absolute h-full flex items-center text-[10px] font-medium whitespace-nowrap"
+              style={{
+                right: `${100 - startPercent}%`,
+                transform: "translateX(-4px)",
+                color: isWarmthMode ? "#4B5563" : "#0ff",
+                top: 0,
+              }}
+            >
+              {dateLabel}
+            </div>
+          ) : (
+            <div
+              className="absolute h-full flex items-center text-[10px] font-medium whitespace-nowrap"
+              style={{
+                left: `${endPercent}%`,
+                transform: "translateX(4px)",
+                color: isWarmthMode ? "#4B5563" : "#0ff",
+                top: 0,
+              }}
+            >
+              {dateLabel}
+            </div>
+          ))}
+
+        {/* Desktop hovercard only */}
+        {!isMobile && isHovered && (
+          <div
+            className={`absolute z-50 ${cardBelow ? "top-full mt-2" : "bottom-full mb-2"}`}
+            style={{ left: `${startPercent}%` }}
+          >
+            <Card
+              title={event.title}
+              desc={event.desc}
+              tags={event.tags}
+              date={event.start}
+              images={collectImageUrls(event.content_blocks)}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
